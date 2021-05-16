@@ -1,5 +1,4 @@
 #include "Shader.h"
-#include <iostream>
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
@@ -39,11 +38,10 @@ std::string Shader::readFile(const char* fileName) const
 unsigned int Shader::compileShader(const std::string shaderCode, unsigned int type) const
 {
     const char* codeChar = shaderCode.c_str();
-    unsigned int shader;
     int success;
     char infoLog[512];
 
-    shader = glCreateShader(type);
+    unsigned int shader = glCreateShader(type);
     glShaderSource(shader, 1, &codeChar, NULL);
     glCompileShader(shader);
 
@@ -74,11 +72,11 @@ void Shader::createProgram(unsigned int vertexID, unsigned int fragmentID)
     }
 }
 
-void Shader::init(const std::string vertexCode, const std::string fragmentCode) const
+void Shader::init(const std::string vertexCode, const std::string fragmentCode)
 {
     unsigned int vertex = compileShader(vertexCode, GL_VERTEX_SHADER);
     unsigned int fragment = compileShader(fragmentCode, GL_FRAGMENT_SHADER);
-
+    createProgram(vertex, fragment);
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
