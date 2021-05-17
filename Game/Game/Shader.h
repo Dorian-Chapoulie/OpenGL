@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Shader
 {
@@ -22,6 +24,8 @@ public:
             glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
         }
     }
+
+    void setMatrix(const std::string& name, glm::mat4 mat) const;
 
 private:
     std::string readFile(const char* fileName) const;

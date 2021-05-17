@@ -1,12 +1,34 @@
 ﻿  main.cpp
-G:\OpenGL\Game\Game\Shader.h(22,65): warning C4244: 'argument' : conversion de 'T' en 'GLfloat', perte possible de données
+G:\OpenGL\Game\Game\main.cpp(42,11): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+G:\OpenGL\Game\Game\main.cpp(43,11): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+G:\OpenGL\Game\Game\main.cpp(47,16): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+G:\OpenGL\Game\Game\main.cpp(48,16): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+G:\OpenGL\Game\Game\main.cpp(49,10): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+G:\OpenGL\Game\Game\main.cpp(50,10): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+G:\OpenGL\Game\Game\main.cpp(270,22): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+G:\OpenGL\Game\Game\Shader.h(24,65): warning C4244: 'argument' : conversion de 'T' en 'GLfloat', perte possible de données
           with
           [
               T=int
           ]
-G:\OpenGL\Game\Game\main.cpp(180): message : voir la référence à l'instanciation de la fonction modèle 'void Shader::setValue<int>(const std::string &,T) const' en cours de compilation
+G:\OpenGL\Game\Game\main.cpp(228): message : voir la référence à l'instanciation de la fonction modèle 'void Shader::setValue<int>(const std::string &,T) const' en cours de compilation
           with
           [
               T=int
           ]
+glfw3.lib(context.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(context.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(init.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(init.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(input.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(input.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(monitor.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(monitor.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(vulkan.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(vulkan.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(window.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(window.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_init.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(win32_init.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_joystick.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(win32_joystick.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_monitor.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(win32_monitor.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_time.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(win32_time.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_thread.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(win32_thread.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(win32_window.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(win32_window.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
+glfw3.lib(wgl_context.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(wgl_context.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(egl_context.obj) : warning LNK4099: PDB '' n'a pu être trouvé avec 'glfw3.lib(egl_context.obj)' ou sur '' ; l'objet sera lié sans informations de débogage
+glfw3.lib(osmesa_context.obj) : warning LNK4099: PDB 'glfw3.pdb' n'a pu être trouvé avec 'glfw3.lib(osmesa_context.obj)' ou sur 'G:\OpenGL\Game\x64\Debug\glfw3.pdb' ; l'objet sera lié sans informations de débogage
   Game.vcxproj -> G:\OpenGL\Game\x64\Debug\Game.exe

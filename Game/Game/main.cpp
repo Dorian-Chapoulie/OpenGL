@@ -6,12 +6,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Camera.h"
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+float lastX = 400, lastY = 300;
+bool firstMouse = true;
+std::unique_ptr<Camera>& cam = Camera::getInstance();
 
 
-//#include <thread>
-//const auto processor_count = std::thread::hardware_concurrency();
-
-//callback when window is resized
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -21,6 +24,48 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	const float cameraSpeed = 5.0f * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cam->increasePosition(cameraSpeed * cam->getFrontVector());
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cam->increasePosition(-cameraSpeed * cam->getFrontVector());
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cam->increasePosition(-glm::normalize(glm::cross(cam->getFrontVector(), cam->getUpVector())) * cameraSpeed);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cam->increasePosition(glm::normalize(glm::cross(cam->getFrontVector(), cam->getUpVector())) * cameraSpeed);
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	cam->increaseYaw(xoffset);
+	cam->increasePitch(yoffset);
+
+	if (cam->getPitch() > 89.0f)
+		cam->setPich(89.0f);
+	if (cam->getPitch() < -89.0f)
+		cam->setPich(-89.0f);
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(cam->getYaw())) * cos(glm::radians(cam->getPitch()));
+	direction.y = sin(glm::radians(cam->getPitch()));
+	direction.z = sin(glm::radians(cam->getYaw())) * cos(glm::radians(cam->getPitch()));
+	cam->setDirection(direction);
 }
 
 int main() {
@@ -47,6 +92,9 @@ int main() {
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glEnable(GL_DEPTH_TEST);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
 
 	Shader ourShader("./vertex.vert", "./fragment.frag");
 	
@@ -188,20 +236,20 @@ int main() {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	glm::mat4 view = cam->getViewMatrix();
 
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
-	int modelLoc = glGetUniformLocation(ourShader.ID, "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	ourShader.setMatrix("model", model);
+	ourShader.setMatrix("view", view);
+	ourShader.setMatrix("projection", projection);
 
-	int viewLoc = glGetUniformLocation(ourShader.ID, "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(cam->getYaw())); // Note that we convert the angle to radians first
+	direction.z = sin(glm::radians(cam->getYaw()));
 
-	int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
@@ -219,27 +267,31 @@ int main() {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (!glfwWindowShouldClose(window))
 	{
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		ourShader.setMatrix("view", cam->getViewMatrix());
 
 		ourShader.use();
 		glBindVertexArray(VAO);
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(10.0f), glm::vec3(-0.5f, 1.0f, 0.0f));
-			//ourShader.setMat4("model", model);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+		int max = 16;
+		for (int x = 0; x < max; x++) {
+			for (int y = 0; y < max; y++) {
+				for (int z = 0; z < max; z++) {
+					glm::mat4 model = glm::mat4(1.0f);
+					model = glm::translate(model, glm::vec3(x, -y, z));
+					ourShader.setMatrix("model", model);
+					glDrawArrays(GL_TRIANGLES, 0, 36);
+				}
+			}
 		}
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		//glBindVertexArray(0);
 
