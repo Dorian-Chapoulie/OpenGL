@@ -22,33 +22,63 @@
     <Filter Include="shaders\fragment">
       <UniqueIdentifier>{cdd86550-a9ec-4438-8cf0-cc57cacd3978}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{d3acc04f-6d7b-461c-bc1a-55e456d818c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="model">
+      <UniqueIdentifier>{efa32a88-df97-4b22-8e0b-04bb33d3be28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="camera">
+      <UniqueIdentifier>{71c2c5d6-ffef-47d4-bca6-94b948c940e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="stb_image.cpp">
-      <Filter>Fichiers sources</Filter>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Shader.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+    <ClInclude Include="Vertex.h">
+      <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+    <ClInclude Include="Texture.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>model</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

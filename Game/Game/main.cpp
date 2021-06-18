@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Camera.h"
+#include "Model.h"
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -69,6 +70,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 }
 
 int main() {
+#pragma region setup
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -95,11 +97,13 @@ int main() {
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
+#pragma endregion endsetup
 
+	Model backpack("../../models/aim_deagle7k/map.obj");
 	Shader ourShader("./vertex.vert", "./fragment.frag");
 	
-
-	/* VBO */
+	/*
+	///VBO
 	float vertices[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -152,15 +156,15 @@ int main() {
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 
-	/* VAO */
+	///VAO
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 
-	/* EBO */
+	///EBO
 	unsigned int EBO;
 	glGenBuffers(1, &EBO);
 
-	/* Link */
+	///Link
 	// 1. bind Vertex Array Object
 	glBindVertexArray(VAO);
 	// 2. copy our vertices array in a vertex buffer for OpenGL to use
@@ -179,9 +183,9 @@ int main() {
 	//texture coord
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	*/
 
-
-
+#pragma region texture
 	unsigned int texture1, texture2;
 	glGenTextures(1, &texture1);
 	glBindTexture(GL_TEXTURE_2D, texture1);
@@ -231,7 +235,7 @@ int main() {
 	glBindTexture(GL_TEXTURE_2D, texture1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2);
-
+#pragma endregion texture
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -264,7 +268,7 @@ int main() {
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); POUR AVOIR LES TRAIT DES VERTICES
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -277,23 +281,7 @@ int main() {
 
 		ourShader.setMatrix("view", cam->getViewMatrix());
 
-		ourShader.use();
-		glBindVertexArray(VAO);
-		int max = 16;
-		for (int x = 0; x < max; x++) {
-			for (int y = 0; y < max; y++) {
-				for (int z = 0; z < max; z++) {
-					glm::mat4 model = glm::mat4(1.0f);
-					model = glm::translate(model, glm::vec3(x, -y, z));
-					ourShader.setMatrix("model", model);
-					glDrawArrays(GL_TRIANGLES, 0, 36);
-				}
-			}
-		}
-
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//glBindVertexArray(0);
+		backpack.draw(ourShader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
