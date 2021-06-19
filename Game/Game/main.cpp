@@ -103,7 +103,7 @@ int main() {
 	Shader ourShader("./vertex.vert", "./fragment.frag");
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(-10.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+	//model = glm::rotate(model, glm::radians(-10.0f), glm::vec3(1.0f, 1.0f, 0.0f));
 
 	glm::mat4 view = cam->getViewMatrix();
 
