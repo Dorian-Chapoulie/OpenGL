@@ -2,19 +2,20 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Shader.h"
-#include "stb_image.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <irrKlang/irrKlang.h>
 #include "Camera.h"
 #include "Model.h"
+
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float lastX = 400, lastY = 300;
 bool firstMouse = true;
 std::unique_ptr<Camera>& cam = Camera::getInstance();
-
+irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -101,6 +102,10 @@ int main() {
 
 	Model backpack("../../models/aim_deagle7k/map.obj");
 	Shader ourShader("./vertex.vert", "./fragment.frag");
+	SoundEngine->play2D("../../audio/quake/standard/prepare.mp3", false);
+	irrklang::vec3df position(0.0f, 0.8f, -8.0f);
+	SoundEngine->play3D("../../audio/quake/standard/monsterkill.mp3", position);
+
 
 	glm::mat4 model = glm::mat4(1.0f);
 	//model = glm::rotate(model, glm::radians(-10.0f), glm::vec3(1.0f, 1.0f, 0.0f));
