@@ -11,6 +11,9 @@
 #include "Model.h"
 #include <thread>
 
+#define WIDTH 800
+#define HEIGHT 600
+#define FULLSCREEN false
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -95,8 +98,9 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_REFRESH_RATE, 144);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", FULLSCREEN ? glfwGetPrimaryMonitor() : NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -104,6 +108,7 @@ int main() {
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSwapInterval(0);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -111,16 +116,17 @@ int main() {
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, WIDTH, HEIGHT);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 #pragma endregion endsetup
 
-	Model backpack("../../models/aim_deagle7k/map.obj");
-	//Model backpack("../../models/crate/Wooden Crate.obj");
+	Model box("../../models/aim_deagle7k/map.obj");
+	//Model box("../../models/crate/Wooden Crate.obj");
 	Shader ourShader("./vertex.vert", "./fragment.frag");
 
 	//SoundEngine->play2D("../../audio/quake/standard/prepare.mp3", false);
@@ -129,7 +135,7 @@ int main() {
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = cam->getViewMatrix();
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, 30.0f);
 
 	ourShader.use();
 	ourShader.setMatrix("model", model);
@@ -156,7 +162,6 @@ int main() {
 	auto* light6 = new Light(&ourShader, glm::vec3(-6.24773, 1.36029, -5.05376), downVector, red,10.0f);
 	auto* light7 = new Light(&ourShader, glm::vec3(0.0675, 3.03751, 0.07107), downVector, blue,37.0f);
 
-
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); POUR AVOIR LES TRAIT DES VERTICES
 	while (!glfwWindowShouldClose(window))
 	{
@@ -174,9 +179,14 @@ int main() {
 		//std::cout << cam->getFrontVector().x << " ," << cam->getFrontVector().y << ", " << cam->getFrontVector().z << std::endl;
 		//std::cout << linear << " " << quadra << std::endl;
 
+		const auto cam_world = inverse(cam->getViewMatrix()) * glm::vec4(0, 0, 0, 1);
+
+		std::cout << cam_world.x << ", " << cam_world.y << ", " << cam_world.z << std::endl;
+
 		ourShader.setMatrix("view", cam->getViewMatrix());
 		ourShader.setVec3("viewPos", cam->getPosition());
-		backpack.draw(ourShader);
+		//backpack.draw(ourShader);
+		box.draw(ourShader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
