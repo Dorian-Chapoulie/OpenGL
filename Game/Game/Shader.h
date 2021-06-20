@@ -27,13 +27,16 @@ public:
 
     void setMatrix(const std::string& name, glm::mat4 mat) const;
     void setVec3(const std::string& name, glm::vec3 vec) const;
-
+    int addLight();
 private:
     std::string readFile(const char* fileName) const;
     unsigned int compileShader(const std::string shaderCode, unsigned int type) const;
     void createProgram(unsigned int vertexID, unsigned int fragmentID);
     void init(const std::string vertexCode, const std::string fragmentCode);
 
+    int lightNumber = 0;
+    bool isInitialized = false;
+    std::string vertexPathName, fragmentPathName;
 public:
     unsigned int ID;
 };

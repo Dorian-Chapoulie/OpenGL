@@ -7,7 +7,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <irrKlang/irrKlang.h>
 #include "Camera.h"
+#include "Light.h"
 #include "Model.h"
+#include <thread>
 
 
 float deltaTime = 0.0f;
@@ -128,53 +130,31 @@ int main() {
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = cam->getViewMatrix();
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-	
-	
-	std::vector<glm::vec3> lightPos;
-	lightPos.emplace_back(glm::vec3(5.75878, 1.32539, -5.09563));
-	lightPos.emplace_back(glm::vec3(5.77907, 1.36867, 1.26564));
-	lightPos.emplace_back(glm::vec3(5.7675, 1.33751, 7.57107));
-	lightPos.emplace_back(glm::vec3(-6.1861, 1.34011, 7.65859));
-	lightPos.emplace_back(glm::vec3(-6.29876, 1.35056, 1.34397));
-	lightPos.emplace_back(glm::vec3(-6.24773, 1.36029, -5.05376));
-	lightPos.emplace_back(glm::vec3(0.0675, 3.03751, 0.07107));
 
 	ourShader.use();
 	ourShader.setMatrix("model", model);
 	ourShader.setMatrix("view", view);
 	ourShader.setVec3("viewPos", cam->getPosition());
 	ourShader.setMatrix("projection", projection);
-	ourShader.setValue<int>("lightNumber", lightPos.size());
-	
+
 	ourShader.setVec3("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
 	ourShader.setVec3("material.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
 	ourShader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
 	ourShader.setValue<float>("material.shininess", 50.0f);
 	
-
-
-	for (int i = 0; i < lightPos.size(); i++) {
-		ourShader.setVec3("lights[" + std::to_string(i) + "].position", lightPos[i]);
-		ourShader.setVec3("lights[" + std::to_string(i) + "].direction", glm::vec3(0.0f, -1.0f, 0.0f));
+	glm::vec3 downVector = glm::vec3(0.0f, -1.0f, 0.0f);
+	glm::vec3 white = glm::vec3(1.0f);
+	glm::vec3 red = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 blue = glm::vec3(0.0f, 0.0f, 1.0f);
+	glm::vec3 paleBlue = glm::vec3(0.58f, 0.87f, 0.96f);
 	
-		ourShader.setVec3("lights[" + std::to_string(i) + "].ambient", glm::vec3(0.5f, 0.5f, 0.5f));
-		ourShader.setVec3("lights[" + std::to_string(i) + "].diffuse", glm::vec3(1.0f));//émet
-		ourShader.setVec3("lights[" + std::to_string(i) + "].specular", glm::vec3(1.0f, 1.0f, 1.0f));//reflet
-
-		if (i == 6)
-		{
-			ourShader.setValue<float>("lights[" + std::to_string(i) + "].linear", 0.f);
-			ourShader.setValue<float>("lights[" + std::to_string(i) + "].quadratic", 0.f);
-		}
-		else {
-			ourShader.setValue<float>("lights[" + std::to_string(i) + "].linear", linear);
-			ourShader.setValue<float>("lights[" + std::to_string(i) + "].quadratic", quadra);
-		}
-		ourShader.setValue<float>("lights[" + std::to_string(i) + "].constant", 1.0f);
-		
-		ourShader.setValue<float>("lights[" + std::to_string(i) + "].cutOff", glm::cos(glm::radians(50.0f))); //radius
-		ourShader.setValue<bool>("lights[" + std::to_string(i) + "].isDirectional",  i != 6);
-	}
+	auto* light = new Light(&ourShader, glm::vec3(5.75878, 1.32539, -5.09563), paleBlue);
+	auto* light2 = new Light(&ourShader, glm::vec3(5.77907, 1.36867, 1.26564), downVector, white, 50.0f);
+	auto* light3 = new Light(&ourShader, glm::vec3(5.7675, 1.33751, 7.57107), downVector, red, 4.0f);
+	auto* light4 = new Light(&ourShader, glm::vec3(-6.1861, 1.34011, 7.65859), downVector, blue,10.0f);
+	auto* light5 = new Light(&ourShader, glm::vec3(-6.29876, 1.35056, 1.34397), downVector, white,10.0f);
+	auto* light6 = new Light(&ourShader, glm::vec3(-6.24773, 1.36029, -5.05376), downVector, red,10.0f);
+	auto* light7 = new Light(&ourShader, glm::vec3(0.0675, 3.03751, 0.07107), downVector, blue,37.0f);
 
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); POUR AVOIR LES TRAIT DES VERTICES
@@ -188,10 +168,12 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//light->initShader();
+
 		//std::cout << cam->getPosition().x << " ," << cam->getPosition().y << ", " << cam->getPosition().z << std::endl;
 		//std::cout << cam->getFrontVector().x << " ," << cam->getFrontVector().y << ", " << cam->getFrontVector().z << std::endl;
 		//std::cout << linear << " " << quadra << std::endl;
-		
+
 		ourShader.setMatrix("view", cam->getViewMatrix());
 		ourShader.setVec3("viewPos", cam->getPosition());
 		backpack.draw(ourShader);

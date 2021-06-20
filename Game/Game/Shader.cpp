@@ -1,7 +1,9 @@
-#include "Shader.h"
+﻿#include "Shader.h"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
+    vertexPathName = vertexPath;
+    fragmentPathName = fragmentPath;
     std::string vShaderCode = readFile(vertexPath);
     std::string fShaderCode = readFile(fragmentPath);
    
@@ -11,6 +13,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 void Shader::use()
 {
     glUseProgram(ID);
+    isInitialized = true;
 }
 
 void Shader::setMatrix(const std::string& name, glm::mat4 mat) const
@@ -21,6 +24,13 @@ void Shader::setMatrix(const std::string& name, glm::mat4 mat) const
 void Shader::setVec3(const std::string& name, glm::vec3 vec) const
 {
     glUniform3f(glGetUniformLocation(ID, name.c_str()), vec.x, vec.y, vec.z);
+}
+
+int Shader::addLight()
+{
+    if (!isInitialized) throw std::runtime_error("[Shader] Error: cannot add a Light before initialization. At: " + vertexPathName + ", " + fragmentPathName);
+    this->setValue<int>("lightNumber", ++lightNumber);
+    return lightNumber - 1;
 }
 
 std::string Shader::readFile(const char* fileName) const
@@ -90,3 +100,4 @@ void Shader::init(const std::string vertexCode, const std::string fragmentCode)
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
+

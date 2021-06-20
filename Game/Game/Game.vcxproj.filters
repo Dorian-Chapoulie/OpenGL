@@ -31,6 +31,9 @@
     <Filter Include="camera">
       <UniqueIdentifier>{71c2c5d6-ffef-47d4-bca6-94b948c940e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="light">
+      <UniqueIdentifier>{54900c52-4f32-442c-b2d0-05f3eda760d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -57,6 +60,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -79,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
