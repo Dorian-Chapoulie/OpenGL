@@ -23,6 +23,7 @@ public:
 	glm::vec3 getFrontVector() const;
 	glm::vec3 getUpVector() const;
 	glm::mat4 getViewMatrix() const;
+	glm::vec3 getPosition() const;
 
 private:
 
