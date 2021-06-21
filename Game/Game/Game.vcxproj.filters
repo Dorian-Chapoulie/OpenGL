@@ -34,6 +34,9 @@
     <Filter Include="light">
       <UniqueIdentifier>{54900c52-4f32-442c-b2d0-05f3eda760d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="player">
+      <UniqueIdentifier>{9f5ec468-ff85-40b8-9475-1e424a45923e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -63,6 +66,12 @@
     <ClCompile Include="Light.cpp">
       <Filter>light</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>player</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalPlayer.cpp">
+      <Filter>player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -88,6 +97,12 @@
     </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>light</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>player</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalPlayer.h">
+      <Filter>player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

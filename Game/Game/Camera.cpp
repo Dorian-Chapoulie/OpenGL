@@ -13,6 +13,11 @@ void Camera::setDirection(glm::vec3 direction)
 	cameraFront = glm::normalize(direction);
 }
 
+void Camera::setPosition(const glm::vec3 position)
+{
+	cameraPos = position;
+}
+
 void Camera::increasePosition(glm::vec3 value)
 {
 	cameraPos += value;

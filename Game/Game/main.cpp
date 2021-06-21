@@ -6,10 +6,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <irrKlang/irrKlang.h>
-#include "Camera.h"
 #include "Light.h"
 #include "Model.h"
 #include <thread>
+
+#include "LocalPlayer.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -19,9 +20,18 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float lastX = 400, lastY = 300;
 bool firstMouse = true;
-std::unique_ptr<Camera>& cam = Camera::getInstance();
+
+LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
-float linear = 0.37f, quadra = 0.14f;
+
+/*
+ * model[0][0] => WIDTH
+ * model[1][1] => HEIGHT
+ * model[3][0] => x
+ * model[3][1] => y
+ * model[3][2] => z
+ * [3][3] => max
+ */
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -33,7 +43,9 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	const float cameraSpeed = 2.0f * deltaTime;
+	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
+	const float cameraSpeed = 10.0f * deltaTime;
+	
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cam->increasePosition(cameraSpeed * cam->getFrontVector());
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -43,20 +55,30 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cam->increasePosition(glm::normalize(glm::cross(cam->getFrontVector(), cam->getUpVector())) * cameraSpeed);
 
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+	const float step = 0.001f;
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 	{
-		linear += 0.01f;
-	}else if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-	{
-		linear -= 0.01f;
+		
 	}
-	else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
-		quadra += 0.01f;
+		
 	}
-	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 	{
-		quadra -= 0.01f;
+		
+	}
+	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		
+	}
+	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	{
+		
+	}
+	else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+	{
+		
 	}
 }
 
@@ -67,6 +89,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 		lastY = ypos;
 		firstMouse = false;
 	}
+
+	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 
 	float xoffset = xpos - lastX;
 	float yoffset = lastY - ypos;
@@ -90,6 +114,52 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	direction.y = sin(glm::radians(cam->getPitch()));
 	direction.z = sin(glm::radians(cam->getYaw())) * cos(glm::radians(cam->getPitch()));
 	cam->setDirection(direction);
+}
+
+void setupShader(Shader& shader)
+{
+	const glm::mat4 model = glm::mat4(1.0f);
+	const glm::mat4 view = localPlayer->getCamera()->getViewMatrix();
+	const glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, 30.0f);
+
+	shader.use();
+	shader.setMatrix("model", model);
+	shader.setMatrix("view", view);
+	shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
+	shader.setMatrix("projection", projection);
+
+	shader.setVec3("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+	shader.setVec3("material.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader.setValue<float>("material.shininess", 50.0f);
+}
+
+Light* l = nullptr;
+void createLights(Shader& shader)
+{
+	const glm::vec3 downVector = glm::vec3(0.0f, -1.0f, 0.0f);
+	const glm::vec3 white = glm::vec3(1.0f);
+	const glm::vec3 red = glm::vec3(1.0f, 0.0f, 0.0f);
+	const glm::vec3 blue = glm::vec3(0.0f, 0.0f, 1.0f);
+	const glm::vec3 paleBlue = glm::vec3(0.58f, 0.87f, 0.96f);
+
+	auto* light = new Light(&shader, glm::vec3(5.75878, 1.32539, -5.09563), white);
+
+	auto* light2 = new Light(&shader, glm::vec3(5.77907, 1.36867, 1.26564), downVector, blue, 50.0f);
+	auto* light4 = new Light(&shader, glm::vec3(-6.1861, 1.34011, 7.65859), downVector, blue, 10.0f);
+	auto* light5 = new Light(&shader, glm::vec3(-6.29876, 1.35056, 1.34397), downVector, white, 10.0f);
+	auto* light6 = new Light(&shader, glm::vec3(-6.24773, 1.36029, -5.05376), downVector, red, 10.0f);
+	auto* light7 = new Light(&shader, glm::vec3(3, 3, 3), downVector, blue, 37.0f);
+	auto* light3 = new Light(&shader, glm::vec3(0, 3, 0), downVector, red, 30.0f);
+	
+	l = light3;
+}
+
+void setupSound()
+{
+	//SoundEngine->play2D("../../audio/quake/standard/prepare.mp3", false);
+	//irrklang::vec3df position(0.0f, 0.8f, -8.0f);
+	//SoundEngine->play3D("../../audio/quake/standard/monsterkill.mp3", position);
 }
 
 int main() {
@@ -125,42 +195,18 @@ int main() {
 	glfwSetCursorPosCallback(window, mouse_callback);
 #pragma endregion endsetup
 
-	Model box("../../models/aim_deagle7k/map.obj");
-	//Model box("../../models/crate/Wooden Crate.obj");
-	Shader ourShader("./vertex.vert", "./fragment.frag");
+	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", "../../models/M4a1/M4a1.obj", glm::vec3(0.0f, 0.8f, -8.0f));
+	//Model model("../../models/aim_deagle7k/map.obj");
+	//Model model("../../models/crate/Wooden Crate.obj");
+	//Model model("../../models/M4a1/M4a1.obj");
+	Model model("../../models/floor/CobbleStones2.obj");
+	Shader shader("./vertex.vert", "./fragment.frag");
 
-	//SoundEngine->play2D("../../audio/quake/standard/prepare.mp3", false);
-	//irrklang::vec3df position(0.0f, 0.8f, -8.0f);
-	//SoundEngine->play3D("../../audio/quake/standard/monsterkill.mp3", position);
+	setupShader(shader);
+	setupSound();
+	createLights(shader);
 
-	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 view = cam->getViewMatrix();
-	glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, 30.0f);
 
-	ourShader.use();
-	ourShader.setMatrix("model", model);
-	ourShader.setMatrix("view", view);
-	ourShader.setVec3("viewPos", cam->getPosition());
-	ourShader.setMatrix("projection", projection);
-
-	ourShader.setVec3("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-	ourShader.setVec3("material.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-	ourShader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-	ourShader.setValue<float>("material.shininess", 50.0f);
-	
-	glm::vec3 downVector = glm::vec3(0.0f, -1.0f, 0.0f);
-	glm::vec3 white = glm::vec3(1.0f);
-	glm::vec3 red = glm::vec3(1.0f, 0.0f, 0.0f);
-	glm::vec3 blue = glm::vec3(0.0f, 0.0f, 1.0f);
-	glm::vec3 paleBlue = glm::vec3(0.58f, 0.87f, 0.96f);
-	
-	auto* light = new Light(&ourShader, glm::vec3(5.75878, 1.32539, -5.09563), paleBlue);
-	auto* light2 = new Light(&ourShader, glm::vec3(5.77907, 1.36867, 1.26564), downVector, white, 50.0f);
-	auto* light3 = new Light(&ourShader, glm::vec3(5.7675, 1.33751, 7.57107), downVector, red, 4.0f);
-	auto* light4 = new Light(&ourShader, glm::vec3(-6.1861, 1.34011, 7.65859), downVector, blue,10.0f);
-	auto* light5 = new Light(&ourShader, glm::vec3(-6.29876, 1.35056, 1.34397), downVector, white,10.0f);
-	auto* light6 = new Light(&ourShader, glm::vec3(-6.24773, 1.36029, -5.05376), downVector, red,10.0f);
-	auto* light7 = new Light(&ourShader, glm::vec3(0.0675, 3.03751, 0.07107), downVector, blue,37.0f);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); POUR AVOIR LES TRAIT DES VERTICES
 	while (!glfwWindowShouldClose(window))
@@ -173,20 +219,13 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//light->initShader();
-
-		//std::cout << cam->getPosition().x << " ," << cam->getPosition().y << ", " << cam->getPosition().z << std::endl;
-		//std::cout << cam->getFrontVector().x << " ," << cam->getFrontVector().y << ", " << cam->getFrontVector().z << std::endl;
-		//std::cout << linear << " " << quadra << std::endl;
-
-		const auto cam_world = inverse(cam->getViewMatrix()) * glm::vec4(0, 0, 0, 1);
-
-		std::cout << cam_world.x << ", " << cam_world.y << ", " << cam_world.z << std::endl;
-
-		ourShader.setMatrix("view", cam->getViewMatrix());
-		ourShader.setVec3("viewPos", cam->getPosition());
-		//backpack.draw(ourShader);
-		box.draw(ourShader);
+		
+		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
+		localPlayer->draw(shader);
+		
+		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+		model.draw(shader);
+		
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
