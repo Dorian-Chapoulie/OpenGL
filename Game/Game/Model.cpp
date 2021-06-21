@@ -11,11 +11,40 @@ Model::Model(const std::string& path)
     std::cout << "[MODEL] loaded in " << duration.count() / 1000000.0f << "s" << std::endl;
 }
 
+Model::Model(const std::string& path, const glm::vec3& position)
+{
+    auto start = std::chrono::high_resolution_clock::now();
+    std::cout << "[MODEL] loading " << path << std::endl;
+    loadModel(path);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "[MODEL] loaded in " << duration.count() / 1000000.0f << "s" << std::endl;
+    this->position = position;
+    this->modelMatrix[3][0] = position.x;
+    this->modelMatrix[3][1] = position.y;
+    this->modelMatrix[3][2] = position.z;
+}
+
 void Model::draw(Shader& shader) const
 {
 	for (Mesh m : meshes) {
+        shader.setMatrix("model", modelMatrix);
 		m.draw(shader);
+        shader.setMatrix("model", glm::mat4(1.0f));
 	}
+}
+
+void Model::setModelMatrix(const glm::mat4& matrix)
+{
+    this->modelMatrix = matrix;
+}
+
+void Model::setPosision(const glm::vec3& position)
+{
+    this->position = position;
+    this->modelMatrix[3][0] = position.x;
+    this->modelMatrix[3][1] = position.y;
+    this->modelMatrix[3][2] = position.z;
 }
 
 void Model::loadModel(const std::string& path)
@@ -109,7 +138,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     return Mesh(vertices, indices, textures);
 }
     
-
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName)
 {
     std::vector<Texture> textures;

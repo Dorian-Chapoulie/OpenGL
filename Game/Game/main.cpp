@@ -20,6 +20,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float lastX = 400, lastY = 300;
 bool firstMouse = true;
+float mouseX, mouseY;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -89,6 +90,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 		lastY = ypos;
 		firstMouse = false;
 	}
+	mouseX = xpos;
+	mouseY = ypos;
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 
@@ -134,25 +137,19 @@ void setupShader(Shader& shader)
 	shader.setValue<float>("material.shininess", 50.0f);
 }
 
-Light* l = nullptr;
 void createLights(Shader& shader)
 {
 	const glm::vec3 downVector = glm::vec3(0.0f, -1.0f, 0.0f);
 	const glm::vec3 white = glm::vec3(1.0f);
 	const glm::vec3 red = glm::vec3(1.0f, 0.0f, 0.0f);
-	const glm::vec3 blue = glm::vec3(0.0f, 0.0f, 1.0f);
-	const glm::vec3 paleBlue = glm::vec3(0.58f, 0.87f, 0.96f);
+	const glm::vec3 blue = glm::vec3(0.0f, 1.0f, 1.0f);
+	const glm::vec3 green = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	auto* light = new Light(&shader, glm::vec3(5.75878, 1.32539, -5.09563), white);
 
-	auto* light2 = new Light(&shader, glm::vec3(5.77907, 1.36867, 1.26564), downVector, blue, 50.0f);
-	auto* light4 = new Light(&shader, glm::vec3(-6.1861, 1.34011, 7.65859), downVector, blue, 10.0f);
-	auto* light5 = new Light(&shader, glm::vec3(-6.29876, 1.35056, 1.34397), downVector, white, 10.0f);
-	auto* light6 = new Light(&shader, glm::vec3(-6.24773, 1.36029, -5.05376), downVector, red, 10.0f);
-	auto* light7 = new Light(&shader, glm::vec3(3, 3, 3), downVector, blue, 37.0f);
-	auto* light3 = new Light(&shader, glm::vec3(0, 3, 0), downVector, red, 30.0f);
-	
-	l = light3;
+	auto* light2 = new Light(&shader, glm::vec3(-3, 4, 0), downVector, blue, 10.0f);
+	auto* light4 = new Light(&shader, glm::vec3(0.5, 4, 0), downVector, red, 10.0f);
+	auto* light5 = new Light(&shader, glm::vec3(4, 4, 0), downVector, green, 10.0f);
 }
 
 void setupSound()
@@ -160,6 +157,29 @@ void setupSound()
 	//SoundEngine->play2D("../../audio/quake/standard/prepare.mp3", false);
 	//irrklang::vec3df position(0.0f, 0.8f, -8.0f);
 	//SoundEngine->play3D("../../audio/quake/standard/monsterkill.mp3", position);
+}
+
+void ray()
+{
+	const glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, 30.0f);
+	
+	float x = (2.0f * mouseX) / WIDTH - 1.0f;
+	float y = 1.0f - (2.0f * mouseY) / HEIGHT;
+	float z = 1.0f;
+	glm::vec3 ray_nds = glm::vec3(x, y, z);
+	glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+	glm::vec4 ray_eye = glm::inverse(projection) * ray_clip;
+	ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+
+	glm::vec3 ray_wor = glm::vec3(0.0f);
+	ray_wor.x = (glm::inverse(localPlayer->getCamera()->getViewMatrix()) * ray_eye).x;
+	ray_wor.y = (glm::inverse(localPlayer->getCamera()->getViewMatrix()) * ray_eye).y;
+	ray_wor.z = (glm::inverse(localPlayer->getCamera()->getViewMatrix()) * ray_eye).z;
+	
+	// don't forget to normalise the vector at some point
+	ray_wor = glm::normalize(ray_wor);
+
+	//std::cout << ray_wor.x << ", " << ray_wor.y << ", " << std::endl;
 }
 
 int main() {
@@ -199,14 +219,16 @@ int main() {
 	//Model model("../../models/aim_deagle7k/map.obj");
 	//Model model("../../models/crate/Wooden Crate.obj");
 	//Model model("../../models/M4a1/M4a1.obj");
-	Model model("../../models/floor/CobbleStones2.obj");
+	Model model("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, -2.0f, 0.0f));
+	//Model model("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 0.0f, 0.0f));
+
+	float dx = 0;
+	
 	Shader shader("./vertex.vert", "./fragment.frag");
 
 	setupShader(shader);
 	setupSound();
 	createLights(shader);
-
-
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); POUR AVOIR LES TRAIT DES VERTICES
 	while (!glfwWindowShouldClose(window))
@@ -218,15 +240,16 @@ int main() {
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		
+		ray();
+
+		//dx += step;
+
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		localPlayer->draw(shader);
-		
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		model.draw(shader);
 		
-
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

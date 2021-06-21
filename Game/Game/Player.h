@@ -11,11 +11,9 @@ public:
 	void setPosition(const glm::vec3& position);
 	virtual void draw(Shader& shader);
 
-private:
-	Model* body = nullptr;
-	Model* weapon = nullptr;
-
 protected:
 	glm::vec3 position = glm::vec3(1.f);
+	Model* body = nullptr;
+	Model* weapon = nullptr;
 };
 
