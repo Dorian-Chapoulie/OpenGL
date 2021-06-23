@@ -72,6 +72,9 @@
     <ClCompile Include="LocalPlayer.cpp">
       <Filter>player</Filter>
     </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="LocalPlayer.h">
       <Filter>player</Filter>
+    </ClInclude>
+    <ClInclude Include="Test.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,8 +9,10 @@
 #include "Light.h"
 #include "Model.h"
 #include <thread>
+#include <reactphysics3d/reactphysics3d.h>
 
 #include "LocalPlayer.h"
+#include "Test.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -147,9 +149,9 @@ void createLights(Shader& shader)
 
 	auto* light = new Light(&shader, glm::vec3(5.75878, 1.32539, -5.09563), white);
 
-	auto* light2 = new Light(&shader, glm::vec3(-3, 4, 0), downVector, blue, 10.0f);
-	auto* light4 = new Light(&shader, glm::vec3(0.5, 4, 0), downVector, red, 10.0f);
-	auto* light5 = new Light(&shader, glm::vec3(4, 4, 0), downVector, green, 10.0f);
+	auto* light2 = new Light(&shader, glm::vec3(-3, 4, 0), downVector, blue, 100.0f);
+	auto* light4 = new Light(&shader, glm::vec3(0.5, 4, 0), downVector, red, 100.0f);
+	auto* light5 = new Light(&shader, glm::vec3(4, 4, 0), downVector, green, 100.0f);
 }
 
 void setupSound()
@@ -161,7 +163,7 @@ void setupSound()
 
 void ray()
 {
-	const glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, 30.0f);
+	/*const glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, 30.0f);
 	
 	float x = (2.0f * mouseX) / WIDTH - 1.0f;
 	float y = 1.0f - (2.0f * mouseY) / HEIGHT;
@@ -177,9 +179,7 @@ void ray()
 	ray_wor.z = (glm::inverse(localPlayer->getCamera()->getViewMatrix()) * ray_eye).z;
 	
 	// don't forget to normalise the vector at some point
-	ray_wor = glm::normalize(ray_wor);
-
-	//std::cout << ray_wor.x << ", " << ray_wor.y << ", " << std::endl;
+	ray_wor = glm::normalize(ray_wor);*/
 }
 
 int main() {
@@ -219,10 +219,10 @@ int main() {
 	//Model model("../../models/aim_deagle7k/map.obj");
 	//Model model("../../models/crate/Wooden Crate.obj");
 	//Model model("../../models/M4a1/M4a1.obj");
-	Model model("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, -2.0f, 0.0f));
+	//Model model("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, -2.0f, 0.0f));
 	//Model model("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 0.0f, 0.0f));
-
-	float dx = 0;
+	//Model model2("../../models/crate/Wooden Crate.obj", glm::vec3(4.0f, 0.0f, 0.0f));
+	Model model("../../models/sphere/sphere.obj");
 	
 	Shader shader("./vertex.vert", "./fragment.frag");
 
@@ -230,9 +230,54 @@ int main() {
 	setupSound();
 	createLights(shader);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); POUR AVOIR LES TRAIT DES VERTICES
+	reactphysics3d::PhysicsCommon physicsCommon;
+	reactphysics3d::PhysicsWorld* world = physicsCommon.createPhysicsWorld();
+
+	
+	reactphysics3d::Vector3 position(0.0, 3.0, 0.0);
+	reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
+	reactphysics3d::Transform transform(position, orientation);
+	reactphysics3d::CollisionBody* body = world->createCollisionBody(transform);
+
+
+	reactphysics3d::Transform transform2(position, orientation);
+	reactphysics3d::CollisionBody* body2 = world->createCollisionBody(transform2);
+
+	float radius = 3.0f;
+	reactphysics3d::SphereShape * sphereShape = physicsCommon.createSphereShape(radius);
+	reactphysics3d::Collider* collider = body->addCollider(sphereShape, transform);
+	reactphysics3d::Collider* collider2 = body2->addCollider(sphereShape, transform);
+
+	std::string s = "test";
+	Test test;
+	reactphysics3d::CollisionCallback& cb = test;
+	body2->setUserData(&s);
+	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
+	
+	float timeStep = 1.0 / 60.0f;
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	while (!glfwWindowShouldClose(window))
 	{
+		world->update(timeStep);
+		world->testCollision(body, body2, cb);
+		//timeStep += 1 / 60.0f;
+		
+		reactphysics3d::Vector3 vec(cam->getPosition().x, cam->getPosition().y, cam->getPosition().z);
+		reactphysics3d::Transform tmp(vec,orientation);
+		body->setTransform(tmp);
+		
+		/*const float timeStep = 1.0f / 60.0f;
+		long double currentFrameTime = getCurrentSystemTime();
+		long double deltaTime = currentFrameTime - previousFrameTime;
+		previousFrameTime = currentFrameTime;
+		accumulator += mDeltaTime;
+
+		while (accumulator >= timeStep) {
+			world->update(timeStep);
+			accumulator -= timeStep;
+		}*/
+
+
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -241,14 +286,11 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		ray();
-
-		//dx += step;
-
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		localPlayer->draw(shader);
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		model.draw(shader);
+		//model2.draw(shader);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();

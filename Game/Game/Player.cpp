@@ -26,5 +26,5 @@ void Player::setPosition(const glm::vec3& position)
 void Player::draw(Shader& shader)
 {
 	//body->draw(shader);
-	weapon->draw(shader);
+	//weapon->draw(shader);
 }
