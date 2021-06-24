@@ -63,3 +63,30 @@ void Mesh::draw(Shader& shader) const
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
+
+std::vector<glm::vec3> Mesh::getBoundingBow()
+{
+    GLfloat
+        min_x, max_x,
+        min_y, max_y,
+        min_z, max_z;
+    min_x = max_x = this->vertices[0].Position.x;
+    min_y = max_y = this->vertices[0].Position.y;
+    min_z = max_z = this->vertices[0].Position.z;
+    for (int i = 0; i < this->vertices.size(); i++) {
+        if (this->vertices[i].Position.x < min_x) min_x = this->vertices[i].Position.x;
+        if (this->vertices[i].Position.x > max_x) max_x = this->vertices[i].Position.x;
+        if (this->vertices[i].Position.y < min_y) min_y = this->vertices[i].Position.y;
+        if (this->vertices[i].Position.y > max_y) max_y = this->vertices[i].Position.y;
+        if (this->vertices[i].Position.z < min_z) min_z = this->vertices[i].Position.z;
+        if (this->vertices[i].Position.z > max_z) max_z = this->vertices[i].Position.z;
+    }
+
+    std::vector<glm::vec3> ret;
+    glm::vec3 size = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z);
+    glm::vec3 center = glm::vec3((min_x + max_x) / 2, (min_y + max_y) / 2, (min_z + max_z) / 2);
+	
+    ret.emplace_back(size);
+    ret.emplace_back(center);
+    return ret;
+}

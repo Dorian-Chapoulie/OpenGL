@@ -14,6 +14,8 @@ public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	void draw(Shader& shader) const;
 
+	std::vector<glm::vec3> getBoundingBow();
+
 private:
 	unsigned int VAO;
 	unsigned int VBO;

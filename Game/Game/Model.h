@@ -18,7 +18,7 @@ public:
 	void setModelMatrix(const glm::mat4& matrix);
 	void setPosision(const glm::vec3& position);
 
-private:
+public:
 	std::vector<Texture> loadedTextures;
 	std::vector<Mesh> meshes;
 	std::string directory;

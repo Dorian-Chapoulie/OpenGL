@@ -34,7 +34,109 @@ irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
  * model[3][1] => y
  * model[3][2] => z
  * [3][3] => max
+ *
+ * TODO: DESTRUCTEUR glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+		glDeleteProgram(shaderProgram);
  */
+
+class Line {
+	int shaderProgram;
+	unsigned int VBO, VAO;
+	std::vector<float> vertices;
+	glm::vec3 startPoint;
+	glm::vec3 endPoint;
+	glm::mat4 MVP;
+	glm::vec3 lineColor;
+public:
+	Line(glm::vec3 start, glm::vec3 end) {
+
+		startPoint = start;
+		endPoint = end;
+		lineColor = glm::vec3(1, 1, 1);
+
+		const char* vertexShaderSource = "#version 330 core\n"
+			"layout (location = 0) in vec3 aPos;\n"
+			"uniform mat4 MVP;\n"
+			"void main()\n"
+			"{\n"
+			"   gl_Position = MVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+			"}\0";
+		const char* fragmentShaderSource = "#version 330 core\n"
+			"out vec4 FragColor;\n"
+			"uniform vec3 color;\n"
+			"void main()\n"
+			"{\n"
+			"   FragColor = vec4(color, 1.0f);\n"
+			"}\n\0";
+
+		// vertex shader
+		int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+		glCompileShader(vertexShader);
+		// check for shader compile errors
+
+		// fragment shader
+		int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+		glCompileShader(fragmentShader);
+		// check for shader compile errors
+
+		// link shaders
+		shaderProgram = glCreateProgram();
+		glAttachShader(shaderProgram, vertexShader);
+		glAttachShader(shaderProgram, fragmentShader);
+		glLinkProgram(shaderProgram);
+		// check for linking errors
+
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+
+		vertices = {
+			 start.x, start.y, start.z,
+			 end.x, end.y, end.z,
+		};
+
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glBindVertexArray(VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+	}
+
+	void setMVP(glm::mat4 mvp) {
+		MVP = mvp;
+	}
+
+	void setColor(glm::vec3 color) {
+		lineColor = color;
+	}
+
+	int draw() {
+		glUseProgram(shaderProgram);
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+		glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &lineColor[0]);
+
+		glBindVertexArray(VAO);
+		//glLineWidth(10.0f);
+		glDrawArrays(GL_LINES, 0, 2);
+		return 0;
+	}
+
+	~Line() {
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+		glDeleteProgram(shaderProgram);
+	}
+};
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -149,9 +251,9 @@ void createLights(Shader& shader)
 
 	auto* light = new Light(&shader, glm::vec3(5.75878, 1.32539, -5.09563), white);
 
-	auto* light2 = new Light(&shader, glm::vec3(-3, 4, 0), downVector, blue, 100.0f);
-	auto* light4 = new Light(&shader, glm::vec3(0.5, 4, 0), downVector, red, 100.0f);
-	auto* light5 = new Light(&shader, glm::vec3(4, 4, 0), downVector, green, 100.0f);
+	auto* light2 = new Light(&shader, glm::vec3(-3, 3, 0), downVector, blue, 100.0f);
+	auto* light4 = new Light(&shader, glm::vec3(0.5, 3, 0), downVector, red, 100.0f);
+	auto* light5 = new Light(&shader, glm::vec3(4, 3, 0), downVector, green, 100.0f);
 }
 
 void setupSound()
@@ -218,11 +320,11 @@ int main() {
 	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", "../../models/M4a1/M4a1.obj", glm::vec3(0.0f, 0.8f, -8.0f));
 	//Model model("../../models/aim_deagle7k/map.obj");
 	//Model model("../../models/crate/Wooden Crate.obj");
-	//Model model("../../models/M4a1/M4a1.obj");
+	Model model("../../models/M4a1/M4a1.obj");
 	//Model model("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, -2.0f, 0.0f));
 	//Model model("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 0.0f, 0.0f));
 	//Model model2("../../models/crate/Wooden Crate.obj", glm::vec3(4.0f, 0.0f, 0.0f));
-	Model model("../../models/sphere/sphere.obj");
+	//Model model("../../models/sphere/sphere.obj", glm::vec3(4.0f, 0.0f, 0.0f));
 	
 	Shader shader("./vertex.vert", "./fragment.frag");
 
@@ -232,59 +334,86 @@ int main() {
 
 	reactphysics3d::PhysicsCommon physicsCommon;
 	reactphysics3d::PhysicsWorld* world = physicsCommon.createPhysicsWorld();
-
 	
-	reactphysics3d::Vector3 position(0.0, 3.0, 0.0);
+	world->setIsDebugRenderingEnabled(true);
+	reactphysics3d::DebugRenderer& debugRenderer = world->getDebugRenderer();
+	debugRenderer.setIsDebugItemDisplayed(reactphysics3d::DebugRenderer::DebugItem::CONTACT_POINT, true);
+	debugRenderer.setIsDebugItemDisplayed(reactphysics3d::DebugRenderer::DebugItem::CONTACT_NORMAL, true);
+	debugRenderer.setIsDebugItemDisplayed(reactphysics3d::DebugRenderer::DebugItem::COLLISION_SHAPE, true);
+	debugRenderer.setIsDebugItemDisplayed(reactphysics3d::DebugRenderer::DebugItem::COLLIDER_BROADPHASE_AABB, true);
+	debugRenderer.setIsDebugItemDisplayed(reactphysics3d::DebugRenderer::DebugItem::COLLIDER_AABB, true);
+	
+	reactphysics3d::Vector3 position(0.0, 0.0, 0.0);
 	reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
-	reactphysics3d::Transform transform(position, orientation);
+	glm::vec3 size = model.meshes[0].getBoundingBow()[0];
+	glm::vec3 center = model.meshes[0].getBoundingBow()[1];
+	reactphysics3d::Transform transform(reactphysics3d::Vector3(center.x, center.y, center.z), orientation);
 	reactphysics3d::CollisionBody* body = world->createCollisionBody(transform);
 
 
 	reactphysics3d::Transform transform2(position, orientation);
 	reactphysics3d::CollisionBody* body2 = world->createCollisionBody(transform2);
 
-	float radius = 3.0f;
-	reactphysics3d::SphereShape * sphereShape = physicsCommon.createSphereShape(radius);
-	reactphysics3d::Collider* collider = body->addCollider(sphereShape, transform);
-	reactphysics3d::Collider* collider2 = body2->addCollider(sphereShape, transform);
+	float radius = 30.0f;
+	//reactphysics3d::SphereShape * sphereShape = physicsCommon.createSphereShape(radius);
+	reactphysics3d::Vector3 vec = reactphysics3d::Vector3(size.x / 2, size.y / 2, size.z / 2);
+	reactphysics3d::BoxShape* boxShape = physicsCommon.createBoxShape(vec);
+	//reactphysics3d::Collider* collider = body->addCollider(boxShape, transform);
+	reactphysics3d::Collider* collider2 = body2->addCollider(boxShape, transform);
 
 	std::string s = "test";
 	Test test;
 	reactphysics3d::CollisionCallback& cb = test;
 	body2->setUserData(&s);
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
+
+	const glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, 30.0f);
+	//Line l(glm::vec3(center.x - size.x / 2, center.y, center.z), glm::vec3(0, -5, 0));
+	std::vector<Line*> lines;
 	
 	float timeStep = 1.0 / 60.0f;
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	while (!glfwWindowShouldClose(window))
 	{
 		world->update(timeStep);
-		world->testCollision(body, body2, cb);
-		//timeStep += 1 / 60.0f;
+		world->testCollision(body2, body2, cb);
 		
 		reactphysics3d::Vector3 vec(cam->getPosition().x, cam->getPosition().y, cam->getPosition().z);
 		reactphysics3d::Transform tmp(vec,orientation);
 		body->setTransform(tmp);
-		
-		/*const float timeStep = 1.0f / 60.0f;
-		long double currentFrameTime = getCurrentSystemTime();
-		long double deltaTime = currentFrameTime - previousFrameTime;
-		previousFrameTime = currentFrameTime;
-		accumulator += mDeltaTime;
-
-		while (accumulator >= timeStep) {
-			world->update(timeStep);
-			accumulator -= timeStep;
-		}*/
-
-
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
 
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		int debugLines = debugRenderer.getNbLines();
+		for (int i = 0; i < debugLines; i++)
+		{
+			reactphysics3d::DebugRenderer::DebugLine l = debugRenderer.getLinesArray()[i];
+			lines.emplace_back(new Line(glm::vec3(l.point1.x, l.point1.y, l.point1.z), glm::vec3(l.point2.x, l.point2.y, l.point2.z)));
+			//lines.emplace_back(new Line(glm::vec3(0, 0, 0), glm::vec3(5, 0, 0)));
+			
+			/*std::cout << l.point1.x << " " << l.point1.y << " " << l.point1.y << std::endl;
+			std::cout << l.point2.x << " " << l.point2.y << " " << l.point2.y << std::endl;
+			std::cout << std::endl;*/
+		}
+		for (Line* l : lines)
+		{
+			l->setMVP(projection * localPlayer->getCamera()->getViewMatrix());
+			l->draw();
+			delete l;
+		}
+		lines.clear();
+
+		//l.setMVP(projection * localPlayer->getCamera()->getViewMatrix());
+		//l.draw();
+
+		shader.use();
+
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 		
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		localPlayer->draw(shader);
