@@ -9,6 +9,7 @@ public:
 	
 	std::unique_ptr<Camera>& getCamera();
 	void draw(Shader& shader) override;
+
 private:
 	std::unique_ptr<Camera>& camera = Camera::getInstance();
 	

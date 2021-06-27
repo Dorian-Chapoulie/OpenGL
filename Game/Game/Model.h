@@ -11,16 +11,18 @@
 class Model
 {
 public:
-	Model(const std::string& path);
-	Model(const std::string& path, const glm::vec3& position);
-	void draw(Shader& shader) const;
+	Model(const std::string& path, bool hasHitbox = true);
+	Model(const std::string& path, const glm::vec3& position, bool hasHitbox = true);
+	void draw(Shader& shader);
 
 	void setModelMatrix(const glm::mat4& matrix);
-	void setPosision(const glm::vec3& position);
+	void setPosition(const glm::vec3& position);
 
-public:
+	std::vector<Mesh*> getMeshes();
+
+private:
 	std::vector<Texture> loadedTextures;
-	std::vector<Mesh> meshes;
+	std::vector<Mesh*> meshes;
 	std::string directory;
 
 	glm::vec3 position = glm::vec3(0.0f);
@@ -28,7 +30,9 @@ public:
 
 	void loadModel(const std::string& path);
 	void processNode(aiNode* node, const aiScene* scene);
-	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+	Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName);
+
+	bool hasHitbox = true;
 };
 

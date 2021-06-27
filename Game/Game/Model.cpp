@@ -1,7 +1,7 @@
 #include "Model.h"
 #include <chrono>
 
-Model::Model(const std::string& path)
+Model::Model(const std::string& path, bool hasHitbox) : hasHitbox(hasHitbox)
 {
     auto start = std::chrono::high_resolution_clock::now();
     std::cout << "[MODEL] loading " << path << std::endl;
@@ -11,25 +11,25 @@ Model::Model(const std::string& path)
     std::cout << "[MODEL] loaded in " << duration.count() / 1000000.0f << "s" << std::endl;
 }
 
-Model::Model(const std::string& path, const glm::vec3& position)
+Model::Model(const std::string& path, const glm::vec3& position, bool hasHitbox) : hasHitbox(hasHitbox)
 {
     auto start = std::chrono::high_resolution_clock::now();
     std::cout << "[MODEL] loading " << path << std::endl;
-    loadModel(path);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "[MODEL] loaded in " << duration.count() / 1000000.0f << "s" << std::endl;
     this->position = position;
     this->modelMatrix[3][0] = position.x;
     this->modelMatrix[3][1] = position.y;
     this->modelMatrix[3][2] = position.z;
+    loadModel(path);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "[MODEL] loaded in " << duration.count() / 1000000.0f << "s" << std::endl;
 }
 
-void Model::draw(Shader& shader) const
+void Model::draw(Shader& shader)
 {
-	for (Mesh m : meshes) {
+	for (Mesh* m : meshes) {
         shader.setMatrix("model", modelMatrix);
-		m.draw(shader);
+		m->draw(shader);
         shader.setMatrix("model", glm::mat4(1.0f));
 	}
 }
@@ -39,12 +39,22 @@ void Model::setModelMatrix(const glm::mat4& matrix)
     this->modelMatrix = matrix;
 }
 
-void Model::setPosision(const glm::vec3& position)
+void Model::setPosition(const glm::vec3& position)
 {
     this->position = position;
     this->modelMatrix[3][0] = position.x;
     this->modelMatrix[3][1] = position.y;
     this->modelMatrix[3][2] = position.z;
+
+	for(Mesh* m : meshes)
+	{
+        m->setBoundingBoxPosition(position);
+	}
+}
+
+std::vector<Mesh*> Model::getMeshes()
+{
+    return meshes;
 }
 
 void Model::loadModel(const std::string& path)
@@ -69,7 +79,6 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
-        std::cout << "loaded: " << mesh->mName.C_Str() << std::endl;
     }
     // then do the same for each of its children
     for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -78,7 +87,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     }
 }
 
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
+Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
@@ -123,7 +132,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         for (unsigned int j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
- 
+
     // process material
     if (mesh->mMaterialIndex >= 0)
     {
@@ -135,8 +144,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
-
-    return Mesh(vertices, indices, textures);
+    return new Mesh(vertices, indices, textures, mesh->mName.C_Str(), position, hasHitbox);
 }
     
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName)

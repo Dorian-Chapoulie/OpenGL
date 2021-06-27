@@ -37,6 +37,9 @@
     <Filter Include="player">
       <UniqueIdentifier>{9f5ec468-ff85-40b8-9475-1e424a45923e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="world">
+      <UniqueIdentifier>{0d96ae40-291f-46a7-bb50-62417d94a001}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -75,6 +78,12 @@
     <ClCompile Include="Test.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="PhysicsWorld.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLine.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -109,6 +118,12 @@
     </ClInclude>
     <ClInclude Include="Test.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsWorld.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLine.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

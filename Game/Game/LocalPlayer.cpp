@@ -26,7 +26,7 @@ void LocalPlayer::draw(Shader& shader)
 	shader.setMatrix("view", mtx_trans);
 	shader.setMatrix("model", weaponModelMatrix);
 
-	
+	Player::setPosition(glm::vec3(position.x, position.y, position.z));
 	Player::draw(shader);
 	shader.setMatrix("model", glm::mat4(1.0f));
 }

@@ -3,7 +3,7 @@
 Player::Player(const std::string& bodyModelPath, const std::string& weaponModelPath, const glm::vec3& position)
 {
 	//this->body = new Model(bodyModelPath);
-	this->weapon = new Model(weaponModelPath);
+	this->weapon = new Model(weaponModelPath, false);
 	this->position = position;
 }
 
@@ -23,8 +23,18 @@ void Player::setPosition(const glm::vec3& position)
 	this->position = position;
 }
 
+void Player::setOrientation(const glm::vec3& orientation)
+{
+	this->orientation = orientation;
+}
+
 void Player::draw(Shader& shader)
 {
 	//body->draw(shader);
 	weapon->draw(shader);
+}
+
+Model* Player::getWeapon()
+{
+	return weapon;
 }
