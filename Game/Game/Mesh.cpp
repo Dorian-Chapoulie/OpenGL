@@ -61,18 +61,14 @@ void Mesh::setupHitbox()
         std::cerr << "[MESH] ERROR: " << name << " size <= 0 : " << size.x << " " << size.y << " " << size.z << std::endl;
         return;
 	}
-
-    std::cout << "position: " << position.x << " " << position.y << " " << position.z << std::endl;
-    std::cout << "center: " << center.x << " " << center.y << " " << center.z << std::endl;
-    std::cout << "size: " << size.x << " " << size.y << " " << size.z << std::endl << std::endl;
 	
     const reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
-    const reactphysics3d::Transform transform(reactphysics3d::Vector3(center.x, center.y, center.z), orientation);
+    const reactphysics3d::Transform transform(reactphysics3d::Vector3(center.x / 2, center.y / 2, center.z / 2), orientation);
    
     body = PhysicsWorld::getInstance()->getWorld()->createCollisionBody(transform);
     body->setUserData(&name);
     hitbox = PhysicsWorld::getInstance()->getPhysics()->createBoxShape(reactphysics3d::Vector3(size.x / 2, size.y / 2, size.z / 2));
-    collider = body->addCollider(hitbox, transform);
+	collider = body->addCollider(hitbox, transform);
 }
 
 std::vector<glm::vec3> Mesh::getMeshCenterAndSize()
@@ -95,10 +91,11 @@ std::vector<glm::vec3> Mesh::getMeshCenterAndSize()
     glm::vec3 size = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z);
     glm::vec3 center = glm::vec3((min_x + max_x) / 2, (min_y + max_y) / 2, (min_z + max_z) / 2);
 
+    center += position * glm::vec3(2.0f);
+
     std::vector<glm::vec3> ret;
     ret.emplace_back(size);
     ret.emplace_back(center);
-
     return ret;
 }
 
@@ -133,11 +130,11 @@ void Mesh::setBoundingBoxPosition(glm::vec3 pos)
 	//recalculate vertices + pos in another foo
     return;
     if (this->body == nullptr) return;
-    this->position = pos;
-	const std::vector<glm::vec3> dataSize = getMeshCenterAndSize();
+    /*this->position = pos;
+	const std::vector<glm::vec3> dataSize = test(vertices, pos);
     const glm::vec3 center = dataSize[1];
-    const reactphysics3d::Transform tmp(reactphysics3d::Vector3(center.x, center.y, center.z), reactphysics3d::Quaternion::identity());
-    body->setTransform(tmp);
+    const reactphysics3d::Transform tmp(reactphysics3d::Vector3(center.x / 2, center.y / 2, center.z / 2), reactphysics3d::Quaternion::identity());
+    body->setTransform(tmp);*/
 }
 
 reactphysics3d::CollisionBody* Mesh::getBody()

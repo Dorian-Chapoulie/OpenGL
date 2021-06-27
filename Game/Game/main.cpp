@@ -224,11 +224,11 @@ int main() {
 	PhysicsWorld* world = PhysicsWorld::getInstance();
 	world->setDebugEnabled(true);
 	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", "../../models/M4a1/M4a1.obj", glm::vec3(0.0f, 0.8f, -8.0f));
-	x = 0.5f;
-	y = 0.0f;
-	z = 0.0f;
+	x = 2.0f;
+	y = 2.0f;
+	z = 2.0f;
 	//Model model("../../models/aim_deagle7k/map.obj");
-	Model model("../../models/map/map.obj");
+	Model model("../../models/map/map.obj", glm::vec3(x, y, z));
 	//Model model("../../models/M4a1/M4a1.obj");
 	//Model model4("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, -2.0f, 0.0f));
 	//Model model("../../models/crate/Wooden Crate.obj", glm::vec3(x, y, z));
@@ -278,7 +278,7 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		
-		//model.setPosition(glm::vec3(x,y,z));
+		model.setPosition(glm::vec3(x,y,z));
 		
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		localPlayer->draw(shader);
