@@ -125,6 +125,9 @@
     <ClInclude Include="OpenGLine.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="ModelUtility.h">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.frag">

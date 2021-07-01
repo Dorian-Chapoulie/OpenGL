@@ -1,14 +1,11 @@
 #include "LocalPlayer.h"
+#include <reactphysics3d/reactphysics3d.h>
 
-LocalPlayer::LocalPlayer(const std::string& bodyModelPath, const std::string& weaponModelPath, const glm::vec3& position)
-: Player(bodyModelPath, weaponModelPath, position)
+LocalPlayer::LocalPlayer(const std::string& bodyModelPath, const glm::vec3& position)
+: Player(bodyModelPath, position)
 {
 	camera->setPosition(position);
-
-	weaponModelMatrix[3][0] = weaponOffsetX;
-	weaponModelMatrix[3][1] = weaponOffsetY;
-	weaponModelMatrix[3][2] = weaponOffsetZ;
-	this->weapon->setModelMatrix(weaponModelMatrix);
+	Player::setPosition(position);
 }
 
 std::unique_ptr<Camera>& LocalPlayer::getCamera()
@@ -18,15 +15,22 @@ std::unique_ptr<Camera>& LocalPlayer::getCamera()
 
 void LocalPlayer::draw(Shader& shader)
 {
-	glm::mat4 mtx_trans = glm::mat4(1.0f);
-	mtx_trans = glm::translate(mtx_trans, glm::vec3(0.0f, 0.0f, -3.0f));
-	const auto cam_world = glm::inverse(camera->getViewMatrix()) * glm::vec4(0, 0, 0, 1);
-	this->position = glm::vec3(cam_world.x, cam_world.y, cam_world.y);
+	/*const glm::mat4 mtx_trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+	const auto cameraPosition = glm::inverse(camera->getViewMatrix()) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	this->position = glm::vec3(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
-	shader.setMatrix("view", mtx_trans);
-	shader.setMatrix("model", weaponModelMatrix);
-
-	Player::setPosition(glm::vec3(position.x, position.y, position.z));
+	shader.setMatrix("view", mtx_trans);*/
+	
+	
 	Player::draw(shader);
-	shader.setMatrix("model", glm::mat4(1.0f));
+}
+
+void LocalPlayer::setPosition(const glm::vec3& position)
+{
+	/*const glm::mat4 mtx_trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+	const auto cameraPosition = glm::inverse(camera->getViewMatrix()) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	const glm::vec3 positionTmp = glm::vec3(cameraPosition.x, cameraPosition.y, cameraPosition.z);*/
+	
+	Player::setPosition(position);
+	camera->setPosition(glm::vec3(position.x, position.y + offsetCameraY, position.z));
 }

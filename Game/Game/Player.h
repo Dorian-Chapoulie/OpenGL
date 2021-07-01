@@ -1,24 +1,30 @@
 #pragma once
 #include "Model.h"
+#include <reactphysics3d/reactphysics3d.h>
 
 class Player
 {
 public:
-	Player(const std::string& bodyModelPath, const std::string& weaponModelPath, const glm::vec3& position);
+	Player(const std::string& bodyModelPath, const glm::vec3& position);
 	~Player();
 
 	glm::vec3 getPosition() const;
-	void setPosition(const glm::vec3& position);
+	
+	virtual void setPosition(const glm::vec3& position);
 	void setOrientation(const glm::vec3& orientation);
 
 	virtual void draw(Shader& shader);
 
-	Model* getWeapon();
+	reactphysics3d::RigidBody* getRigidBody() const;
+	Model* getModel() const;
+
+private:
+	glm::vec3 position = glm::vec3(1.0f);
+	glm::vec3 orientation = glm::vec3(1.0f);
 
 protected:
-	glm::vec3 position = glm::vec3(1.f);
-	glm::vec3 orientation = glm::vec3(1.f);
-	Model* body = nullptr;
-	Model* weapon = nullptr;
+	Model* model = nullptr;
+	float offsetCameraY = 25.0f;
+	const float WEIGHT = 75.0f;
 };
 

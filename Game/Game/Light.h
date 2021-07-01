@@ -41,7 +41,6 @@ private:
     float* cutOff = nullptr;
 
     bool isDirectional = false;
-
     
     Shader* shader = nullptr;
 

@@ -11,13 +11,13 @@ public:
 
 	void setDirection(glm::vec3 direction);
 	void setPosition(const glm::vec3 position);
-	void increasePosition(glm::vec3 value);
-
-	void increaseYaw(float value);
-	void increasePitch(float value);
 	void setPich(float value);
 	void setYaw(float value);
-
+	
+	void increasePosition(glm::vec3 value);
+	void increaseYaw(float value);
+	void increasePitch(float value);
+	
 	float getYaw() const;
 	float getPitch() const;
 
@@ -28,6 +28,7 @@ public:
 
 private:
 
+	Camera();
 	static std::unique_ptr<Camera> instance;
 
 	glm::vec3 cameraPos = glm::vec3(1.0f);

@@ -62,7 +62,9 @@ void PhysicsWorld::drawHitBoxes() const
 
 void PhysicsWorld::init()
 {
-	world = physicsCommon.createPhysicsWorld();
+	reactphysics3d::PhysicsWorld::WorldSettings settings;
+	settings.gravity = reactphysics3d::Vector3(0.f, -9.81f, 0.0f);
+	world = physicsCommon.createPhysicsWorld(settings);
 }
 
 void PhysicsWorld::setDebugEnabled(bool isEnabled)

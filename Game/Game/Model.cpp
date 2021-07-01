@@ -1,29 +1,21 @@
 #include "Model.h"
 #include <chrono>
 
-Model::Model(const std::string& path, bool hasHitbox) : hasHitbox(hasHitbox)
-{
-    auto start = std::chrono::high_resolution_clock::now();
-    std::cout << "[MODEL] loading " << path << std::endl;
-    loadModel(path);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "[MODEL] loaded in " << duration.count() / 1000000.0f << "s" << std::endl;
-}
+#include "PhysicsWorld.h"
 
-Model::Model(const std::string& path, const glm::vec3& position, bool hasHitbox) : hasHitbox(hasHitbox)
+
+Model::Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, bool hasHitbox)
 {
-    auto start = std::chrono::high_resolution_clock::now();
-    std::cout << "[MODEL] loading " << path << std::endl;
+    this->type = type;
     this->position = position;
+    this->hasHitbox = hasHitbox;
     this->modelMatrix[3][0] = position.x;
     this->modelMatrix[3][1] = position.y;
     this->modelMatrix[3][2] = position.z;
     loadModel(path);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "[MODEL] loaded in " << duration.count() / 1000000.0f << "s" << std::endl;
+    setupHitbox();
 }
+
 
 void Model::draw(Shader& shader)
 {
@@ -34,27 +26,23 @@ void Model::draw(Shader& shader)
 	}
 }
 
-void Model::setModelMatrix(const glm::mat4& matrix)
-{
-    this->modelMatrix = matrix;
-}
-
 void Model::setPosition(const glm::vec3& position)
 {
     this->position = position;
-    this->modelMatrix[3][0] = position.x;
+    /*this->modelMatrix[3][0] = position.x;
     this->modelMatrix[3][1] = position.y;
-    this->modelMatrix[3][2] = position.z;
-
-	for(Mesh* m : meshes)
-	{
-        m->setBoundingBoxPosition(position);
-	}
+    this->modelMatrix[3][2] = position.z;*/
+    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
 }
 
-std::vector<Mesh*> Model::getMeshes()
+void Model::setMass(float mass) const
 {
-    return meshes;
+    reinterpret_cast<reactphysics3d::RigidBody*>(body)->setMass(mass);
+}
+
+reactphysics3d::CollisionBody* Model::getCollisionBody() const
+{
+    return body;
 }
 
 void Model::loadModel(const std::string& path)
@@ -74,13 +62,13 @@ void Model::loadModel(const std::string& path)
 
 void Model::processNode(aiNode* node, const aiScene* scene)
 {
-    // process all the node's meshes (if any)
+
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
     }
-    // then do the same for each of its children
+
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
         processNode(node->mChildren[i], scene);
@@ -126,14 +114,12 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         vertices.push_back(vertex);
     }
 
-    //indices
     for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
         aiFace face = mesh->mFaces[i];
         for (unsigned int j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
 
-    // process material
     if (mesh->mMaterialIndex >= 0)
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -144,7 +130,8 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
-    return new Mesh(vertices, indices, textures, mesh->mName.C_Str(), position, hasHitbox);
+
+	return new Mesh(vertices, indices, textures);
 }
     
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName)
@@ -175,4 +162,84 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
         }
     }
     return textures;
+}
+
+void Model::setupHitbox()
+{
+    const std::vector<glm::vec3> dataSize = getBiggestHitBox();
+    const glm::vec3 size = dataSize[0];
+    const glm::vec3 center = dataSize[1];
+
+    if (size.x <= 0.0f || size.y <= 0.0f || size.z <= 0.0f)
+    {
+        std::cerr << "[MESH] ERROR: " << "name" << " size <= 0 : " << size.x << " " << size.y << " " << size.z << std::endl;
+        return;
+    }
+
+    const reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
+    const reactphysics3d::Transform transform(reactphysics3d::Vector3(center.x / 2, center.y / 2, center.z / 2), orientation);
+
+    switch (type)
+    {
+    case MODEL_TYPE::COLLISION_BODY:
+        body = PhysicsWorld::getInstance()->getWorld()->createCollisionBody(transform);
+        break;
+    case MODEL_TYPE::RIGID_BODY:
+        body = PhysicsWorld::getInstance()->getWorld()->createRigidBody(transform);
+        reinterpret_cast<reactphysics3d::RigidBody*>(body)->setType(reactphysics3d::BodyType::DYNAMIC);
+        break;
+    case MODEL_TYPE::STATIC:
+        body = PhysicsWorld::getInstance()->getWorld()->createRigidBody(transform);
+        reinterpret_cast<reactphysics3d::RigidBody*>(body)->setType(reactphysics3d::BodyType::STATIC);
+        break;
+    default:
+        body = PhysicsWorld::getInstance()->getWorld()->createCollisionBody(transform);
+        break;
+    }
+    //TODO: body->setUserData(&name);
+    hitbox = PhysicsWorld::getInstance()->getPhysics()->createBoxShape(reactphysics3d::Vector3(size.x / 2, size.y / 2, size.z / 2));
+    collider = body->addCollider(hitbox, transform);
+}
+
+std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& vertices) const
+{
+	
+    GLfloat max_x, max_y, max_z;
+    GLfloat min_x = max_x = vertices[0].Position.x;
+    GLfloat min_y = max_y = vertices[0].Position.y;
+    GLfloat min_z = max_z = vertices[0].Position.z;
+    for (int i = 0; i < vertices.size(); i++) {
+        if (vertices[i].Position.x < min_x) min_x = vertices[i].Position.x;
+        if (vertices[i].Position.x > max_x) max_x = vertices[i].Position.x;
+        if (vertices[i].Position.y < min_y) min_y = vertices[i].Position.y;
+        if (vertices[i].Position.y > max_y) max_y = vertices[i].Position.y;
+        if (vertices[i].Position.z < min_z) min_z = vertices[i].Position.z;
+        if (vertices[i].Position.z > max_z) max_z = vertices[i].Position.z;
+    }
+    glm::vec3 size = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z);
+    glm::vec3 center = glm::vec3((min_x + max_x) / 2, (min_y + max_y) / 2, (min_z + max_z) / 2);
+
+    center += position * glm::vec3(2.0f);
+
+    std::vector<glm::vec3> ret;
+    ret.emplace_back(size);
+    ret.emplace_back(center);
+    return ret;
+}
+
+std::vector<glm::vec3> Model::getBiggestHitBox() const
+{
+    std::vector<glm::vec3> sizeCenter = getMeshCenterAndSize(meshes[0]->getVertices());
+    glm::vec3 maxSize = glm::vec3(sizeCenter[0]);
+	for(Mesh* m : meshes)
+	{
+        const std::vector<glm::vec3> temp = getMeshCenterAndSize(m->getVertices());
+        const glm::vec3 size = temp[0];
+		if (size.x > maxSize.x && size.y > maxSize.y && size.z > maxSize.z)
+		{
+            maxSize = size;
+            sizeCenter = temp;
+		}
+	}
+    return sizeCenter;
 }

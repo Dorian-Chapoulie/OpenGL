@@ -25,7 +25,8 @@ float lastFrame = 0.0f;
 float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float mouseX, mouseY;
-float x = 0.0f, y = 0.0f, z = 0.0f;
+float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
+const float BASE_FORCE = 0.10f;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -53,42 +54,18 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
-	const float cameraSpeed = 10.0f * deltaTime;
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cam->increasePosition(cameraSpeed * cam->getFrontVector());
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cam->increasePosition(-cameraSpeed * cam->getFrontVector());
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cam->increasePosition(-glm::normalize(glm::cross(cam->getFrontVector(), cam->getUpVector())) * cameraSpeed);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cam->increasePosition(glm::normalize(glm::cross(cam->getFrontVector(), cam->getUpVector())) * cameraSpeed);
-
-	const float step = 0.005f;
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-	{
-		x += step;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		forceZ += BASE_FORCE;
+	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		forceZ -= BASE_FORCE;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-	{
-		x -= step;
+	
+	
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		forceX += BASE_FORCE;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-	{
-		y += step;
-	}
-	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-	{
-		y -= step;
-	}
-	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-	{
-		z += step;
-	}
-	else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
-	{
-		z -= step;
+	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		forceX -= BASE_FORCE;
 	}
 }
 
@@ -155,7 +132,7 @@ void createLights(Shader& shader)
 
 	auto* light = new Light(&shader, glm::vec3(5.75878, 1.32539, -5.09563), white);
 
-	auto* light2 = new Light(&shader, glm::vec3(-3, 8, 0), downVector, blue, 100.0f);
+	auto* light2 = new Light(&shader, glm::vec3(0, 8, 0), downVector, red, 10.0f);
 	//auto* light4 = new Light(&shader, glm::vec3(0.5, 8, 0), downVector, red, 100.0f);
 	//auto* light5 = new Light(&shader, glm::vec3(4, 8, 0), downVector, green, 100.0f);
 }
@@ -223,18 +200,18 @@ int main() {
 
 	PhysicsWorld* world = PhysicsWorld::getInstance();
 	world->setDebugEnabled(true);
-	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", "../../models/M4a1/M4a1.obj", glm::vec3(0.0f, 0.8f, -8.0f));
-	x = 2.0f;
-	y = 2.0f;
-	z = 2.0f;
+	localPlayer = new LocalPlayer("../../models/sphere/sphere.obj", glm::vec3(5.0f, 5.f, 0.0f));
+	auto* playerCollisionBody = localPlayer->getRigidBody();
+	
 	//Model model("../../models/aim_deagle7k/map.obj");
-	Model model("../../models/map/map.obj", glm::vec3(x, y, z));
+	//Model model("../../models/map/map.obj");
 	//Model model("../../models/M4a1/M4a1.obj");
-	//Model model4("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, -2.0f, 0.0f));
-	//Model model("../../models/crate/Wooden Crate.obj", glm::vec3(x, y, z));
+	//Model model("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, 0.0f, 0.0f), MODEL_TYPE::RIGID_BODY);
+	Model model("../../models/floor_2/floor.obj", MODEL_TYPE::STATIC, glm::vec3(0.0f, 0.0f, 0.0f), true);
+	Model model2("../../models/crate/Wooden Crate.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(2.0f, 3.0f, 5.0f), true);
+	Model model3("../../models/sphere/sphere.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(0.0f, 0.5f, 0.0f), true);
 	//Model model2("../../models/crate/Wooden Crate.obj", glm::vec3(4.0f, 4.0f, 2.0f));
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(8.0f, 8.0f, 4.0f));
-	//Model model2("../../models/sphere/sphere.obj", glm::vec3(0.5f, 0.0f, 0.0f));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 
@@ -264,6 +241,10 @@ int main() {
 			}
 		}).detach();*/
 
+
+	//reactphysics3d::Vector3 force(-30.0f, 0.0, 0.0);
+	//reinterpret_cast<reactphysics3d::RigidBody*>(m->getBody())->applyForceToCenterOfMass(force);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -277,15 +258,21 @@ int main() {
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		
-		model.setPosition(glm::vec3(x,y,z));
+
+		//playerCollisionBody->applyForceToCenterOfMass(reactphysics3d::Vector3(forceX, forceY, forceZ));
+		reactphysics3d::Transform transform = playerCollisionBody->getTransform();
+		glm::vec3 pos = glm::vec3(transform.getPosition().x, transform.getPosition().y, transform.getPosition().z);
+		//localPlayer->setPosition(pos);
+		localPlayer->setPosition(glm::vec3(forceX, forceY, forceZ));
+
+		//std::cout << localPlayer->getCamera()->getPosition().x << " " << localPlayer->getCamera()->getPosition().y << " " << localPlayer->getCamera()->getPosition().z << std::endl;
 		
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		localPlayer->draw(shader);
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		model.draw(shader);
-		//model2.draw(shader);
-		//model3.draw(shader);
+		model2.draw(shader);
+		model3.draw(shader);
 		//model4.draw(shader);
 
 		glfwSwapBuffers(window);

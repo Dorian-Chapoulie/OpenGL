@@ -4,24 +4,28 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <reactphysics3d/collision/Collider.h>
+#include <reactphysics3d/collision/shapes/BoxShape.h>
+
 #include "Mesh.h"
 #include "Texture.h"
 #include "Shader.h"
+#include "ModelUtility.h"
 
 class Model
 {
 public:
-	Model(const std::string& path, bool hasHitbox = true);
-	Model(const std::string& path, const glm::vec3& position, bool hasHitbox = true);
+	Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, bool hasHitbox = true);
 	void draw(Shader& shader);
 
-	void setModelMatrix(const glm::mat4& matrix);
 	void setPosition(const glm::vec3& position);
+	void setMass(float mass) const;
 
-	std::vector<Mesh*> getMeshes();
+	reactphysics3d::CollisionBody* getCollisionBody() const;
 
 private:
 	std::vector<Texture> loadedTextures;
+	//TODO: loadedModels
 	std::vector<Mesh*> meshes;
 	std::string directory;
 
@@ -33,6 +37,15 @@ private:
 	Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName);
 
+	reactphysics3d::CollisionBody* body = nullptr;
+	reactphysics3d::BoxShape* hitbox = nullptr;
+	reactphysics3d::Collider* collider = nullptr;
+
+	void setupHitbox();
+	std::vector<glm::vec3> getMeshCenterAndSize(const std::vector<Vertex>& vertices) const;
+	std::vector<glm::vec3> getBiggestHitBox() const;
+	
 	bool hasHitbox = true;
+	MODEL_TYPE type = MODEL_TYPE::COLLISION_BODY;
 };
 

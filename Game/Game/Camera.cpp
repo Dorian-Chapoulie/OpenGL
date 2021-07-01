@@ -72,3 +72,6 @@ glm::vec3 Camera::getPosition() const
 {
 	return cameraPos;
 }
+
+Camera::Camera()
+{}
