@@ -26,7 +26,7 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float mouseX, mouseY;
 float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
-const float BASE_FORCE = 0.10f;
+const float BASE_FORCE = 0.005f;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -42,6 +42,10 @@ irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
  * TODO: DESTRUCTEUR glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &VBO);
 		glDeleteProgram(shaderProgram);
+			/*const glm::mat4 mtx_trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+	const auto cameraPosition = glm::inverse(camera->getViewMatrix()) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	const glm::vec3 positionTmp = glm::vec3(cameraPosition.x, cameraPosition.y - offsetCameraY, cameraPosition.z);
+	
  */
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -103,6 +107,17 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	direction.y = sin(glm::radians(cam->getPitch()));
 	direction.z = sin(glm::radians(cam->getYaw())) * cos(glm::radians(cam->getPitch()));
 	cam->setDirection(direction);
+}
+
+void scroll_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (ypos == 1)
+	{
+		localPlayer->decreaseCameraYOffset();
+	} else
+	{
+		localPlayer->increaseCameraYOffset();
+	}
 }
 
 void setupShader(Shader& shader, const glm::mat4& projection)
@@ -196,11 +211,12 @@ int main() {
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 #pragma endregion endsetup
 
 	PhysicsWorld* world = PhysicsWorld::getInstance();
-	world->setDebugEnabled(true);
-	localPlayer = new LocalPlayer("../../models/sphere/sphere.obj", glm::vec3(5.0f, 5.f, 0.0f));
+	//world->setDebugEnabled(true);
+	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 5.f, 0.0f));
 	auto* playerCollisionBody = localPlayer->getRigidBody();
 	
 	//Model model("../../models/aim_deagle7k/map.obj");
@@ -208,8 +224,8 @@ int main() {
 	//Model model("../../models/M4a1/M4a1.obj");
 	//Model model("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, 0.0f, 0.0f), MODEL_TYPE::RIGID_BODY);
 	Model model("../../models/floor_2/floor.obj", MODEL_TYPE::STATIC, glm::vec3(0.0f, 0.0f, 0.0f), true);
-	Model model2("../../models/crate/Wooden Crate.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(2.0f, 3.0f, 5.0f), true);
-	Model model3("../../models/sphere/sphere.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(0.0f, 0.5f, 0.0f), true);
+	//Model model2("../../models/crate/Wooden Crate.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(2.0f, 3.0f, 5.0f), true);
+	//Model model3("../../models/sphere/sphere.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(0.0f, 0.5f, 0.0f), true);
 	//Model model2("../../models/crate/Wooden Crate.obj", glm::vec3(4.0f, 4.0f, 2.0f));
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(8.0f, 8.0f, 4.0f));
 
@@ -252,7 +268,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		world->getWorld()->update(timeStep);
-		world->drawHitBoxes();
+		//world->drawHitBoxes();
 		
 		shader.use();
 		const float currentFrame = glfwGetTime();
@@ -260,8 +276,8 @@ int main() {
 		lastFrame = currentFrame;
 
 		//playerCollisionBody->applyForceToCenterOfMass(reactphysics3d::Vector3(forceX, forceY, forceZ));
-		reactphysics3d::Transform transform = playerCollisionBody->getTransform();
-		glm::vec3 pos = glm::vec3(transform.getPosition().x, transform.getPosition().y, transform.getPosition().z);
+		//reactphysics3d::Transform transform = playerCollisionBody->getTransform();
+		//glm::vec3 pos = glm::vec3(transform.getPosition().x, transform.getPosition().y, transform.getPosition().z);
 		//localPlayer->setPosition(pos);
 		localPlayer->setPosition(glm::vec3(forceX, forceY, forceZ));
 
@@ -271,8 +287,8 @@ int main() {
 		localPlayer->draw(shader);
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		model.draw(shader);
-		model2.draw(shader);
-		model3.draw(shader);
+		//model2.draw(shader);
+		//model3.draw(shader);
 		//model4.draw(shader);
 
 		glfwSwapBuffers(window);

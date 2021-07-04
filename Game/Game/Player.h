@@ -14,6 +14,8 @@ public:
 	void setOrientation(const glm::vec3& orientation);
 
 	virtual void draw(Shader& shader);
+	void increaseCameraYOffset();
+	void decreaseCameraYOffset();
 
 	reactphysics3d::RigidBody* getRigidBody() const;
 	Model* getModel() const;
@@ -25,6 +27,7 @@ private:
 protected:
 	Model* model = nullptr;
 	float offsetCameraY = 25.0f;
+	const float offsetCameraYStep = 1.0f;
 	const float WEIGHT = 75.0f;
 };
 

@@ -29,10 +29,9 @@ void Model::draw(Shader& shader)
 void Model::setPosition(const glm::vec3& position)
 {
     this->position = position;
-    /*this->modelMatrix[3][0] = position.x;
+    this->modelMatrix[3][0] = position.x;
     this->modelMatrix[3][1] = position.y;
-    this->modelMatrix[3][2] = position.z;*/
-    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
+    this->modelMatrix[3][2] = position.z;
 }
 
 void Model::setMass(float mass) const

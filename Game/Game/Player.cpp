@@ -33,6 +33,16 @@ void Player::draw(Shader& shader)
 	model->draw(shader);
 }
 
+void Player::increaseCameraYOffset()
+{
+	this->offsetCameraY += offsetCameraYStep;
+}
+
+void Player::decreaseCameraYOffset()
+{
+	this->offsetCameraY -= offsetCameraYStep;
+}
+
 reactphysics3d::RigidBody* Player::getRigidBody() const
 {
 	return reinterpret_cast<reactphysics3d::RigidBody*>(model->getCollisionBody());
