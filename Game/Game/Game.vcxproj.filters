@@ -40,6 +40,9 @@
     <Filter Include="world">
       <UniqueIdentifier>{0d96ae40-291f-46a7-bb50-62417d94a001}</UniqueIdentifier>
     </Filter>
+    <Filter Include="skybox">
+      <UniqueIdentifier>{72992498-1034-4dad-a958-ef1be2636da1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -83,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="OpenGLine.cpp">
       <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBox.cpp">
+      <Filter>skybox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,12 +134,21 @@
     <ClInclude Include="ModelUtility.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>skybox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.frag">
       <Filter>shaders\fragment</Filter>
     </None>
     <None Include="vertex.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="skybox.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="skybox.vert">
       <Filter>shaders\vertex</Filter>
     </None>
   </ItemGroup>
