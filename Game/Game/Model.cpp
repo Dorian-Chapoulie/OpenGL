@@ -4,16 +4,35 @@
 #include "PhysicsWorld.h"
 
 
-Model::Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, bool hasHitbox)
+Model::Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, float scale, bool hasHitbox)
 {
     this->type = type;
     this->position = position;
     this->hasHitbox = hasHitbox;
+    this->scale = scale;
+    this->modelMatrix = glm::mat4(scale);
     this->modelMatrix[3][0] = position.x;
     this->modelMatrix[3][1] = position.y;
     this->modelMatrix[3][2] = position.z;
     loadModel(path);
     setupHitbox();
+}
+
+Model::~Model()
+{
+	switch(type)
+	{
+    case MODEL_TYPE::COLLISION_BODY:
+        PhysicsWorld::getInstance()->getWorld()->destroyCollisionBody(body);
+        break;
+    case MODEL_TYPE::RIGID_BODY:
+        PhysicsWorld::getInstance()->getWorld()->destroyRigidBody(reinterpret_cast<reactphysics3d::RigidBody*>(body));
+        break;
+	}
+    //delete body;
+
+    PhysicsWorld::getInstance()->getPhysics()->destroyBoxShape(hitbox);
+    //delete collider;
 }
 
 
@@ -32,6 +51,11 @@ void Model::setPosition(const glm::vec3& position)
     this->modelMatrix[3][0] = position.x;
     this->modelMatrix[3][1] = position.y;
     this->modelMatrix[3][2] = position.z;
+}
+
+void Model::setOriantation(const glm::vec3& oritantion)
+{
+    this->orientation = orientation;
 }
 
 void Model::setMass(float mass) const
@@ -110,6 +134,7 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
         }
 
+        vertex.Position += position;
         vertices.push_back(vertex);
     }
 
@@ -166,8 +191,8 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 void Model::setupHitbox()
 {
     const std::vector<glm::vec3> dataSize = getBiggestHitBox();
-    const glm::vec3 size = dataSize[0];
-    const glm::vec3 center = dataSize[1];
+    const glm::vec3 size = dataSize[0] * scale;
+    const glm::vec3 center = dataSize[1] * scale;
 
     if (size.x <= 0.0f || size.y <= 0.0f || size.z <= 0.0f)
     {
@@ -198,6 +223,7 @@ void Model::setupHitbox()
     //TODO: body->setUserData(&name);
     hitbox = PhysicsWorld::getInstance()->getPhysics()->createBoxShape(reactphysics3d::Vector3(size.x / 2, size.y / 2, size.z / 2));
     collider = body->addCollider(hitbox, transform);
+    collider->getMaterial().setBounciness(0);
 }
 
 std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& vertices) const

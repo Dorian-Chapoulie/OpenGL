@@ -19,6 +19,7 @@
 #define WIDTH 800
 #define HEIGHT 600
 #define FULLSCREEN false
+#define DRAW_DISTANCE 500.0f
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -26,11 +27,12 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float mouseX, mouseY;
 float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
-const float BASE_FORCE = 0.005f;
+const float BASE_FORCE = 10.0f;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
-
+//TODO: desctructeur model & mesh
+//TODO: change model via model as param and not path
 /*
  * model[0][0] => WIDTH
  * model[1][1] => HEIGHT
@@ -55,21 +57,36 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void processInput(GLFWwindow* window)
 {
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		forceZ += BASE_FORCE;
+		forceZ = BASE_FORCE;
 	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		forceZ -= BASE_FORCE;
+		forceZ = BASE_FORCE;
+	} else
+	{
+		forceZ = 0.0f;
 	}
 	
 	
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		forceX += BASE_FORCE;
+		forceX = BASE_FORCE;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		forceX -= BASE_FORCE;
+		forceX = -BASE_FORCE;
+	}
+	else
+	{
+		forceX = 0.0f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+		localPlayer->changeModel("../../models/Humvee/Humvee.obj", 0.1f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+		localPlayer->changeModel("../../models/crate/Wooden Crate.obj");
 	}
 }
 
@@ -215,23 +232,23 @@ int main() {
 #pragma endregion endsetup
 
 	PhysicsWorld* world = PhysicsWorld::getInstance();
-	//world->setDebugEnabled(true);
-	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 5.f, 0.0f));
+	world->setDebugEnabled(true);
+	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 100.f, 0.0f));
 	auto* playerCollisionBody = localPlayer->getRigidBody();
 	
 	//Model model("../../models/aim_deagle7k/map.obj");
-	//Model model("../../models/map/map.obj");
+	Model model("../../models/aim_deagle7k/map.obj", MODEL_TYPE::STATIC, glm::vec3(-1.0f, 0.0f, 0.0f), true);
 	//Model model("../../models/M4a1/M4a1.obj");
-	//Model model("../../models/floor/CobbleStones2.obj", glm::vec3(0.0f, 0.0f, 0.0f), MODEL_TYPE::RIGID_BODY);
-	Model model("../../models/floor_2/floor.obj", MODEL_TYPE::STATIC, glm::vec3(0.0f, 0.0f, 0.0f), true);
-	//Model model2("../../models/crate/Wooden Crate.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(2.0f, 3.0f, 5.0f), true);
+	//Model model("../../models/floor/CobbleStones2.obj", MODEL_TYPE::STATIC, glm::vec3(-1.0f, 0.0f, 0.0f), true);
+	//Model model("../../models/floor_2/floor.obj", MODEL_TYPE::STATIC, glm::vec3(-10.0f, -20.0f, 0.0f), true);
+	//Model model2("../../models/crate/Wooden Crate.obj", MODEL_TYPE::STATIC, glm::vec3(100.0f, 10.f, -100.0f), true);
 	//Model model3("../../models/sphere/sphere.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(0.0f, 0.5f, 0.0f), true);
 	//Model model2("../../models/crate/Wooden Crate.obj", glm::vec3(4.0f, 4.0f, 2.0f));
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(8.0f, 8.0f, 4.0f));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 
-	glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
 	world->setProjection(&projection);
 	setupShader(shader, projection);
 	setupSound();
@@ -257,10 +274,6 @@ int main() {
 			}
 		}).detach();*/
 
-
-	//reactphysics3d::Vector3 force(-30.0f, 0.0, 0.0);
-	//reinterpret_cast<reactphysics3d::RigidBody*>(m->getBody())->applyForceToCenterOfMass(force);
-
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -268,20 +281,18 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		world->getWorld()->update(timeStep);
-		//world->drawHitBoxes();
+		world->drawHitBoxes();
 		
 		shader.use();
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		//playerCollisionBody->applyForceToCenterOfMass(reactphysics3d::Vector3(forceX, forceY, forceZ));
-		//reactphysics3d::Transform transform = playerCollisionBody->getTransform();
-		//glm::vec3 pos = glm::vec3(transform.getPosition().x, transform.getPosition().y, transform.getPosition().z);
-		//localPlayer->setPosition(pos);
-		localPlayer->setPosition(glm::vec3(forceX, forceY, forceZ));
-
-		//std::cout << localPlayer->getCamera()->getPosition().x << " " << localPlayer->getCamera()->getPosition().y << " " << localPlayer->getCamera()->getPosition().z << std::endl;
+		playerCollisionBody->applyForceToCenterOfMass(reactphysics3d::Vector3(forceX, forceY, forceZ));
+		reactphysics3d::Transform transform = playerCollisionBody->getTransform();
+		glm::vec3 pos = glm::vec3(transform.getPosition().x / 2, transform.getPosition().y / 2, transform.getPosition().z / 2);
+		localPlayer->setPosition(pos);
+		//localPlayer->setPosition(glm::vec3(forceX, forceY, forceZ));
 		
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		localPlayer->draw(shader);

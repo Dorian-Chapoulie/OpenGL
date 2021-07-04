@@ -15,10 +15,12 @@
 class Model
 {
 public:
-	Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, bool hasHitbox = true);
+	Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, float scale = 1.0f, bool hasHitbox = true);
+	~Model();
 	void draw(Shader& shader);
 
 	void setPosition(const glm::vec3& position);
+	void setOriantation(const glm::vec3& oritantion);
 	void setMass(float mass) const;
 
 	reactphysics3d::CollisionBody* getCollisionBody() const;
@@ -30,7 +32,9 @@ private:
 	std::string directory;
 
 	glm::vec3 position = glm::vec3(0.0f);
+	glm::vec3 orientation = glm::vec3(0.0f);
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
+	float scale = 1.0f;
 
 	void loadModel(const std::string& path);
 	void processNode(aiNode* node, const aiScene* scene);

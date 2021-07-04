@@ -16,4 +16,5 @@ void LocalPlayer::setPosition(const glm::vec3& position)
 {
 	camera->setPosition(glm::vec3(position.x * 2, position.y + offsetCameraY, position.z * 2));
 	Player::setPosition(position);
+	//Player::setOrientation(camera->getFrontVector());
 }
