@@ -27,7 +27,7 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float mouseX, mouseY;
 float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
-const float BASE_FORCE = 10.0f;
+const float BASE_FORCE = 300.0f;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -64,7 +64,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		forceZ = BASE_FORCE;
 	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		forceZ = BASE_FORCE;
+		forceZ = -BASE_FORCE;
 	} else
 	{
 		forceZ = 0.0f;
@@ -233,11 +233,11 @@ int main() {
 
 	PhysicsWorld* world = PhysicsWorld::getInstance();
 	world->setDebugEnabled(true);
-	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 100.f, 0.0f));
+	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 1.f, 0.0f));
 	auto* playerCollisionBody = localPlayer->getRigidBody();
 	
 	//Model model("../../models/aim_deagle7k/map.obj");
-	Model model("../../models/aim_deagle7k/map.obj", MODEL_TYPE::STATIC, glm::vec3(-1.0f, 0.0f, 0.0f), true);
+	Model model("../../models/map/map.obj", MODEL_TYPE::STATIC, glm::vec3(0.0f, 0.0f, 0.0f), true);
 	//Model model("../../models/M4a1/M4a1.obj");
 	//Model model("../../models/floor/CobbleStones2.obj", MODEL_TYPE::STATIC, glm::vec3(-1.0f, 0.0f, 0.0f), true);
 	//Model model("../../models/floor_2/floor.obj", MODEL_TYPE::STATIC, glm::vec3(-10.0f, -20.0f, 0.0f), true);
@@ -260,40 +260,27 @@ int main() {
 	float timeStep = 1.0 / 60.0f;
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 
-	/*td::thread([&]()
-		{
-			while (true) {
-				world->getWorld()->update(timeStep);
-				reactphysics3d::Vector3 vec(cam->getPosition().x, cam->getPosition().y, cam->getPosition().z);
-				reactphysics3d::Transform tmp(vec, reactphysics3d::Quaternion::identity());
-				for(Mesh* m : localPlayer->getWeapon()->getMeshes())
-				{
-					m->getBody()->setTransform(tmp);
-				}
-				world->getWorld()->testCollision(body, body, cb);
-			}
-		}).detach();*/
-
+	reactphysics3d::PhysicsWorld* physicsWorld = world->getWorld();
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		world->getWorld()->update(timeStep);
+		physicsWorld->update(timeStep);
 		world->drawHitBoxes();
+
+		playerCollisionBody->applyForceToCenterOfMass(reactphysics3d::Vector3(forceX, forceY, forceZ));
+		reactphysics3d::Transform transform = playerCollisionBody->getTransform();
+		glm::vec3 pos = glm::vec3(transform.getPosition().x / 2, transform.getPosition().y / 2, transform.getPosition().z / 2);
+		localPlayer->setPosition(pos);
+		
 		
 		shader.use();
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		playerCollisionBody->applyForceToCenterOfMass(reactphysics3d::Vector3(forceX, forceY, forceZ));
-		reactphysics3d::Transform transform = playerCollisionBody->getTransform();
-		glm::vec3 pos = glm::vec3(transform.getPosition().x / 2, transform.getPosition().y / 2, transform.getPosition().z / 2);
-		localPlayer->setPosition(pos);
-		//localPlayer->setPosition(glm::vec3(forceX, forceY, forceZ));
-		
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		localPlayer->draw(shader);
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());

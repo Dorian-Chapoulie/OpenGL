@@ -32,8 +32,8 @@ private:
 
 protected:
 	Model* model = nullptr;
-	float offsetCameraY = 25.0f;
+	float offsetCameraY = 5.0f;
 	const float offsetCameraYStep = 1.0f;
-	const float WEIGHT = 0.1f;
+	const float WEIGHT = 75.0f;
 };
 

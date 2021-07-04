@@ -21,9 +21,9 @@ public:
 
 	void setPosition(const glm::vec3& position);
 	void setOriantation(const glm::vec3& oritantion);
-	void setMass(float mass) const;
+	void setMass(float mass);
 
-	reactphysics3d::CollisionBody* getCollisionBody() const;
+	std::vector<reactphysics3d::CollisionBody*> getCollisionBodys() const;
 
 private:
 	std::vector<Texture> loadedTextures;
@@ -41,9 +41,9 @@ private:
 	Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName);
 
-	reactphysics3d::CollisionBody* body = nullptr;
-	reactphysics3d::BoxShape* hitbox = nullptr;
-	reactphysics3d::Collider* collider = nullptr;
+	std::vector<reactphysics3d::CollisionBody*> bodys;
+	std::vector<reactphysics3d::BoxShape*> hitboxes;
+	std::vector<reactphysics3d::Collider*> colliders;
 
 	void setupHitbox();
 	std::vector<glm::vec3> getMeshCenterAndSize(const std::vector<Vertex>& vertices) const;
