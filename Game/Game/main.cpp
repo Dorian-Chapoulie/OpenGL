@@ -9,13 +9,10 @@
 #include "Light.h"
 #include "Model.h"
 #include <thread>
-#include <reactphysics3d/reactphysics3d.h>
 
 #include "LocalPlayer.h"
 #include "OpenGLine.h"
-#include "PhysicsWorld.h"
 #include "SkyBox.h"
-#include "Test.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -28,7 +25,7 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float mouseX, mouseY;
 float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
-const float BASE_FORCE = 30.0f;
+const float BASE_FORCE = 800.0f;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -81,13 +78,6 @@ void processInput(GLFWwindow* window)
 	else
 	{
 		forceX = 0.0f;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-		localPlayer->changeModel("../../models/Humvee/Humvee.obj", 0.1f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-		localPlayer->changeModel("../../models/crate/Wooden Crate.obj");
 	}
 }
 
@@ -206,6 +196,7 @@ void ray()
 	ray_wor = glm::normalize(ray_wor);*/
 }
 
+#include <Bullet3/btBulletCollisionCommon.h>
 int main() {
 #pragma region setup
 	glfwInit();
@@ -240,13 +231,13 @@ int main() {
 	glfwSetScrollCallback(window, scroll_callback);
 #pragma endregion endsetup
 
-	PhysicsWorld* world = PhysicsWorld::getInstance();
-	//world->setDebugEnabled(true);
-	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 1.f, 0.0f));
-	auto* playerCollisionBody = localPlayer->getRigidBody();
+
+	btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+	
+	localPlayer = new LocalPlayer("../../models/tank/tank.obj", glm::vec3(0.0f, -0.5f, 0.0f));
 	
 	//Model model("../../models/aim_deagle7k/map.obj");
-	Model model("../../models/map_light/map_light.obj", MODEL_TYPE::STATIC, glm::vec3(0.0f, 0.0f, 0.0f), true);
+	Model model("../../models/map_lighter/map.obj", MODEL_TYPE::STATIC, glm::vec3(0.0f, 0.0f, 0.0f), true);
 	//Model model("../../models/M4a1/M4a1.obj");
 	//Model model("../../models/floor/CobbleStones2.obj", MODEL_TYPE::STATIC, glm::vec3(-1.0f, 0.0f, 0.0f), true);
 	//Model model("../../models/floor_2/floor.obj", MODEL_TYPE::STATIC, glm::vec3(-10.0f, -20.0f, 0.0f), true);
@@ -260,34 +251,21 @@ int main() {
 	SkyBox skybox("../../textures/skybox");
 
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
-	world->setProjection(&projection);
-	
+
 	setupShader(shader, projection);
 	setupSkyBoxShader(skyboxShader, projection);
 	setupSound();
 	createLights(shader);
 
-	Test test;
-	reactphysics3d::CollisionCallback& cb = test;
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 60.0f;
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 
-	reactphysics3d::PhysicsWorld* physicsWorld = world->getWorld();
 	while (!glfwWindowShouldClose(window))
 	{		
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		physicsWorld->update(timeStep);
-		//world->drawHitBoxes();
-
-		playerCollisionBody->applyForceToCenterOfMass(reactphysics3d::Vector3(forceX, forceY, forceZ));
-		reactphysics3d::Transform transform = playerCollisionBody->getTransform();
-		glm::vec3 pos = glm::vec3(transform.getPosition().x / 2, transform.getPosition().y / 2, transform.getPosition().z / 2);
-		localPlayer->setPosition(pos);
-		
 		
 		shader.use();
 		const float currentFrame = glfwGetTime();

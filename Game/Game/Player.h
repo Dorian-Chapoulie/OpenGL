@@ -1,6 +1,5 @@
 #pragma once
 #include "Model.h"
-#include <reactphysics3d/reactphysics3d.h>
 
 class Player
 {
@@ -13,13 +12,12 @@ public:
 	virtual void setPosition(const glm::vec3& position);
 	void setOrientation(const glm::vec3& orientation);
 
-	void changeModel(const std::string& modelPath, float scale = 1.0f);
+	void changeModel(const std::string& modelPath);
 
 	virtual void draw(Shader& shader);
 	void increaseCameraYOffset();
 	void decreaseCameraYOffset();
-
-	reactphysics3d::RigidBody* getRigidBody() const;
+	
 	Model* getModel() const;
 
 private:
@@ -27,13 +25,13 @@ private:
 	glm::vec3 orientation = glm::vec3(1.0f);
 	std::string modelPath;
 	
-	void initModel(const std::string& modelPath, float scale = 1.0f);
+	void initModel(const std::string& modelPath);
 	
 
 protected:
 	Model* model = nullptr;
 	float offsetCameraY = 5.0f;
 	const float offsetCameraYStep = 1.0f;
-	const float WEIGHT = 75.0f;
+	const float WEIGHT = 3000.0f;
 };
 

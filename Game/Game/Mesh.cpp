@@ -1,6 +1,5 @@
 #include "Mesh.h"
 #include <utility>
-#include "PhysicsWorld.h"
 
 Mesh::Mesh(
 	std::vector<Vertex> vertices,

@@ -3,7 +3,7 @@
 Player::Player(const std::string& bodyModelPath, const glm::vec3& position)
 {
 	this->position = position;
-	initModel(bodyModelPath, 0.5f);
+	initModel(bodyModelPath);
 }
 
 Player::~Player()
@@ -27,10 +27,10 @@ void Player::setOrientation(const glm::vec3& orientation)
 	this->orientation = orientation;
 }
 
-void Player::changeModel(const std::string& modelPath, float scale)
+void Player::changeModel(const std::string& modelPath)
 {
 	if (this->modelPath == modelPath) return;
-	initModel(modelPath, scale);
+	initModel(modelPath);
 }
 
 void Player::draw(Shader& shader)
@@ -48,20 +48,14 @@ void Player::decreaseCameraYOffset()
 	this->offsetCameraY -= offsetCameraYStep;
 }
 
-reactphysics3d::RigidBody* Player::getRigidBody() const
-{
-	return reinterpret_cast<reactphysics3d::RigidBody*>(model->getCollisionBodys()[0]);
-}
-
 Model* Player::getModel() const
 {
 	return model;
 }
 
-void Player::initModel(const std::string& modelPath, float scale)
+void Player::initModel(const std::string& modelPath)
 {
 	delete model;
 	this->modelPath = modelPath;
-	model = new Model(modelPath, MODEL_TYPE::RIGID_BODY, position, scale, true);
-	model->setMass(WEIGHT);
+	model = new Model(modelPath, MODEL_TYPE::RIGID_BODY, position, false, true);
 }

@@ -1,42 +1,21 @@
 #include "Model.h"
 #include <chrono>
 
-#include "PhysicsWorld.h"
-
-
-Model::Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, float scale, bool hasHitbox)
+Model::Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, bool hasMultipleHitboxes, bool hasHitbox)
 {
     this->type = type;
     this->position = position;
     this->hasHitbox = hasHitbox;
-    this->scale = scale;
-    this->modelMatrix = glm::mat4(scale);
     this->modelMatrix[3][0] = position.x;
     this->modelMatrix[3][1] = position.y;
     this->modelMatrix[3][2] = position.z;
     loadModel(path);
-	setupHitbox();
+    if (hasMultipleHitboxes) setupHitboxes();
+    else if (hasHitbox) setupHitbox();
 }
 
 Model::~Model()
 {
-    for (reactphysics3d::CollisionBody* body : bodys) {
-        switch (type)
-        {
-        case MODEL_TYPE::COLLISION_BODY:
-            PhysicsWorld::getInstance()->getWorld()->destroyCollisionBody(body);
-            break;
-        case MODEL_TYPE::RIGID_BODY:
-            PhysicsWorld::getInstance()->getWorld()->destroyRigidBody(reinterpret_cast<reactphysics3d::RigidBody*>(body));
-            break;
-        }
-        //delete body;
-    }
-
-    for (reactphysics3d::BoxShape* hitbox : hitboxes) {
-        PhysicsWorld::getInstance()->getPhysics()->destroyBoxShape(hitbox);
-    }
-    //delete collider;
 }
 
 
@@ -52,10 +31,10 @@ void Model::draw(Shader& shader)
 void Model::setPosition(const glm::vec3& position)
 {
     this->position = position;
-    this->modelMatrix[3][0] = this->position.x;
-    this->modelMatrix[3][1] = this->position.y;
-    this->modelMatrix[3][2] = this->position.z;
-    this->modelMatrix = glm::translate(glm::mat4(scale), position);
+    //this->modelMatrix[3][0] = this->position.x;
+    //this->modelMatrix[3][1] = this->position.y;
+    //this->modelMatrix[3][2] = this->position.z;
+    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
     //this->modelMatrix *= glm::scale(this->modelMatrix, glm::vec3(scale));
 }
 
@@ -64,17 +43,6 @@ void Model::setOriantation(const glm::vec3& oritantion)
     this->orientation = orientation;
 }
 
-void Model::setMass(float mass)
-{
-    for (reactphysics3d::CollisionBody* body : bodys) {
-        reinterpret_cast<reactphysics3d::RigidBody*>(body)->setMass(mass / bodys.size());
-    } 
-}
-
-std::vector<reactphysics3d::CollisionBody*> Model::getCollisionBodys() const
-{
-    return bodys;
-}
 
 void Model::loadModel(const std::string& path)
 {
@@ -143,7 +111,6 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         }
 
         vertex.Position += position;
-        vertex.Position *= scale;
         vertices.push_back(vertex);
     }
 
@@ -197,53 +164,23 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
     return textures;
 }
 
-void Model::setupHitbox()
+void Model::setupHitboxes()
 {
     for (const Mesh* mesh : meshes)
     {
-        reactphysics3d::CollisionBody* body;
-        reactphysics3d::BoxShape* hitbox;
-        reactphysics3d::Collider* collider;
-    	
+
         const std::vector<glm::vec3> dataSize = getMeshCenterAndSize(mesh->getVertices());
-        const glm::vec3 size = dataSize[0] * scale;
-        const glm::vec3 center = dataSize[1] * scale;
-
-        if (size.x <= 0.0f || size.y <= 0.0f || size.z <= 0.0f)
-        {
-            std::cerr << "[MESH] ERROR: " << "name" << " size <= 0 : " << size.x << " " << size.y << " " << size.z << std::endl;
-            return;
-        }
-
-        const reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
-        const reactphysics3d::Transform transform(reactphysics3d::Vector3(center.x / 2, center.y / 2, center.z / 2), orientation);
-
-        switch (type)
-        {
-        case MODEL_TYPE::COLLISION_BODY:
-            body = PhysicsWorld::getInstance()->getWorld()->createCollisionBody(transform);
-            break;
-        case MODEL_TYPE::RIGID_BODY:
-            body = PhysicsWorld::getInstance()->getWorld()->createRigidBody(transform);
-            reinterpret_cast<reactphysics3d::RigidBody*>(body)->setType(reactphysics3d::BodyType::DYNAMIC);
-            break;
-        case MODEL_TYPE::STATIC:
-            body = PhysicsWorld::getInstance()->getWorld()->createRigidBody(transform);
-            reinterpret_cast<reactphysics3d::RigidBody*>(body)->setType(reactphysics3d::BodyType::STATIC);
-            break;
-        default:
-            body = PhysicsWorld::getInstance()->getWorld()->createCollisionBody(transform);
-            break;
-        }
-        //TODO: body->setUserData(&name);
-        hitbox = PhysicsWorld::getInstance()->getPhysics()->createBoxShape(reactphysics3d::Vector3(size.x / 2, size.y / 2, size.z / 2));
-        collider = body->addCollider(hitbox, transform);
-        collider->getMaterial().setBounciness(0);
-
-        bodys.emplace_back(body);
-        hitboxes.emplace_back(hitbox);
-    	colliders.emplace_back(collider);
+        const glm::vec3 size = dataSize[0];
+        const glm::vec3 center = dataSize[1];
+    	
     }
+}
+
+void Model::setupHitbox()
+{
+	const std::vector<glm::vec3> dataSize = getBiggestHitBox();
+	const glm::vec3 size = dataSize[0];
+	const glm::vec3 center = dataSize[1];
 }
 
 std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& vertices) const

@@ -78,12 +78,6 @@
     <ClCompile Include="LocalPlayer.cpp">
       <Filter>player</Filter>
     </ClCompile>
-    <ClCompile Include="Test.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsWorld.cpp">
-      <Filter>world</Filter>
-    </ClCompile>
     <ClCompile Include="OpenGLine.cpp">
       <Filter>utils</Filter>
     </ClCompile>
@@ -121,12 +115,6 @@
     </ClInclude>
     <ClInclude Include="LocalPlayer.h">
       <Filter>player</Filter>
-    </ClInclude>
-    <ClInclude Include="Test.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsWorld.h">
-      <Filter>world</Filter>
     </ClInclude>
     <ClInclude Include="OpenGLine.h">
       <Filter>utils</Filter>

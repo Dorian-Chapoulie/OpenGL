@@ -1,5 +1,4 @@
 #include "LocalPlayer.h"
-#include <reactphysics3d/reactphysics3d.h>
 
 LocalPlayer::LocalPlayer(const std::string& bodyModelPath, const glm::vec3& position)
 : Player(bodyModelPath, position)
@@ -14,7 +13,6 @@ std::unique_ptr<Camera>& LocalPlayer::getCamera()
 
 void LocalPlayer::setPosition(const glm::vec3& position)
 {
-	camera->setPosition(glm::vec3(position.x * 2, position.y + offsetCameraY, position.z * 2));
+	camera->setPosition(glm::vec3(position.x, position.y + offsetCameraY, position.z));
 	Player::setPosition(position);
-	//Player::setOrientation(camera->getFrontVector());
 }
