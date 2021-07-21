@@ -3,7 +3,6 @@
 #include "Vertex.h"
 #include "Texture.h"
 #include "Shader.h"
-#include "ModelUtility.h"
 
 class Mesh
 {

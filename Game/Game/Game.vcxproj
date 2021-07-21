@@ -146,11 +146,13 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="GLDebugDrawer.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="MyMotionState.cpp" />
     <ClCompile Include="OpenGLine.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -160,11 +162,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="GLDebugDrawer.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LocalPlayer.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelUtility.h" />
+    <ClInclude Include="MyMotionState.h" />
     <ClInclude Include="OpenGLine.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Shader.h" />

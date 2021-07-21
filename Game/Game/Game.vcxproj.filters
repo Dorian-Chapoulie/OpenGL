@@ -84,6 +84,12 @@
     <ClCompile Include="SkyBox.cpp">
       <Filter>skybox</Filter>
     </ClCompile>
+    <ClCompile Include="GLDebugDrawer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="MyMotionState.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -119,11 +125,14 @@
     <ClInclude Include="OpenGLine.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="ModelUtility.h">
-      <Filter>utils</Filter>
-    </ClInclude>
     <ClInclude Include="SkyBox.h">
       <Filter>skybox</Filter>
+    </ClInclude>
+    <ClInclude Include="GLDebugDrawer.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="MyMotionState.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,14 +1,21 @@
 #include "Model.h"
-#include <chrono>
 
-Model::Model(const std::string& path, MODEL_TYPE type, const glm::vec3& position, bool hasMultipleHitboxes, bool hasHitbox)
+Model::Model(const std::string& path, const glm::vec3& position, float weight, bool hasMultipleHitboxes, bool hasHitbox)
 {
-    this->type = type;
+    this->weight = weight;
     this->position = position;
     this->hasHitbox = hasHitbox;
-    this->modelMatrix[3][0] = position.x;
-    this->modelMatrix[3][1] = position.y;
-    this->modelMatrix[3][2] = position.z;
+    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
+    loadModel(path);
+    if (hasMultipleHitboxes) setupHitboxes();
+    else if (hasHitbox) setupHitbox();
+}
+
+Model::Model(const std::string& path, const glm::vec3& position, bool hasMultipleHitboxes, bool hasHitbox)
+{
+    this->position = position;
+    this->hasHitbox = hasHitbox;
+    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
     loadModel(path);
     if (hasMultipleHitboxes) setupHitboxes();
     else if (hasHitbox) setupHitbox();
@@ -18,31 +25,42 @@ Model::~Model()
 {
 }
 
-
 void Model::draw(Shader& shader)
 {
 	for (Mesh* m : meshes) {
         shader.setMatrix("model", modelMatrix);
 		m->draw(shader);
-        shader.setMatrix("model", glm::mat4(1.0f));
+        //shader.setMatrix("model", glm::mat4(1.0f));
 	}
 }
 
 void Model::setPosition(const glm::vec3& position)
 {
     this->position = position;
-    //this->modelMatrix[3][0] = this->position.x;
-    //this->modelMatrix[3][1] = this->position.y;
-    //this->modelMatrix[3][2] = this->position.z;
     this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
     //this->modelMatrix *= glm::scale(this->modelMatrix, glm::vec3(scale));
 }
 
-void Model::setOriantation(const glm::vec3& oritantion)
+void Model::update()
 {
-    this->orientation = orientation;
+
+    btTransform trans;
+    rigidBody->getMotionState()->getWorldTransform(trans);
+    position = glm::vec3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());// - glm::vec3(m_scaledMeshOffsetToBody.getX(), m_scaledMeshOffsetToBody.getY(), m_scaledMeshOffsetToBody.getZ());
+    printf("%f %f %f\n", position.x, position.y, position.z);
+
+
+    int activationState = rigidBody->getActivationState();
+    if (activationState == 2) rigidBody->activate();
+	//TODO: add bool canSleep 
+
+    this->modelMatrix = glm::translate(glm::mat4(1.f), position);
 }
 
+btRigidBody* Model::getRigidBody() const
+{
+    return rigidBody;
+}
 
 void Model::loadModel(const std::string& path)
 {
@@ -110,7 +128,7 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
         }
 
-        vertex.Position += position;
+        //vertex.Position += position;
         vertices.push_back(vertex);
     }
 
@@ -176,11 +194,36 @@ void Model::setupHitboxes()
     }
 }
 
+#include "MyMotionState.h"
 void Model::setupHitbox()
 {
 	const std::vector<glm::vec3> dataSize = getBiggestHitBox();
-	const glm::vec3 size = dataSize[0];
-	const glm::vec3 center = dataSize[1];
+    this->size = dataSize[0] * glm::vec3(0.5);
+    this->center = dataSize[1];
+
+    boxCollisionShape = new btBoxShape(btVector3(size.x, size.y, size.z));
+    transform.setIdentity();
+    transform.setOrigin(btVector3(center.x, center.y, center.z));
+ 
+    btMotionState* mt = new btDefaultMotionState(transform);
+    rigidBody = new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
+        weight,
+        mt,
+        boxCollisionShape
+    ));
+    //btMotionState* mt = new MyMotionState(rigidBody, center, size, this);
+    //rigidBody->setMotionState(mt);
+
+    /* btVector3 mesh_center = btVector3(center.x, center.y, center.z);
+     btVector3 mesh_scale = btVector3(size.x, size.y, size.z);
+
+
+     btVector3 aabb_min, aabb_max;
+     boxCollisionShape->getAabb(transform, aabb_min, aabb_max);
+     btVector3 body_scale = aabb_max - aabb_min;
+
+     m_scaleMeshToBody = body_scale / mesh_scale;
+     m_scaledMeshOffsetToBody = (-mesh_center * m_scaleMeshToBody);*/
 }
 
 std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& vertices) const
@@ -201,7 +244,7 @@ std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& ve
     glm::vec3 size = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z);
     glm::vec3 center = glm::vec3((min_x + max_x) / 2, (min_y + max_y) / 2, (min_z + max_z) / 2);
 
-    center += position * glm::vec3(2.0f);
+    center += position * 2.0f;
 
     std::vector<glm::vec3> ret;
     ret.emplace_back(size);
