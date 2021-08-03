@@ -27,7 +27,7 @@ bool firstMouse = true;
 float mouseX, mouseY;
 float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
 float posX = 0.0f, posY = 0.0f, posZ = 0.0f;
-const float BASE_FORCE = 5.0f;
+const float BASE_FORCE = 10.0f;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -62,10 +62,16 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		posZ += BASE_FORCE * 0.01f;
+		//posZ += BASE_FORCE * 0.01f;
+		forceZ = BASE_FORCE * 0.1f;
 	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		posZ -= BASE_FORCE * 0.01f;
+		//posZ -= BASE_FORCE * 0.01f;
+		forceZ = -BASE_FORCE * 0.1f;
 	}
+	else {
+		forceZ = 0.0f;
+	}
+
 
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 		forceZ = BASE_FORCE;
@@ -75,31 +81,31 @@ void processInput(GLFWwindow* window)
 	}
 	else
 	{
-		forceZ = 0.0f;
+		//forceZ = 0.0f;
 	}
 	
 	
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		forceX = BASE_FORCE;
-		posX += BASE_FORCE * 0.01f;
+		forceX = BASE_FORCE * 0.1f;
+		//posX += BASE_FORCE * 0.01f;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		forceX = -BASE_FORCE;
-		posX -= BASE_FORCE * 0.01f;
+		forceX = -BASE_FORCE * 0.1f;
+		//posX -= BASE_FORCE * 0.01f;
 	} else
 	{
 		forceX = 0.0f;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		forceX = BASE_FORCE;
+		//forceX = BASE_FORCE;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		forceX = -BASE_FORCE;
+		//forceX = -BASE_FORCE;
 	}
 	else
 	{
-		forceX = 0.0f;
+		//forceX = 0.0f;
 	}
 }
 
@@ -250,23 +256,21 @@ int main() {
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 	dynamicsWorld->setDebugDrawer(debugDraw);
 
-
-
 	
-	localPlayer = new LocalPlayer("../../models/tank/tank.obj", glm::vec3(0.0f, 0.0f, 0.0f));
 	//dynamicsWorld->addRigidBody(localPlayer->getModel()->getRigidBody());
 	
 	//Model model("../../models/aim_deagle7k/map.obj");
 	//Model model("../../models/map_lighter/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
 	//Model model("../../models/M4a1/M4a1.obj");
 	//Model model("../../models/floor/CobbleStones2.obj", MODEL_TYPE::STATIC, glm::vec3(-1.0f, 0.0f, 0.0f), true);
-Model model("../../models/floor_2/floor.obj", glm::vec3(-10.0f, -25.0f, 50.0f), false);
+Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false);
 	//Model model2("../../models/crate/Wooden Crate.obj", MODEL_TYPE::STATIC, glm::vec3(100.0f, 10.f, -100.0f), true);
 	//Model model3("../../models/sphere/sphere.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(0.0f, 0.5f, 0.0f), true);
-	Model model2("../../models/sphere/sphere.obj", glm::vec3(-1, 3, 3), 10.0f, false);
+	Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), 10.0f, false);
 	//Model model2;
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(8.0f, 8.0f, 4.0f));
 
+	localPlayer = new LocalPlayer("../../models/sphere/sphere.obj", glm::vec3(0.0f, 5.0f, 0.0f));
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	SkyBox skybox("../../textures/skybox");
@@ -279,8 +283,9 @@ Model model("../../models/floor_2/floor.obj", glm::vec3(-10.0f, -25.0f, 50.0f), 
 	createLights(shader);
 
 
-	dynamicsWorld->addRigidBody(model2.getRigidBody());
+	dynamicsWorld->addRigidBody(localPlayer->getModel()->getRigidBody());
 	dynamicsWorld->addRigidBody(model.getRigidBody());
+	dynamicsWorld->addRigidBody(model2.getRigidBody());
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 60.0f;
@@ -295,24 +300,24 @@ Model model("../../models/floor_2/floor.obj", glm::vec3(-10.0f, -25.0f, 50.0f), 
 		dynamicsWorld->stepSimulation(timeStep, 10);
 		dynamicsWorld->debugDrawWorld();
 		
-
-		model2.update();
-		model2.getRigidBody()->applyCentralForce(btVector3(forceX, forceY, forceZ));
-		
-		localPlayer->setPosition(glm::vec3(posX, posY, posZ));
-
-		const btTransform tr = model2.getRigidBody()->getWorldTransform();
+		/*const btTransform tr = model2.getRigidBody()->getWorldTransform();
 		OpenGLine l(glm::vec3(0, 0, 0), glm::vec3(5));
 		l.setMVP(projection * Camera::getInstance()->getViewMatrix());
-		l.draw();
+		l.draw();*/
 		
-		shader.use();
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		//shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
-		//localPlayer->draw(shader);
+		shader.use();
+	
+		localPlayer->getModel()->getRigidBody()->applyCentralForce(btVector3(forceX, forceY, forceZ));
+		//localPlayer->setPosition(localPlayer->getModel()->getPosition());
+		localPlayer->getModel()->update();
+		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
+
+		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
+		localPlayer->draw(shader);
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		model.draw(shader);
 		model2.draw(shader);

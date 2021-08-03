@@ -19,7 +19,7 @@ glm::vec3 Player::getPosition() const
 void Player::setPosition(const glm::vec3& position)
 {
 	this->position = position;
-	//this->model->setPosition(this->position);
+	this->model->setPosition(this->position);
 }
 
 void Player::setOrientation(const glm::vec3& orientation)
@@ -57,5 +57,5 @@ void Player::initModel(const std::string& modelPath)
 {
 	delete model;
 	this->modelPath = modelPath;
-	model = new Model(modelPath, position, false, false);
+	model = new Model(modelPath, position, 1.0f, false);
 }

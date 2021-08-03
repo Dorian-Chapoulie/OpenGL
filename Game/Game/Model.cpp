@@ -5,7 +5,7 @@ Model::Model(const std::string& path, const glm::vec3& position, float weight, b
     this->weight = weight;
     this->position = position;
     this->hasHitbox = hasHitbox;
-    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
+    this->modelMatrix = glm::translate(this->modelMatrix, position);
     loadModel(path);
     if (hasMultipleHitboxes) setupHitboxes();
     else if (hasHitbox) setupHitbox();
@@ -15,7 +15,7 @@ Model::Model(const std::string& path, const glm::vec3& position, bool hasMultipl
 {
     this->position = position;
     this->hasHitbox = hasHitbox;
-    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
+    this->modelMatrix = glm::translate(this->modelMatrix, position);
     loadModel(path);
     if (hasMultipleHitboxes) setupHitboxes();
     else if (hasHitbox) setupHitbox();
@@ -34,27 +34,43 @@ void Model::draw(Shader& shader)
 	}
 }
 
+glm::vec3 Model::getPosition() {
+    return position;
+}
+
 void Model::setPosition(const glm::vec3& position)
 {
     this->position = position;
-    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
-    //this->modelMatrix *= glm::scale(this->modelMatrix, glm::vec3(scale));
+    this->modelMatrix = glm::translate(this->modelMatrix, position);
+    //printf("%f %f %f\n", this->modelMatrix[3][0], this->modelMatrix[3][1], this->modelMatrix[3][2]);
+    //this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(scale));
 }
-
+#include "Camera.h"
 void Model::update()
 {
-
+   
     btTransform trans;
     rigidBody->getMotionState()->getWorldTransform(trans);
-    position = glm::vec3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());// - glm::vec3(m_scaledMeshOffsetToBody.getX(), m_scaledMeshOffsetToBody.getY(), m_scaledMeshOffsetToBody.getZ());
-    printf("%f %f %f\n", position.x, position.y, position.z);
-
+    glm::vec3 pos = glm::vec3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());// - glm::vec3(m_scaledMeshOffsetToBody.getX(), m_scaledMeshOffsetToBody.getY(), m_scaledMeshOffsetToBody.getZ());
 
     int activationState = rigidBody->getActivationState();
     if (activationState == 2) rigidBody->activate();
 	//TODO: add bool canSleep 
 
-    this->modelMatrix = glm::translate(glm::mat4(1.f), position);
+    const glm::vec3 tmp = glm::vec3(
+        pos.x - this->position.x,
+        pos.y - this->position.y,
+        pos.z - this->position.z
+    );
+
+
+    this->position = pos;
+    this->modelMatrix = glm::translate(this->modelMatrix, tmp);
+
+
+    //printf("%f %f %f\n", modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2]);
+    //printf("%f %f %f\n", pos.x, pos.y, pos.z);
+    //setPosition(position);
 }
 
 btRigidBody* Model::getRigidBody() const

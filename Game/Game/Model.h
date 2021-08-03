@@ -19,6 +19,7 @@ public:
 	void draw(Shader& shader);
 
 	void setPosition(const glm::vec3& position);
+	glm::vec3 getPosition();
 	void update();
 	
 	btRigidBody* getRigidBody() const;
