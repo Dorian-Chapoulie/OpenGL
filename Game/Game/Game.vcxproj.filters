@@ -43,6 +43,9 @@
     <Filter Include="skybox">
       <UniqueIdentifier>{72992498-1034-4dad-a958-ef1be2636da1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MotionState">
+      <UniqueIdentifier>{9104c06d-1b0b-45eb-ace0-0e53350d0e8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -88,7 +91,7 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="MyMotionState.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>MotionState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -132,7 +135,7 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="MyMotionState.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>MotionState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

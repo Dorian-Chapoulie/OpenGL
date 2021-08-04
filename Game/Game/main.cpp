@@ -266,11 +266,13 @@ int main() {
 Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false);
 	//Model model2("../../models/crate/Wooden Crate.obj", MODEL_TYPE::STATIC, glm::vec3(100.0f, 10.f, -100.0f), true);
 	//Model model3("../../models/sphere/sphere.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(0.0f, 0.5f, 0.0f), true);
-	Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), 10.0f, false);
+	Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), false);
+	Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(-7, 3, 3), 10.0f, false);
+	Model model4("../../models/sphere/sphere.obj", glm::vec3(-7, 30, 3), 30.0f, false);
 	//Model model2;
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(8.0f, 8.0f, 4.0f));
 
-	localPlayer = new LocalPlayer("../../models/sphere/sphere.obj", glm::vec3(0.0f, 5.0f, 0.0f));
+	localPlayer = new LocalPlayer("../../models/tank/tank.obj", glm::vec3(4.0f, 5.0f, 5.0f));
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	SkyBox skybox("../../textures/skybox");
@@ -286,6 +288,8 @@ Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false
 	dynamicsWorld->addRigidBody(localPlayer->getModel()->getRigidBody());
 	dynamicsWorld->addRigidBody(model.getRigidBody());
 	dynamicsWorld->addRigidBody(model2.getRigidBody());
+	dynamicsWorld->addRigidBody(model3.getRigidBody());
+	dynamicsWorld->addRigidBody(model4.getRigidBody());
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 60.0f;
@@ -312,8 +316,6 @@ Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false
 		shader.use();
 	
 		localPlayer->getModel()->getRigidBody()->applyCentralForce(btVector3(forceX, forceY, forceZ));
-		//localPlayer->setPosition(localPlayer->getModel()->getPosition());
-		localPlayer->getModel()->update();
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
@@ -321,6 +323,8 @@ Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		model.draw(shader);
 		model2.draw(shader);
+		model3.draw(shader);
+		model4.draw(shader);
 
 	#pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);
