@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "MyMotionState.h"
+#include <glm/gtx/quaternion.hpp>
 
 Model::Model(const std::string& path, const glm::vec3& position, float weight, bool hasMultipleHitboxes, bool hasHitbox)
 {
@@ -50,21 +51,46 @@ void Model::draw(Shader& shader)
 }
 
 glm::vec3 Model::getPosition() {
-    return position;
+    btVector3 tr = rigidBody->getWorldTransform().getOrigin();
+    return glm::vec3(tr.getX(), tr.getY(), tr.getZ());
+}
+
+const float Model::getCenterRotation() const {
+    return centerRotation;
 }
 
 void Model::setPosition(const glm::vec3& position)
 {
     this->position = position;
     this->modelMatrix = glm::translate(this->modelMatrix, position);
-    //printf("%f %f %f\n", position.x, position.y, position.z);
-    //this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(scale));
 }
 
-void Model::setWorldTransform(const glm::vec3& position)
+void Model::setRotationAroundCenter(const float angle)
+{
+    this->centerRotation = glm::radians(angle);
+    btQuaternion quat;
+    quat.setEuler(centerRotation, 0, 0);
+    quat.setRotation(btVector3(0, 1, 0), centerRotation);
+    rigidBody->getWorldTransform().setRotation(quat);
+}
+
+void Model::setWorldTransform(const glm::vec3& position, const glm::quat& rot)
 {
     this->position = position;
-    this->modelMatrix = glm::translate(glm::mat4(1.0f), position);
+    glm::quat r = glm::quat(glm::vec3(0, centerRotation, 0));
+
+    btVector3 tr = rigidBody->getWorldTransform().getOrigin();
+
+    const glm::vec3 temp = glm::vec3(tr.getX(), tr.getY(), tr.getZ());
+
+
+    modelMatrix = glm::translate(glm::mat4(1.0f), position);
+    modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.f, 0.f));
+
+    /*
+        modelMatrix = glm::translate(glm::mat4(1.0f), position);
+        modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.0f, 0.f));
+    */
 }
 
 btRigidBody* Model::getRigidBody() const
@@ -222,9 +248,9 @@ void Model::setupHitbox()
     ));
     btMotionState* motionState = new MyMotionState(this, transform);
     rigidBody->setMotionState(motionState);
+    rigidBody->setCenterOfMassTransform(transform);
     //TODO: find best way
     rigidBody->setActivationState(DISABLE_DEACTIVATION);
-    
 }
 
 std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& vertices) const

@@ -10,7 +10,7 @@ public:
 	std::unique_ptr<Camera>& getCamera();
 
 	void setPosition(const glm::vec3& position) override;
-	void setCameraPosition(const glm::vec3& position);
+	void setCameraPosition(const glm::vec3& position, const glm::vec3& size);
 
 private:
 	std::unique_ptr<Camera>& camera = Camera::getInstance();

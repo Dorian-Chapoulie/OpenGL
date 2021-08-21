@@ -9,7 +9,9 @@
 #include "Light.h"
 #include "Model.h"
 #include <thread>
-
+#include <Bullet3/btBulletCollisionCommon.h>
+#include <Bullet3/btBulletDynamicsCommon.h>
+#include <Bullet3/LinearMath/btIDebugDraw.h>
 #include "GLDebugDrawer.h"
 #include "LocalPlayer.h"
 #include "OpenGLine.h"
@@ -27,7 +29,7 @@ bool firstMouse = true;
 float mouseX, mouseY;
 float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
 float posX = 0.0f, posY = 0.0f, posZ = 0.0f;
-const float BASE_FORCE = 10.0f;
+const float BASE_FORCE = 10000.0f;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -72,18 +74,6 @@ void processInput(GLFWwindow* window)
 		forceZ = 0.0f;
 	}
 
-
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		forceZ = BASE_FORCE;
-	}
-	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		forceZ = -BASE_FORCE;
-	}
-	else
-	{
-		//forceZ = 0.0f;
-	}
-	
 	
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		forceX = BASE_FORCE * 0.1f;
@@ -97,16 +87,6 @@ void processInput(GLFWwindow* window)
 		forceX = 0.0f;
 	}
 	
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		//forceX = BASE_FORCE;
-	}
-	else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		//forceX = -BASE_FORCE;
-	}
-	else
-	{
-		//forceX = 0.0f;
-	}
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -203,9 +183,6 @@ void setupSound()
 	//SoundEngine->play3D("../../audio/quake/standard/monsterkill.mp3", position);
 }
 
-#include <Bullet3/btBulletCollisionCommon.h>
-#include <Bullet3/btBulletDynamicsCommon.h>
-#include <Bullet3/LinearMath/btIDebugDraw.h>
 int main() {
 #pragma region setup
 	glfwInit();
@@ -240,7 +217,7 @@ int main() {
 	glfwSetScrollCallback(window, scroll_callback);
 #pragma endregion endsetup
 
-
+#pragma region physics
 	btBroadphaseInterface* broadphase = new btDbvtBroadphase();
 	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
 	btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
@@ -255,24 +232,16 @@ int main() {
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 	dynamicsWorld->setDebugDrawer(debugDraw);
-
+#pragma endregion physics
 	
-	//dynamicsWorld->addRigidBody(localPlayer->getModel()->getRigidBody());
-	
-	//Model model("../../models/aim_deagle7k/map.obj");
-	//Model model("../../models/map_lighter/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
-	//Model model("../../models/M4a1/M4a1.obj");
-	//Model model("../../models/floor/CobbleStones2.obj", MODEL_TYPE::STATIC, glm::vec3(-1.0f, 0.0f, 0.0f), true);
-Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false);
-	//Model model2("../../models/crate/Wooden Crate.obj", MODEL_TYPE::STATIC, glm::vec3(100.0f, 10.f, -100.0f), true);
-	//Model model3("../../models/sphere/sphere.obj", MODEL_TYPE::COLLISION_BODY, glm::vec3(0.0f, 0.5f, 0.0f), true);
-	Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), false);
-	Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(-7, 3, 3), 10.0f, false);
-	Model model4("../../models/sphere/sphere.obj", glm::vec3(-7, 30, 3), 30.0f, false);
-	//Model model2;
-	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(8.0f, 8.0f, 4.0f));
+	Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false);
+	Model model2("../../models/triangle/triangle.obj", glm::vec3(0.0f, 1.0f, 0.0f), false);
+	//Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), false);
+	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(-7, 3, 3), 10.0f, false);
+	//Model model4("../../models/crate/Wooden Crate.obj", glm::vec3(-8, 30, -5), 300.0f, false);
 
-	localPlayer = new LocalPlayer("../../models/tank/tank.obj", glm::vec3(4.0f, 5.0f, 5.0f));
+
+	localPlayer = new LocalPlayer("../../models/tank/tank.obj", glm::vec3(-7, 30.0f, 3));
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	SkyBox skybox("../../textures/skybox");
@@ -288,13 +257,14 @@ Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false
 	dynamicsWorld->addRigidBody(localPlayer->getModel()->getRigidBody());
 	dynamicsWorld->addRigidBody(model.getRigidBody());
 	dynamicsWorld->addRigidBody(model2.getRigidBody());
-	dynamicsWorld->addRigidBody(model3.getRigidBody());
-	dynamicsWorld->addRigidBody(model4.getRigidBody());
+	//dynamicsWorld->addRigidBody(model3.getRigidBody());
+	//dynamicsWorld->addRigidBody(model4.getRigidBody());
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
-	float timeStep = 1.0 / 60.0f;
+	float timeStep = 1.0 / 30.0f;
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
+	//force y = 9.1
 	while (!glfwWindowShouldClose(window))
 	{	
 		processInput(window);
@@ -304,11 +274,6 @@ Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false
 		dynamicsWorld->stepSimulation(timeStep, 10);
 		dynamicsWorld->debugDrawWorld();
 		
-		/*const btTransform tr = model2.getRigidBody()->getWorldTransform();
-		OpenGLine l(glm::vec3(0, 0, 0), glm::vec3(5));
-		l.setMVP(projection * Camera::getInstance()->getViewMatrix());
-		l.draw();*/
-		
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -316,15 +281,17 @@ Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false
 		shader.use();
 	
 		localPlayer->getModel()->getRigidBody()->applyCentralForce(btVector3(forceX, forceY, forceZ));
-		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
+		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition(), localPlayer->getModel()->getSize());
+		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw());
+
 
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		localPlayer->draw(shader);
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		model.draw(shader);
 		model2.draw(shader);
-		model3.draw(shader);
-		model4.draw(shader);
+		//model3.draw(shader);
+		//model4.draw(shader);
 
 	#pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);

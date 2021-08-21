@@ -18,7 +18,6 @@ void MyMotionState::getWorldTransform(btTransform& worldTrans) const {
 
 
 void MyMotionState::setWorldTransform(const btTransform& worldTrans) {
-
     glm::vec3 position(
         worldTrans.getOrigin().getX(),
         worldTrans.getOrigin().getY(),
@@ -34,6 +33,9 @@ void MyMotionState::setWorldTransform(const btTransform& worldTrans) {
         position.z - center.z + basePosition.z
     );
 
-    model->setWorldTransform(tmp);
+    btQuaternion physicsQuat = worldTrans.getRotation();
+    glm::quat rotation = glm::quat(glm::vec3(0, abs(physicsQuat.getY()), 0));
+
+    model->setWorldTransform(tmp, rotation);
     m_graphicsWorldTrans = worldTrans * m_centerOfMassOffset;
 }

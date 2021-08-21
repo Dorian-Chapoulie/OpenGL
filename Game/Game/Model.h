@@ -19,17 +19,20 @@ public:
 	void draw(Shader& shader);
 
 	void setPosition(const glm::vec3& position);
-	void setWorldTransform(const glm::vec3& position);
+	void setRotationAroundCenter(const float angle);
+	void setWorldTransform(const glm::vec3& position, const glm::quat& rotation);
 
 	glm::vec3 getPosition();
 	const glm::vec3 getCenter() const;
 	const glm::vec3 getSize() const;
 	const glm::vec3 getBasePosition() const;
+	const float getCenterRotation() const;
 	
 	btRigidBody* getRigidBody() const;
 private:
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
+	float centerRotation = 0.0f;
 	glm::vec3 basePosition = glm::vec3(0.0f);
 	std::vector<Texture> loadedTextures;
 	std::vector<Mesh*> meshes;
@@ -37,8 +40,7 @@ private:
 
 	glm::vec3 size = glm::vec3(0.0f);
 	glm::vec3 center = glm::vec3(0.0f);
-	
-	glm::vec3 orientation = glm::vec3(0.0f);
+
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 
 	void loadModel(const std::string& path);
@@ -59,8 +61,9 @@ private:
 	btVector3 m_scaledMeshOffsetToBody;
 	btVector3 m_scaleMeshToBody;
 
-	btRigidBody* rigidBody = nullptr;
+	btRigidBody* worldTrans = nullptr;
 	btCollisionShape* boxCollisionShape = nullptr;
+	btRigidBody* rigidBody = nullptr;
 
 	float weight = 0.0f;
 };
