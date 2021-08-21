@@ -51,8 +51,7 @@ void Model::draw(Shader& shader)
 }
 
 glm::vec3 Model::getPosition() {
-    btVector3 tr = rigidBody->getWorldTransform().getOrigin();
-    return glm::vec3(tr.getX(), tr.getY(), tr.getZ());
+    return position;
 }
 
 const float Model::getCenterRotation() const {
@@ -79,18 +78,8 @@ void Model::setWorldTransform(const glm::vec3& position, const glm::quat& rot)
     this->position = position;
     glm::quat r = glm::quat(glm::vec3(0, centerRotation, 0));
 
-    btVector3 tr = rigidBody->getWorldTransform().getOrigin();
-
-    const glm::vec3 temp = glm::vec3(tr.getX(), tr.getY(), tr.getZ());
-
-
     modelMatrix = glm::translate(glm::mat4(1.0f), position);
     modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.f, 0.f));
-
-    /*
-        modelMatrix = glm::translate(glm::mat4(1.0f), position);
-        modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.0f, 0.f));
-    */
 }
 
 btRigidBody* Model::getRigidBody() const
