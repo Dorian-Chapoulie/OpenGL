@@ -53,6 +53,16 @@ float Camera::getPitch() const
 	return pitch;
 }
 
+float Camera::getDefaultYaw() const
+{
+	return defaultYaw;
+}
+
+float Camera::getDefaultPitch() const
+{
+	return defaultPitch;
+}
+
 glm::vec3 Camera::getFrontVector() const
 {
 	return cameraFront;

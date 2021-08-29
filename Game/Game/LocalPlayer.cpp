@@ -16,6 +16,7 @@ void LocalPlayer::setPosition(const glm::vec3& position)
 	//Player::setPosition(position);
 }
 
+//TODO: remove size
 void LocalPlayer::setCameraPosition(const glm::vec3& position, const glm::vec3& size) {
 	camera->setPosition(
 		glm::vec3(

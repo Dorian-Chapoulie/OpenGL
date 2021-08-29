@@ -112,7 +112,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
 	cam->increaseYaw(xoffset);
 	cam->increasePitch(yoffset);
-
+	//put this code in increaseYaw/Pitch
 	if (cam->getPitch() > 89.0f)
 		cam->setPich(89.0f);
 	if (cam->getPitch() < -89.0f)
@@ -241,7 +241,7 @@ int main() {
 	//Model model4("../../models/crate/Wooden Crate.obj", glm::vec3(-8, 30, -5), 300.0f, false);
 
 
-	localPlayer = new LocalPlayer("../../models/tank/tank.obj", glm::vec3(-7, 30.0f, 3));
+	localPlayer = new LocalPlayer("../../models/soldier/soldier.obj", glm::vec3(-7, 30.0f, 3));
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	SkyBox skybox("../../textures/skybox");
@@ -282,12 +282,13 @@ int main() {
 	
 		localPlayer->getModel()->getRigidBody()->applyCentralForce(btVector3(forceX, forceY, forceZ));
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition(), localPlayer->getModel()->getSize());
-		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw());
+		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
 
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
-		localPlayer->draw(shader);
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+
+		localPlayer->draw(shader);
 		model.draw(shader);
 		model2.draw(shader);
 		//model3.draw(shader);

@@ -76,8 +76,7 @@ void Model::setRotationAroundCenter(const float angle)
 void Model::setWorldTransform(const glm::vec3& position, const glm::quat& rot)
 {
     this->position = position;
-    glm::quat r = glm::quat(glm::vec3(0, centerRotation, 0));
-
+    //glm::quat r = glm::quat(glm::vec3(0, centerRotation, 0));
     modelMatrix = glm::translate(glm::mat4(1.0f), position);
     modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.f, 0.f));
 }

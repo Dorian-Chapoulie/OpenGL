@@ -20,6 +20,8 @@ public:
 	
 	float getYaw() const;
 	float getPitch() const;
+	float getDefaultYaw() const;
+	float getDefaultPitch() const;
 
 	glm::vec3 getFrontVector() const;
 	glm::vec3 getUpVector() const;
@@ -31,12 +33,17 @@ private:
 	Camera();
 	static std::unique_ptr<Camera> instance;
 
+	float yaw = 89.0f, defaultYaw = 89.0f;
+	float pitch = 0.0f, defaultPitch = 0.0f;
+
 	glm::vec3 cameraPos = glm::vec3(1.0f);
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
+	glm::vec3 cameraFront = glm::vec3(
+		cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
+		sin(glm::radians(pitch)),
+		sin(glm::radians(yaw)) * cos(glm::radians(pitch))
+	);
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-	float yaw = 90.0f;
-	float pitch = 0.0f;
+	
 };
 
