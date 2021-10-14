@@ -148,9 +148,9 @@ void setupShader(Shader& shader, const glm::mat4& projection)
 	shader.setMatrix("projection", projection);
 
 	shader.setVec3("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setVec3("material.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader.setVec3("material.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-	shader.setValue<float>("material.shininess", 50.0f);
+	shader.setValue<float>("material.shininess", 100.0f);
 }
 
 void setupSkyBoxShader(Shader& shader, const glm::mat4& projection)
@@ -164,14 +164,14 @@ void setupSkyBoxShader(Shader& shader, const glm::mat4& projection)
 void createLights(Shader& shader)
 {
 	const glm::vec3 downVector = glm::vec3(0.0f, -1.0f, 0.0f);
-	const glm::vec3 white = glm::vec3(1.0f);
+	const glm::vec3 white = glm::vec3(1.0f, 1.0f, 1.0f);
 	const glm::vec3 red = glm::vec3(1.0f, 0.0f, 0.0f);
 	const glm::vec3 blue = glm::vec3(0.0f, 1.0f, 1.0f);
 	const glm::vec3 green = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	auto* light = new Light(&shader, glm::vec3(5.75878, 1.32539, -5.09563), white);
+	auto* light = new Light(&shader, glm::vec3(0.f, 50.0f, 0.f), white);
 
-	auto* light2 = new Light(&shader, glm::vec3(0, 8, 0), downVector, red, 10.0f);
+	//auto* light2 = new Light(&shader, glm::vec3(0, 10, 0), downVector, red, 100.0f);
 	//auto* light4 = new Light(&shader, glm::vec3(0.5, 8, 0), downVector, red, 100.0f);
 	//auto* light5 = new Light(&shader, glm::vec3(4, 8, 0), downVector, green, 100.0f);
 }
@@ -234,8 +234,8 @@ int main() {
 	dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 	
-	Model model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), false);
-	Model model2("../../models/triangle/triangle.obj", glm::vec3(0.0f, 1.0f, 0.0f), false);
+	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), false);
+	//Model model2("../../models/triangle/triangle.obj", glm::vec3(0.0f, 1.0f, 0.0f), false);
 	//Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), false);
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(-7, 3, 3), 10.0f, false);
 	//Model model4("../../models/crate/Wooden Crate.obj", glm::vec3(-8, 30, -5), 300.0f, false);
@@ -256,7 +256,7 @@ int main() {
 
 	dynamicsWorld->addRigidBody(localPlayer->getModel()->getRigidBody());
 	dynamicsWorld->addRigidBody(model.getRigidBody());
-	dynamicsWorld->addRigidBody(model2.getRigidBody());
+	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 	//dynamicsWorld->addRigidBody(model3.getRigidBody());
 	//dynamicsWorld->addRigidBody(model4.getRigidBody());
 
@@ -290,7 +290,7 @@ int main() {
 
 		localPlayer->draw(shader);
 		model.draw(shader);
-		model2.draw(shader);
+		//model2.draw(shader);
 		//model3.draw(shader);
 		//model4.draw(shader);
 

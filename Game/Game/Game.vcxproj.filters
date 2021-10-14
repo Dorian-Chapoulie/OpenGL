@@ -46,6 +46,9 @@
     <Filter Include="MotionState">
       <UniqueIdentifier>{9104c06d-1b0b-45eb-ace0-0e53350d0e8a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="level">
+      <UniqueIdentifier>{6b7759a6-aa8f-4bc8-8efe-fddffcf36f80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -93,6 +96,9 @@
     <ClCompile Include="MyMotionState.cpp">
       <Filter>MotionState</Filter>
     </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -136,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="MyMotionState.h">
       <Filter>MotionState</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>level</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -147,6 +147,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLDebugDrawer.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -163,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GLDebugDrawer.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LocalPlayer.h" />
     <ClInclude Include="Mesh.h" />

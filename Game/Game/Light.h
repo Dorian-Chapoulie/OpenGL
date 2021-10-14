@@ -30,12 +30,12 @@ public:
     
 private:
     glm::vec3 position = glm::vec3(0.0f);
-    glm::vec3 ambiant = glm::vec3(0.5f);
+    glm::vec3 ambiant = glm::vec3(1.0f);
     glm::vec3 diffuse = glm::vec3(1.0f);
     glm::vec3 specular = glm::vec3(1.0f);
     glm::vec3* direction = nullptr;
 
-    const float constant = 1.0f;
+    const float constant = 0.5f;
     float linear = 0.37f;
     float quadratic = 0.14f;
     float* cutOff = nullptr;
