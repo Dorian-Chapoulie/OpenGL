@@ -13,8 +13,9 @@
 
 class Model {
 public:
-	Model(const std::string& path, const glm::vec3& position, float weight, bool hasMultipleHitboxes = true, bool hasHitbox = true);
-	Model(const std::string& path, const glm::vec3& position, bool hasMultipleHitboxes = true, bool hasHitbox = true);
+	Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox, bool hasMultipleHitboxes);
+	Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox);
+	Model(const std::string& path, const glm::vec3& position, bool hasHitbox);
 	~Model();
 	void draw(Shader& shader);
 
@@ -28,7 +29,7 @@ public:
 	const glm::vec3 getBasePosition() const;
 	const float getCenterRotation() const;
 	
-	btRigidBody* getRigidBody() const;
+	std::vector<btRigidBody*> getRigidBodys() const;
 private:
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
@@ -38,8 +39,8 @@ private:
 	std::vector<Mesh*> meshes;
 	std::string directory;
 
-	glm::vec3 size = glm::vec3(0.0f);
-	glm::vec3 center = glm::vec3(0.0f);
+	std::vector<glm::vec3> sizes;
+	std::vector<glm::vec3> centers;
 
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -54,16 +55,14 @@ private:
 	std::vector<glm::vec3> getBiggestHitBox() const;
 
 	bool hasHitbox = true;
-	bool hasMultipleHitboxes = true;
 
 //BulletPhysics
 private:
 	btVector3 m_scaledMeshOffsetToBody;
-	btVector3 m_scaleMeshToBody;
 
-	btRigidBody* worldTrans = nullptr;
-	btCollisionShape* boxCollisionShape = nullptr;
-	btRigidBody* rigidBody = nullptr;
+	std::vector<btRigidBody*> worldTrans;
+	std::vector<btCollisionShape*> boxCollisionShapes;
+	std::vector<btRigidBody*> rigidBodys;
 
 	float weight = 0.0f;
 };

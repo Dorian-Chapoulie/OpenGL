@@ -11,6 +11,7 @@ public:
 
 	void setPosition(const glm::vec3& position) override;
 	void setCameraPosition(const glm::vec3& position, const glm::vec3& size);
+	void move(const glm::vec3& force);
 
 private:
 	std::unique_ptr<Camera>& camera = Camera::getInstance();

@@ -2,7 +2,7 @@
 #include "MyMotionState.h"
 #include <glm/gtx/quaternion.hpp>
 
-Model::Model(const std::string& path, const glm::vec3& position, float weight, bool hasMultipleHitboxes, bool hasHitbox)
+Model::Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox, bool hasMultipleHitboxes)
 {
     this->weight = weight;
     this->position = position;
@@ -10,11 +10,24 @@ Model::Model(const std::string& path, const glm::vec3& position, float weight, b
     this->hasHitbox = hasHitbox;
     setPosition(position);
     loadModel(path);
-    if (hasMultipleHitboxes) setupHitboxes();
-    else if (hasHitbox) setupHitbox();
+    if (hasHitbox) setupHitbox();
+    else if (hasMultipleHitboxes) setupHitboxes();
+    std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
 }
 
-Model::Model(const std::string& path, const glm::vec3& position, bool hasMultipleHitboxes, bool hasHitbox)
+Model::Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox)
+{
+    this->weight = weight;
+    this->position = position;
+    this->basePosition = position;
+    this->hasHitbox = hasHitbox;
+    setPosition(position);
+    loadModel(path);
+    if (hasHitbox) setupHitboxes();
+    std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
+}
+
+Model::Model(const std::string& path, const glm::vec3& position, bool hasHitbox)
 {
     this->position = position;
     this->hasHitbox = hasHitbox;
@@ -22,8 +35,8 @@ Model::Model(const std::string& path, const glm::vec3& position, bool hasMultipl
     this->basePosition = position;
     setPosition(position);
     loadModel(path);
-    if (hasMultipleHitboxes) setupHitboxes();
-    else if (hasHitbox) setupHitbox();
+    if (hasHitbox) setupHitboxes();
+    std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
 }
 
 Model::~Model()
@@ -35,11 +48,19 @@ const glm::vec3 Model::getBasePosition() const {
 }
 
 const glm::vec3 Model::getSize() const {
-    return size;
+    //TODO: fix this
+    if (sizes.size() > 0) {
+        return sizes[0];
+    }
+    return glm::vec3(0.0f);
 }
 
 const glm::vec3 Model::getCenter() const {
-    return center;
+    //TODO: fix this
+    if (centers.size() > 0) {
+        return centers[0];
+    }
+    return glm::vec3(0.0f);
 }
 
 void Model::draw(Shader& shader)
@@ -70,7 +91,9 @@ void Model::setRotationAroundCenter(const float angle)
     btQuaternion quat;
     quat.setEuler(centerRotation, 0, 0);
     quat.setRotation(btVector3(0, 1, 0), centerRotation);
-    rigidBody->getWorldTransform().setRotation(quat);
+    for (auto& rigidBody : rigidBodys) {
+        rigidBody->getWorldTransform().setRotation(quat);
+    }
 }
 
 void Model::setWorldTransform(const glm::vec3& position, const glm::quat& rot)
@@ -81,9 +104,9 @@ void Model::setWorldTransform(const glm::vec3& position, const glm::quat& rot)
     modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.f, 0.f));
 }
 
-btRigidBody* Model::getRigidBody() const
+std::vector<btRigidBody*> Model::getRigidBodys() const
 {
-    return rigidBody;
+    return rigidBodys;
 }
 
 void Model::loadModel(const std::string& path)
@@ -208,37 +231,56 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 
 void Model::setupHitboxes()
 {
-    for (const Mesh* mesh : meshes)
-    {
-
+    for (Mesh* mesh : meshes) {
         const std::vector<glm::vec3> dataSize = getMeshCenterAndSize(mesh->getVertices());
-        const glm::vec3 size = dataSize[0];
-        const glm::vec3 center = dataSize[1];
-    	
+        sizes.emplace_back(glm::vec3(dataSize[0] * glm::vec3(0.5)));
+        centers.emplace_back(dataSize[1]);
+
+        const glm::vec3 size = sizes.back();
+        const glm::vec3 center = centers.back();
+
+        boxCollisionShapes.emplace_back(new btBoxShape(btVector3(size.x, size.y, size.z)));
+        btTransform transform;
+        transform.setIdentity();
+        transform.setOrigin(btVector3(center.x, center.y, center.z));
+
+        rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
+            weight,
+            nullptr,
+            boxCollisionShapes.back()
+        )));
+   
+        rigidBodys.back()->setMotionState(new MyMotionState(this, transform));
+        rigidBodys.back()->setCenterOfMassTransform(transform);
+        //TODO: find best way
+        rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);	
     }
 }
 
 void Model::setupHitbox()
 {
-	const std::vector<glm::vec3> dataSize = getBiggestHitBox();
-    this->size = dataSize[0] * glm::vec3(0.5);
-    this->center = dataSize[1];
+    const std::vector<glm::vec3> dataSize = getBiggestHitBox();
+    sizes.emplace_back(glm::vec3(dataSize[0] * glm::vec3(0.5)));
+    centers.emplace_back(dataSize[1]);
 
-    boxCollisionShape = new btBoxShape(btVector3(size.x, size.y, size.z));
+    const glm::vec3 size = sizes.back();
+    const glm::vec3 center = centers.back();
+
+    boxCollisionShapes.emplace_back(new btBoxShape(btVector3(size.x, size.y, size.z)));
     btTransform transform;
     transform.setIdentity();
     transform.setOrigin(btVector3(center.x, center.y, center.z));
 
-    rigidBody = new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
+    rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
         weight,
         nullptr,
-        boxCollisionShape
-    ));
-    btMotionState* motionState = new MyMotionState(this, transform);
-    rigidBody->setMotionState(motionState);
-    rigidBody->setCenterOfMassTransform(transform);
+        boxCollisionShapes.back()
+    )));
+
+    rigidBodys.back()->setMotionState(new MyMotionState(this, transform));
+    rigidBodys.back()->setCenterOfMassTransform(transform);
     //TODO: find best way
-    rigidBody->setActivationState(DISABLE_DEACTIVATION);
+    rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
 }
 
 std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& vertices) const
@@ -283,3 +325,4 @@ std::vector<glm::vec3> Model::getBiggestHitBox() const
 	}
     return sizeCenter;
 }
+

@@ -57,5 +57,5 @@ void Player::initModel(const std::string& modelPath)
 {
 	delete model;
 	this->modelPath = modelPath;
-	model = new Model(modelPath, position, 1000.0f, false);
+	model = new Model(modelPath, position, 1000.0f, true, false);
 }

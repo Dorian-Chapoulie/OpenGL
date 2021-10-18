@@ -234,7 +234,7 @@ int main() {
 	dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 	
-	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), false);
+	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
 	//Model model2("../../models/triangle/triangle.obj", glm::vec3(0.0f, 1.0f, 0.0f), false);
 	//Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), false);
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(-7, 3, 3), 10.0f, false);
@@ -253,9 +253,12 @@ int main() {
 	setupSound();
 	createLights(shader);
 
-
-	dynamicsWorld->addRigidBody(localPlayer->getModel()->getRigidBody());
-	dynamicsWorld->addRigidBody(model.getRigidBody());
+	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}
+	for (auto* rigidBody : model.getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 	//dynamicsWorld->addRigidBody(model3.getRigidBody());
 	//dynamicsWorld->addRigidBody(model4.getRigidBody());
@@ -278,9 +281,9 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		shader.use();
+		shader.use(); 
 	
-		localPlayer->getModel()->getRigidBody()->applyCentralForce(btVector3(forceX, forceY, forceZ));
+		localPlayer->move(glm::vec3(forceX, forceY, forceZ));
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition(), localPlayer->getModel()->getSize());
 		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 

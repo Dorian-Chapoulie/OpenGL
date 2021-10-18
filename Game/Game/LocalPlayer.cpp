@@ -26,3 +26,10 @@ void LocalPlayer::setCameraPosition(const glm::vec3& position, const glm::vec3& 
 		)
 	);
 }
+
+void LocalPlayer::move(const glm::vec3& force)
+{
+	for (auto rigidBody : getModel()->getRigidBodys()) {
+		rigidBody->applyCentralForce(btVector3(force.x, force.y, force.z));
+	}
+}
