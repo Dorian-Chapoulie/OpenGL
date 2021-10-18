@@ -29,7 +29,7 @@ bool firstMouse = true;
 float mouseX, mouseY;
 float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
 float posX = 0.0f, posY = 0.0f, posZ = 0.0f;
-const float BASE_FORCE = 10000.0f;
+const float BASE_FORCE = 90.0f;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -231,7 +231,7 @@ int main() {
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(debugDraw);
+	//dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 	
 	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
@@ -282,7 +282,7 @@ int main() {
 		lastFrame = currentFrame;
 
 		shader.use(); 
-	
+
 		localPlayer->move(glm::vec3(forceX, forceY, forceZ));
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition(), localPlayer->getModel()->getSize());
 		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
