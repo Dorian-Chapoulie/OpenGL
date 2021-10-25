@@ -21,15 +21,20 @@
 #define HEIGHT 600
 #define FULLSCREEN false
 #define DRAW_DISTANCE 500.0f
+#define FOV 70.0f
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-float lastX = 400, lastY = 300;
+float lastX = WIDTH / 2.0f, lastY = HEIGHT / 2.0f;
 bool firstMouse = true;
 float mouseX, mouseY;
 float forceX = 0.0f, forceY = 0.0f, forceZ = 0.0f;
-float posX = 0.0f, posY = 0.0f, posZ = 0.0f;
-const float BASE_FORCE = 90.0f;
+bool forward = false;
+bool backward = false;
+bool left = false;
+bool right = false;
+bool jump = false;
+
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -64,29 +69,32 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		//posZ += BASE_FORCE * 0.01f;
-		forceZ = BASE_FORCE * 0.1f;
+		forward = true;
+		backward = false;
 	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		//posZ -= BASE_FORCE * 0.01f;
-		forceZ = -BASE_FORCE * 0.1f;
+		backward = true;
+		forward = false;
 	}
 	else {
-		forceZ = 0.0f;
+		forward = false;
+		backward = false;
 	}
 
 	
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		forceX = BASE_FORCE * 0.1f;
-		//posX += BASE_FORCE * 0.01f;
+		left = true;
+		right = false;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		forceX = -BASE_FORCE * 0.1f;
-		//posX -= BASE_FORCE * 0.01f;
+		right = true;
+		left = false;
 	} else
 	{
-		forceX = 0.0f;
+		right = false;
+		left = false;
 	}
-	
+
+	jump = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -112,7 +120,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
 	cam->increaseYaw(xoffset);
 	cam->increasePitch(yoffset);
-	//put this code in increaseYaw/Pitch
+
 	if (cam->getPitch() > 89.0f)
 		cam->setPich(89.0f);
 	if (cam->getPitch() < -89.0f)
@@ -215,6 +223,7 @@ int main() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetCursorPos(window, WIDTH / 2.0f, HEIGHT / 2.0f);
 #pragma endregion endsetup
 
 #pragma region physics
@@ -246,7 +255,7 @@ int main() {
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	SkyBox skybox("../../textures/skybox");
 
-	glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
+	glm::mat4 projection = glm::perspective(glm::radians(FOV), static_cast<float>(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
 
 	setupShader(shader, projection);
 	setupSkyBoxShader(skyboxShader, projection);
@@ -260,11 +269,12 @@ int main() {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
-	//dynamicsWorld->addRigidBody(model3.getRigidBody());
-	//dynamicsWorld->addRigidBody(model4.getRigidBody());
+
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 30.0f;
+	int nbFrames = 0;
+	double lastTime = glfwGetTime();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
 	//force y = 9.1
@@ -281,12 +291,20 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		double currentTime = glfwGetTime();
+		nbFrames++;
+		if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
+		 // printf and reset timer
+			printf("%d FPS\n", nbFrames);
+			nbFrames = 0;
+			lastTime += 1.0;
+		}
+
 		shader.use(); 
 
-		localPlayer->move(glm::vec3(forceX, forceY, forceZ));
+		localPlayer->move(forward, backward, left, right, jump, deltaTime);
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition(), localPlayer->getModel()->getSize());
 		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
-
 
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
