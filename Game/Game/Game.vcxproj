@@ -144,6 +144,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Animator.cpp" />
+    <ClCompile Include="Bone.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLDebugDrawer.cpp" />
@@ -162,6 +165,11 @@
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="Animator.h" />
+    <ClInclude Include="AssimpHelper.hpp" />
+    <ClInclude Include="Bone.h" />
+    <ClInclude Include="BoneInfo.hpp" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GLDebugDrawer.h" />
     <ClInclude Include="Level.h" />
@@ -179,6 +187,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="animation.vert" />
     <None Include="fragment.frag" />
     <None Include="skybox.frag" />
     <None Include="skybox.vert" />

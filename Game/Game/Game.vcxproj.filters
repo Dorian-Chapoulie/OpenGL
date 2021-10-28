@@ -49,6 +49,9 @@
     <Filter Include="level">
       <UniqueIdentifier>{6b7759a6-aa8f-4bc8-8efe-fddffcf36f80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="animation">
+      <UniqueIdentifier>{e94b25b6-58e9-480d-bc51-9129177aa0e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -99,6 +102,15 @@
     <ClCompile Include="Level.cpp">
       <Filter>level</Filter>
     </ClCompile>
+    <ClCompile Include="Bone.cpp">
+      <Filter>animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animator.cpp">
+      <Filter>animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -146,6 +158,21 @@
     <ClInclude Include="Level.h">
       <Filter>level</Filter>
     </ClInclude>
+    <ClInclude Include="BoneInfo.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="AssimpHelper.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Bone.h">
+      <Filter>animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animator.h">
+      <Filter>animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.frag">
@@ -158,6 +185,9 @@
       <Filter>shaders\fragment</Filter>
     </None>
     <None Include="skybox.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="animation.vert">
       <Filter>shaders\vertex</Filter>
     </None>
   </ItemGroup>

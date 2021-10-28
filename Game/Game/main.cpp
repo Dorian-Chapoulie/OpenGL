@@ -16,6 +16,8 @@
 #include "LocalPlayer.h"
 #include "OpenGLine.h"
 #include "SkyBox.h"
+#include "Animation.h"
+#include "Animator.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -94,7 +96,7 @@ void processInput(GLFWwindow* window)
 		left = false;
 	}
 
-	jump = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+	//jump = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -249,11 +251,15 @@ int main() {
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(-7, 3, 3), 10.0f, false);
 	//Model model4("../../models/crate/Wooden Crate.obj", glm::vec3(-8, 30, -5), 300.0f, false);
 
-
 	localPlayer = new LocalPlayer("../../models/soldier/soldier.obj", glm::vec3(-7, 30.0f, 3));
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
+	Shader animationShader("./animation.vert", "./fragment.frag");
+
 	SkyBox skybox("../../textures/skybox");
+
+	Animation danceAnimation("../../models/soldier/swat.fbx", localPlayer->getModel());
+	Animator animator(&danceAnimation);
 
 	glm::mat4 projection = glm::perspective(glm::radians(FOV), static_cast<float>(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
 
@@ -293,12 +299,12 @@ int main() {
 
 		double currentTime = glfwGetTime();
 		nbFrames++;
-		if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
-		 // printf and reset timer
-			printf("%d FPS\n", nbFrames);
+		if (currentTime - lastTime >= 1.0) {
+			//printf("%d FPS\n", nbFrames);
 			nbFrames = 0;
 			lastTime += 1.0;
 		}
+		animator.UpdateAnimation(deltaTime);
 
 		shader.use(); 
 
@@ -309,7 +315,11 @@ int main() {
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
-		localPlayer->draw(shader);
+		auto transforms = animator.GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i)
+			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+
+		localPlayer->draw(animationShader);
 		model.draw(shader);
 		//model2.draw(shader);
 		//model3.draw(shader);

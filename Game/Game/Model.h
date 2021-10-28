@@ -1,15 +1,16 @@
 #pragma once
-#include <string>
+	#include <string>
 #include <vector>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <Bullet3/btBulletCollisionCommon.h>
 #include <Bullet3/btBulletDynamicsCommon.h>
-
+#include <map>
 #include "Mesh.h"
 #include "Texture.h"
 #include "Shader.h"
+#include "BoneInfo.hpp"
 
 class Model {
 public:
@@ -30,6 +31,9 @@ public:
 	const float getCenterRotation() const;
 	
 	std::vector<btRigidBody*> getRigidBodys() const;
+
+	auto& GetBoneInfoMap() { return m_BoneInfoMap; }
+	int& GetBoneCount() { return m_BoneCounter; }
 private:
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
@@ -65,5 +69,15 @@ private:
 	std::vector<btRigidBody*> rigidBodys;
 
 	float weight = 0.0f;
+
+//Aniamtion
+private:
+	std::map<std::string, BoneInfo> m_BoneInfoMap; //
+	int m_BoneCounter = 0;
+	const int MAX_BONE_WEIGHTS = 0;
+
+	void SetVertexBoneDataToDefault(Vertex& vertex);
+	void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
+	void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
 };
 
