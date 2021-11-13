@@ -246,23 +246,22 @@ int main() {
 #pragma endregion physics
 	
 	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
+	Model model2("../../models/character/dancing_vampire.dae", glm::vec3(100.0f, 1.0f, 0.0f), true);
 	//Model model2("../../models/triangle/triangle.obj", glm::vec3(0.0f, 1.0f, 0.0f), false);
 	//Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), false);
 	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(-7, 3, 3), 10.0f, false);
 	//Model model4("../../models/crate/Wooden Crate.obj", glm::vec3(-8, 30, -5), 300.0f, false);
 
-	localPlayer = new LocalPlayer("../../models/soldier/soldier.obj", glm::vec3(-7, 30.0f, 3));
+	localPlayer = new LocalPlayer("../../models/character/character.obj", glm::vec3(5, 1, 0));
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
-	Shader animationShader("./animation.vert", "./fragment.frag");
+	Shader animationShader("./animation.vert", "./animation.frag");
 
 	SkyBox skybox("../../textures/skybox");
 
-	Animation danceAnimation("../../models/soldier/swat.fbx", localPlayer->getModel());
-	Animator animator(&danceAnimation);
-
 	glm::mat4 projection = glm::perspective(glm::radians(FOV), static_cast<float>(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
 
+	setupShader(animationShader, projection);
 	setupShader(shader, projection);
 	setupSkyBoxShader(skyboxShader, projection);
 	setupSound();
@@ -274,8 +273,13 @@ int main() {
 	for (auto* rigidBody : model.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
+	for (auto* rigidBody : model2.getRigidBodys()) {
+		//dynamicsWorld->addRigidBody(rigidBody);
+	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 
+	Animation danceAnimation("../../models/character/dancing_vampire.dae", &model2);
+	Animator animator(&danceAnimation);
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 30.0f;
@@ -297,6 +301,8 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		animator.UpdateAnimation(currentFrame * 30.0f);
+
 		double currentTime = glfwGetTime();
 		nbFrames++;
 		if (currentTime - lastTime >= 1.0) {
@@ -304,9 +310,21 @@ int main() {
 			nbFrames = 0;
 			lastTime += 1.0;
 		}
-		animator.UpdateAnimation(deltaTime);
 
-		shader.use(); 
+		animationShader.use();
+		animationShader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
+		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+		auto transforms = animator.GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i) {
+			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+		}
+		model2.draw(animationShader);
+
+
+
+
+
+		shader.use();
 
 		localPlayer->move(forward, backward, left, right, jump, deltaTime);
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition(), localPlayer->getModel()->getSize());
@@ -315,11 +333,7 @@ int main() {
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
-		auto transforms = animator.GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i)
-			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-
-		localPlayer->draw(animationShader);
+		localPlayer->draw(shader);
 		model.draw(shader);
 		//model2.draw(shader);
 		//model3.draw(shader);

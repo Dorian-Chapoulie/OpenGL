@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include <utility>
 
 Mesh::Mesh(
 	std::vector<Vertex> vertices,
@@ -47,8 +46,7 @@ void Mesh::setupMesh()
     glVertexAttribIPointer(3, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));
     // bones weights
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-        (void*)offsetof(Vertex, m_Weights));
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
 
     glBindVertexArray(0);
 }

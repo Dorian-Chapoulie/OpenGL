@@ -29,6 +29,7 @@ public:
 	const glm::vec3 getSize() const;
 	const glm::vec3 getBasePosition() const;
 	const float getCenterRotation() const;
+	const glm::mat4 getModelMatrix() const;
 	
 	std::vector<btRigidBody*> getRigidBodys() const;
 

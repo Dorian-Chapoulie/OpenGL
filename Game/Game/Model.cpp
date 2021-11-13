@@ -27,7 +27,7 @@ Model::Model(const std::string& path, const glm::vec3& position, float weight, b
     if (hasHitbox) setupHitboxes();
     std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
 }
-
+//TODO: stipulate that this is a static object
 Model::Model(const std::string& path, const glm::vec3& position, bool hasHitbox)
 {
     this->position = position;
@@ -78,6 +78,11 @@ glm::vec3 Model::getPosition() {
 
 const float Model::getCenterRotation() const {
     return centerRotation;
+}
+
+const glm::mat4 Model::getModelMatrix() const
+{
+    return modelMatrix;
 }
 
 void Model::setPosition(const glm::vec3& position)

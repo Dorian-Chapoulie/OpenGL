@@ -187,6 +187,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="animation.frag" />
     <None Include="animation.vert" />
     <None Include="fragment.frag" />
     <None Include="skybox.frag" />

@@ -190,5 +190,8 @@
     <None Include="animation.vert">
       <Filter>shaders\vertex</Filter>
     </None>
+    <None Include="animation.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
   </ItemGroup>
 </Project>
