@@ -173,6 +173,9 @@
     <ClInclude Include="Animator.h">
       <Filter>animation</Filter>
     </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.frag">

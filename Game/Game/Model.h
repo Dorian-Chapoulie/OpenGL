@@ -75,7 +75,7 @@ private:
 private:
 	std::map<std::string, BoneInfo> m_BoneInfoMap; //
 	int m_BoneCounter = 0;
-	const int MAX_BONE_WEIGHTS = 0;
+	const int MAX_BONE_WEIGHTS = 4;
 
 	void SetVertexBoneDataToDefault(Vertex& vertex);
 	void SetVertexBoneData(Vertex& vertex, int boneID, float weight);

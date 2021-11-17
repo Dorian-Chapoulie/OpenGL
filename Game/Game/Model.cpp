@@ -127,7 +127,7 @@ void Model::SetVertexBoneDataToDefault(Vertex& vertex)
 void Model::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
 {
     for (int i = 0; i < MAX_BONE_WEIGHTS; ++i)
-    {
+    {        
         if (vertex.m_BoneIDs[i] < 0)
         {
             vertex.m_Weights[i] = weight;
@@ -139,7 +139,6 @@ void Model::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
 
 void Model::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
 {
-
     for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
     {
         int boneID = -1;
@@ -261,7 +260,14 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
 
-    ExtractBoneWeightForVertices(vertices, mesh, scene);
+    
+
+    if (mesh->mName == aiString("VampireMesh")) {
+        printf("ici\n");
+        ExtractBoneWeightForVertices(vertices, mesh, scene);
+    }
+   
+
 	return new Mesh(vertices, indices, textures);
 }
     

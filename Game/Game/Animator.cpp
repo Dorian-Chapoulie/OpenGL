@@ -51,6 +51,11 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
         m_FinalBoneMatrices[index] = globalTransformation * offset;
     }
 
+    if (Bone && Bone->GetBoneID() == 51) {
+        const glm::mat4 mat = Bone->GetLocalTransform();
+        m_CurrentAnimation->test = glm::vec3(mat[3][0], mat[3][1] + 200, mat[3][2]);
+    }
+
     for (int i = 0; i < node->childrenCount; i++)
         CalculateBoneTransform(&node->children[i], globalTransformation);
 }

@@ -32,7 +32,8 @@ public:
     {
         return m_BoneInfoMap;
     }
-
+    Model* model = nullptr;
+    glm::vec3 test;
 private:
     void ReadMissingBones(const aiAnimation* animation, Model& model);
 

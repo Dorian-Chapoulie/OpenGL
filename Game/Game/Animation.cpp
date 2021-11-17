@@ -2,6 +2,7 @@
 
 Animation::Animation(const std::string& animationPath, Model* model)
 {
+    this->model = model;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
 
@@ -59,7 +60,7 @@ void Animation::ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src)
     assert(src);
 
     dest.name = src->mName.data;
-    dest.transformation = AssimpHelper::ConvertMatrixToGLMFormat(src->mTransformation);
+    dest.transformation = model->getModelMatrix(); //AssimpHelper::ConvertMatrixToGLMFormat(src->mTransformation);
     dest.childrenCount = src->mNumChildren;
 
     for (int i = 0; i < src->mNumChildren; i++)

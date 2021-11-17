@@ -5,8 +5,6 @@ class Animator
 public:
     Animator(Animation* Animation);
 
-    void toto();
-
     void UpdateAnimation(float dt);
 
     void PlayAnimation(Animation* pAnimation);
