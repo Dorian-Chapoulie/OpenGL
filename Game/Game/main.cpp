@@ -22,7 +22,8 @@
 #define WIDTH 800
 #define HEIGHT 600
 #define FULLSCREEN false
-#define DRAW_DISTANCE 500.0f
+//TODO: change this value 
+#define DRAW_DISTANCE 50000.0f
 #define FOV 70.0f
 
 float deltaTime = 0.0f;
@@ -56,7 +57,7 @@ irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 			/*const glm::mat4 mtx_trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 	const auto cameraPosition = glm::inverse(camera->getViewMatrix()) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	const glm::vec3 positionTmp = glm::vec3(cameraPosition.x, cameraPosition.y - offsetCameraY, cameraPosition.z);
-	
+
  */
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -73,7 +74,8 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		forward = true;
 		backward = false;
-	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+	}
+	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		backward = true;
 		forward = false;
 	}
@@ -82,7 +84,7 @@ void processInput(GLFWwindow* window)
 		backward = false;
 	}
 
-	
+
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		left = true;
 		right = false;
@@ -90,7 +92,8 @@ void processInput(GLFWwindow* window)
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		right = true;
 		left = false;
-	} else
+	}
+	else
 	{
 		right = false;
 		left = false;
@@ -140,7 +143,8 @@ void scroll_callback(GLFWwindow* window, double xpos, double ypos)
 	if (ypos == 1)
 	{
 		localPlayer->decreaseCameraYOffset();
-	} else
+	}
+	else
 	{
 		localPlayer->increaseCameraYOffset();
 	}
@@ -244,19 +248,15 @@ int main() {
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 	//dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
-	
-	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
-	Model model2("../../models/character/dancing_vampire.dae", glm::vec3(10.0f, 1.0f, 0.0f), true);
-	//Model model2("../../models/triangle/triangle.obj", glm::vec3(0.0f, 1.0f, 0.0f), false);
-	//Model model2("../../models/sphere/sphere.obj", glm::vec3(1, 3, 3), false);
-	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(-7, 3, 3), 10.0f, false);
-	//Model model4("../../models/crate/Wooden Crate.obj", glm::vec3(-8, 30, -5), 300.0f, false);
 
-	localPlayer = new LocalPlayer("../../models/character/character.obj", glm::vec3(5, 1, 0));
+	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
+	Model model2("../../models/die/die.dae", glm::vec3(0.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.05f));
+	Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
+
+	localPlayer = new LocalPlayer("../../models/swat/swat.dae", glm::vec3(5, 1, 0));
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	Shader animationShader("./animation.vert", "./animation.frag");
-
 	SkyBox skybox("../../textures/skybox");
 
 	glm::mat4 projection = glm::perspective(glm::radians(FOV), static_cast<float>(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
@@ -278,8 +278,13 @@ int main() {
 	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 
-	Animation danceAnimation("../../models/character/dancing_vampire.dae", &model2);
+	/*Animation danceAnimation("../../models/swat/swat.dae", localPlayer->getModel());
+	Animation dieAnimation("../../models/die/die.dae", &model2);
+	Animation idleAnimation("../../models/idle/idle.dae", &model3);
+
 	Animator animator(&danceAnimation);
+	Animator animator2(&dieAnimation);
+	Animator animator3(&idleAnimation);*/
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 30.0f;
@@ -288,20 +293,23 @@ int main() {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
 	//force y = 9.1
+	bool test = true;
 	while (!glfwWindowShouldClose(window))
-	{	
+	{
 		processInput(window);
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		dynamicsWorld->stepSimulation(timeStep, 10);
 		dynamicsWorld->debugDrawWorld();
-		
+
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		animator.UpdateAnimation(deltaTime);
+		/*animator.UpdateAnimation(deltaTime);
+		animator2.UpdateAnimation(deltaTime);
+		animator3.UpdateAnimation(deltaTime);*/
 
 		double currentTime = glfwGetTime();
 		nbFrames++;
@@ -311,41 +319,56 @@ int main() {
 			nbFrames = 0;
 			lastTime += 1.0;
 		}
+		//std::cout << currentFrame << std::endl;
 
-		animationShader.use();
+		/*animationShader.use();
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
+		localPlayer->draw(animationShader);
+
+
+		transforms = animator2.GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i) {
+			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+		}
 		model2.draw(animationShader);
-	
+
+
+
+		transforms = animator3.GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i) {
+			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+		}
+		model3.draw(animationShader);*/
 
 		shader.use();
 
 		localPlayer->move(forward, backward, left, right, jump, deltaTime);
-		localPlayer->setCameraPosition(danceAnimation.test, localPlayer->getModel()->getSize());
-		//localPlayer->setCameraPosition(localPlayer->getModel()->getPosition(), localPlayer->getModel()->getSize());
+		//localPlayer->setCameraPosition(danceAnimation.test, localPlayer->getModel()->getSize());
+		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
-
+		//viewpos inutile
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
-		localPlayer->draw(shader);
+		//localPlayer->draw(shader);
 		model.draw(shader);
 		//model2.draw(shader);
 		//model3.draw(shader);
 		//model4.draw(shader);
 
-	#pragma region SKYBOX
+#pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);
 		skyboxShader.use();
 		glm::mat4 view = glm::mat4(glm::mat3(localPlayer->getCamera()->getViewMatrix()));
 		skyboxShader.setMatrix("view", view);
 		skyboxShader.setMatrix("projection", projection);
 		skybox.draw();
-	#pragma endregion 
+#pragma endregion 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

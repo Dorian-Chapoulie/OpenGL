@@ -16,6 +16,7 @@ void Camera::setDirection(glm::vec3 direction)
 void Camera::setPosition(const glm::vec3 position)
 {
 	cameraPos = position;
+	//glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
 void Camera::increasePosition(glm::vec3 value)

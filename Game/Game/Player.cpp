@@ -58,5 +58,5 @@ void Player::initModel(const std::string& modelPath)
 {
 	delete model;
 	this->modelPath = modelPath;
-	model = new Model(modelPath, position, 90.0f, true, false);
+	model = new Model(modelPath, position, 90.0f, true, false, glm::vec3(0.05f));
 }

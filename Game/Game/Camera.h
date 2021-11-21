@@ -13,11 +13,11 @@ public:
 	void setPosition(const glm::vec3 position);
 	void setPich(float value);
 	void setYaw(float value);
-	
+
 	void increasePosition(glm::vec3 value);
 	void increaseYaw(float value);
 	void increasePitch(float value);
-	
+
 	float getYaw() const;
 	float getPitch() const;
 	float getDefaultYaw() const;
@@ -44,6 +44,6 @@ private:
 	);
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-	
+
 };
 

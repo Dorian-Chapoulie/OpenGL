@@ -1,5 +1,5 @@
 #pragma once
-	#include <string>
+#include <string>
 #include <vector>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -15,8 +15,10 @@
 class Model {
 public:
 	Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox, bool hasMultipleHitboxes);
+	Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox, bool hasMultipleHitboxes, glm::vec3 scale);
 	Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox);
 	Model(const std::string& path, const glm::vec3& position, bool hasHitbox);
+	Model(const std::string& path, const glm::vec3& position, const glm::vec3& scale, bool hasHitbox);
 	~Model();
 	void draw(Shader& shader);
 
@@ -30,7 +32,7 @@ public:
 	const glm::vec3 getBasePosition() const;
 	const float getCenterRotation() const;
 	const glm::mat4 getModelMatrix() const;
-	
+
 	std::vector<btRigidBody*> getRigidBodys() const;
 
 	auto& GetBoneInfoMap() { return m_BoneInfoMap; }
@@ -46,6 +48,7 @@ private:
 
 	std::vector<glm::vec3> sizes;
 	std::vector<glm::vec3> centers;
+	glm::vec3 scale = glm::vec3(1.0f);
 
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -61,7 +64,7 @@ private:
 
 	bool hasHitbox = true;
 
-//BulletPhysics
+	//BulletPhysics
 private:
 	btVector3 m_scaledMeshOffsetToBody;
 
@@ -71,7 +74,7 @@ private:
 
 	float weight = 0.0f;
 
-//Aniamtion
+	//Aniamtion
 private:
 	std::map<std::string, BoneInfo> m_BoneInfoMap; //
 	int m_BoneCounter = 0;
