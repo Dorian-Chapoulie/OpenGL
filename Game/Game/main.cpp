@@ -254,6 +254,7 @@ int main() {
 	Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
 	localPlayer = new LocalPlayer("../../models/swat/swat.dae", glm::vec3(5, 1, 0));
+
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	Shader animationShader("./animation.vert", "./animation.frag");
@@ -278,13 +279,13 @@ int main() {
 	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 
-	/*Animation danceAnimation("../../models/swat/swat.dae", localPlayer->getModel());
+	Animation danceAnimation("../../models/swat/swat.dae", localPlayer->getModel());
 	Animation dieAnimation("../../models/die/die.dae", &model2);
 	Animation idleAnimation("../../models/idle/idle.dae", &model3);
 
 	Animator animator(&danceAnimation);
 	Animator animator2(&dieAnimation);
-	Animator animator3(&idleAnimation);*/
+	Animator animator3(&idleAnimation);
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 30.0f;
@@ -293,6 +294,7 @@ int main() {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
 	//force y = 9.1
+
 	bool test = true;
 	while (!glfwWindowShouldClose(window))
 	{
@@ -307,9 +309,9 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		/*animator.UpdateAnimation(deltaTime);
+		animator.UpdateAnimation(deltaTime);
 		animator2.UpdateAnimation(deltaTime);
-		animator3.UpdateAnimation(deltaTime);*/
+		animator3.UpdateAnimation(deltaTime);
 
 		double currentTime = glfwGetTime();
 		nbFrames++;
@@ -321,7 +323,7 @@ int main() {
 		}
 		//std::cout << currentFrame << std::endl;
 
-		/*animationShader.use();
+		animationShader.use();
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i) {
@@ -342,7 +344,7 @@ int main() {
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
-		model3.draw(animationShader);*/
+		model3.draw(animationShader);
 
 		shader.use();
 

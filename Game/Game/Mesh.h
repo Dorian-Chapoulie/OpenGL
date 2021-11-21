@@ -15,7 +15,9 @@ public:
 
 	void draw(Shader& shader) const;
 
-	std::vector<Vertex> getVertices() const;
+	std::vector<Vertex> getVertices();
+
+	void cleanUp();
 
 	//private:
 	unsigned int VAO = 0;

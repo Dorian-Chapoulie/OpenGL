@@ -31,14 +31,12 @@ Model::Model(const std::string& path, const glm::vec3& position, float weight, b
 	loadModel(path);
 	if (hasHitbox) setupHitbox();
 	else if (hasMultipleHitboxes) setupHitboxes();
-	this->loadedTextures.clear();
-	this->meshes.clear();
-	for (Mesh* m : meshes)
+
+	for (auto* m : meshes)
 	{
-		m->vertices.clear();
+		m->cleanUp();
 	}
 
-	printf("cleared on: %s\n", path.c_str());
 	std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
 }
 
@@ -106,8 +104,8 @@ const glm::vec3 Model::getCenter() const {
 
 void Model::draw(Shader& shader)
 {
+	shader.setMatrix("model", modelMatrix);
 	for (Mesh* m : meshes) {
-		shader.setMatrix("model", modelMatrix);
 		m->draw(shader);
 	}
 }
@@ -228,7 +226,6 @@ void Model::loadModel(const std::string& path)
 
 void Model::processNode(aiNode* node, const aiScene* scene)
 {
-
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -305,7 +302,6 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	//TODO create an animated model class
 	ExtractBoneWeightForVertices(vertices, mesh, scene);
 
-
 	return new Mesh(vertices, indices, textures);
 }
 
@@ -364,11 +360,13 @@ void Model::setupHitboxes()
 		rigidBodys.back()->setCenterOfMassTransform(transform);
 		//TODO: find best way
 		rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
+		mesh->cleanUp();
 	}
 }
 
 void Model::setupHitbox()
 {
+	if (meshes.empty()) return;
 	const std::vector<glm::vec3> dataSize = getBiggestHitBox();
 	sizes.emplace_back(glm::vec3(dataSize[0] * glm::vec3(0.5)));
 	centers.emplace_back(dataSize[1]);
@@ -391,6 +389,11 @@ void Model::setupHitbox()
 	rigidBodys.back()->setCenterOfMassTransform(transform);
 	//TODO: find best way
 	rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
+
+	for (Mesh* m : meshes)
+	{
+		m->cleanUp();
+	}
 }
 
 std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& vertices) const
@@ -421,6 +424,7 @@ std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& ve
 
 std::vector<glm::vec3> Model::getBiggestHitBox() const
 {
+	if (meshes.empty()) return std::vector<glm::vec3> { glm::vec3(0) };
 	std::vector<glm::vec3> sizeCenter = getMeshCenterAndSize(meshes[0]->getVertices());
 	glm::vec3 maxSize = glm::vec3(sizeCenter[0]);
 	for (Mesh* m : meshes)
@@ -432,6 +436,7 @@ std::vector<glm::vec3> Model::getBiggestHitBox() const
 			maxSize = size;
 			sizeCenter = temp;
 		}
+		m->cleanUp();
 	}
 	return sizeCenter;
 }
