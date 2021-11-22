@@ -23,7 +23,7 @@
 #define HEIGHT 600
 #define FULLSCREEN false
 //TODO: change this value 
-#define DRAW_DISTANCE 50000.0f
+#define DRAW_DISTANCE 500.0f
 #define FOV 70.0f
 
 float deltaTime = 0.0f;
