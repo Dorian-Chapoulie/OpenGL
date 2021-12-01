@@ -8,7 +8,7 @@ Player::Player(const std::string& bodyModelPath, const glm::vec3& position)
 
 Player::~Player()
 {
-	delete model;
+	delete dynamicModel;
 }
 
 glm::vec3 Player::getPosition() const
@@ -36,7 +36,7 @@ void Player::changeModel(const std::string& modelPath)
 //TODO: replace this.draw by getModel().draw()
 void Player::draw(Shader& shader)
 {
-	model->draw(shader);
+	dynamicModel->draw(shader);
 }
 
 void Player::increaseCameraYOffset()
@@ -49,14 +49,14 @@ void Player::decreaseCameraYOffset()
 	this->offsetCameraY -= offsetCameraYStep;
 }
 
-Model* Player::getModel() const
+DynamicModel* Player::getModel() const
 {
-	return model;
+	return dynamicModel;
 }
 
 void Player::initModel(const std::string& modelPath)
 {
-	delete model;
+	delete dynamicModel;
 	this->modelPath = modelPath;
-	model = new Model(modelPath, position, 90.0f, true, false, glm::vec3(0.05f));
+	dynamicModel = new DynamicModel(modelPath, position, 90.0f, glm::vec3(0.2f));
 }

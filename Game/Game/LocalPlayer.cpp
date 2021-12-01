@@ -1,16 +1,23 @@
 #include "LocalPlayer.h"
 #include <thread>
 #include <chrono>
+#include <Bullet3/BulletDynamics/Dynamics/btRigidBody.h>
 
 LocalPlayer::LocalPlayer(const std::string& bodyModelPath, const glm::vec3& position)
 	: Player(bodyModelPath, position)
 {
-	setPosition(position);
+
 }
 
 std::unique_ptr<Camera>& LocalPlayer::getCamera()
 {
 	return camera;
+}
+
+const glm::vec3& LocalPlayer::get_position()
+{
+	//return dynamicModel->get_hit_boxes()[0]->get_position();
+	return dynamicModel->get_position();
 }
 
 void LocalPlayer::setPosition(const glm::vec3& position)
@@ -66,12 +73,12 @@ void LocalPlayer::move(bool forward, bool backward, bool left, bool right, bool 
 	const float compensation = (1.0f + delta);
 	moveVector *= SPEED * compensation;
 
-	for (auto rigidBody : getModel()->getRigidBodys()) {
-		rigidBody->activate();
-		rigidBody->setLinearVelocity(btVector3(
-			moveVector.x,
-			isJumping ? JUMP_FORCE : FALL_FORCE,
-			moveVector.z
-		));
-	}
+	HitBox* body = dynamicModel->get_hit_boxes()[0];
+	btRigidBody* rigidBody = body->get_rigid_body();
+	rigidBody->activate();
+	rigidBody->setLinearVelocity(btVector3(
+		moveVector.x,
+		isJumping ? JUMP_FORCE : FALL_FORCE,
+		moveVector.z
+	));
 }

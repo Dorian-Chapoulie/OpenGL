@@ -1,41 +1,42 @@
 #include "MyMotionState.h"
+#include <glm/detail/type_quat.hpp>
 
 MyMotionState::MyMotionState(
-    Model* model,
-    const btTransform& startTrans,
-    const btTransform& centerOfMassOffset
+	HitBox* body,
+	const btTransform& startTrans,
+	const btTransform& centerOfMassOffset
 )
-    : model(model),
-    m_graphicsWorldTrans(startTrans),
-    m_centerOfMassOffset(centerOfMassOffset),
-    m_startWorldTrans(startTrans) {
+	: body(body),
+	m_graphicsWorldTrans(startTrans),
+	m_centerOfMassOffset(centerOfMassOffset),
+	m_startWorldTrans(startTrans) {
 
 }
 
 void MyMotionState::getWorldTransform(btTransform& worldTrans) const {
-    worldTrans = m_graphicsWorldTrans * m_centerOfMassOffset.inverse();
+	worldTrans = m_graphicsWorldTrans * m_centerOfMassOffset.inverse();
 }
 
 
 void MyMotionState::setWorldTransform(const btTransform& worldTrans) {
-    glm::vec3 position(
-        worldTrans.getOrigin().getX(),
-        worldTrans.getOrigin().getY(),
-        worldTrans.getOrigin().getZ()
-    );
+	glm::vec3 position(
+		worldTrans.getOrigin().getX(),
+		worldTrans.getOrigin().getY(),
+		worldTrans.getOrigin().getZ()
+	);
 
-    const glm::vec3 center = model->getCenter();
-    const glm::vec3 basePosition = model->getBasePosition();
+	const glm::vec3 center = body->get_center();
+	const glm::vec3 basePosition = body->get_model()->get_base_position();
 
-    const glm::vec3 tmp = glm::vec3(
-        position.x - center.x + basePosition.x,
-        position.y - center.y + basePosition.y,
-        position.z - center.z + basePosition.z
-    );
+	const glm::vec3 tmp = glm::vec3(
+		position.x - center.x + basePosition.x,
+		position.y - center.y + basePosition.y,
+		position.z - center.z + basePosition.z
+	);
 
-    btQuaternion physicsQuat = worldTrans.getRotation();
-    glm::quat rotation = glm::quat(glm::vec3(0, abs(physicsQuat.getY()), 0));
+	const btQuaternion worldTransformQuaternion = worldTrans.getRotation();
+	const glm::quat rotation = glm::quat(glm::vec3(0, abs(worldTransformQuaternion.getY()), 0));
 
-    model->setWorldTransform(tmp, rotation);
-    m_graphicsWorldTrans = worldTrans * m_centerOfMassOffset;
+	body->set_world_transform(tmp, rotation);
+	m_graphicsWorldTrans = worldTrans * m_centerOfMassOffset;
 }

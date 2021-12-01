@@ -18,6 +18,7 @@
 #include "SkyBox.h"
 #include "Animation.h"
 #include "Animator.h"
+#include "StaticModel.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -249,11 +250,11 @@ int main() {
 	//dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
-	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
-	Model model2("../../models/die/die.dae", glm::vec3(0.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.05f));
-	Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
+	StaticModel model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f));
+	//DynamicModel model2("../../models/die/die.dae", glm::vec3(0.0f, 10.0f, 0.0f), 1090.0f, glm::vec3(.5f));
+	//DynamicModel model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 10.0f, glm::vec3(0.05f));
 
-	localPlayer = new LocalPlayer("../../models/swat/swat.dae", glm::vec3(5, 1, 0));
+	localPlayer = new LocalPlayer("../../models/die/die.dae", glm::vec3(50, 50, 5));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -268,24 +269,18 @@ int main() {
 	setupSound();
 	createLights(shader);
 
-	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
+	for (HitBox* hitbox : localPlayer->getModel()->get_hit_boxes()) {
+		dynamicsWorld->addRigidBody(hitbox->get_rigid_body());
 	}
-	for (auto* rigidBody : model.getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
+	for (HitBox* hitbox : model.get_hit_boxes()) {
+		dynamicsWorld->addRigidBody(hitbox->get_rigid_body());
 	}
-	for (auto* rigidBody : model2.getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
-	}
-	//dynamicsWorld->addRigidBody(model2.getRigidBody());
+	/*for (HitBox* hitbox : model2.get_hit_boxes()) {
+		dynamicsWorld->addRigidBody(hitbox->get_rigid_body());
+	}*/
 
-	Animation danceAnimation("../../models/swat/swat.dae", localPlayer->getModel());
-	Animation dieAnimation("../../models/die/die.dae", &model2);
-	Animation idleAnimation("../../models/idle/idle.dae", &model3);
-
-	Animator animator(&danceAnimation);
-	Animator animator2(&dieAnimation);
-	Animator animator3(&idleAnimation);
+	Animator animator(localPlayer->getModel()->get_animation());
+	//Animator animator2(model2.get_animation());
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 30.0f;
@@ -294,6 +289,17 @@ int main() {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
 	//force y = 9.1
+	std::thread t([&]()
+		{
+			while (true)
+			{
+				animator.UpdateAnimation(deltaTime + 0.05f);
+				//animator2.UpdateAnimation(deltaTime + 0.05f);
+				//animator3.UpdateAnimation(deltaTime + 0.05f);
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+		});
+	t.detach();
 
 	bool test = true;
 	while (!glfwWindowShouldClose(window))
@@ -308,10 +314,6 @@ int main() {
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-
-		animator.UpdateAnimation(deltaTime);
-		animator2.UpdateAnimation(deltaTime);
-		animator3.UpdateAnimation(deltaTime);
 
 		double currentTime = glfwGetTime();
 		nbFrames++;
@@ -331,37 +333,28 @@ int main() {
 		}
 		localPlayer->draw(animationShader);
 
-
-		transforms = animator2.GetFinalBoneMatrices();
+		/*transforms = animator2.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
-		model2.draw(animationShader);
+		model2.draw(animationShader);*/
 
 
-
-		transforms = animator3.GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i) {
-			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-		}
-		model3.draw(animationShader);
 
 		shader.use();
 
 		localPlayer->move(forward, backward, left, right, jump, deltaTime);
 		//localPlayer->setCameraPosition(danceAnimation.test, localPlayer->getModel()->getSize());
-		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
-		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
+		localPlayer->setCameraPosition(localPlayer->get_position());
+		//TODO: fix this
+		localPlayer->getModel()->get_hit_boxes()[0]->set_rotation_around_center(-cam->getYaw() + cam->getDefaultYaw());
 
-		//viewpos inutile
+		//TODO: viewpos inutile
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
 		//localPlayer->draw(shader);
 		model.draw(shader);
-		//model2.draw(shader);
-		//model3.draw(shader);
-		//model4.draw(shader);
 
 #pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);

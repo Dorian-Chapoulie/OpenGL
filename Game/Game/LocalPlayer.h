@@ -9,6 +9,8 @@ public:
 
 	std::unique_ptr<Camera>& getCamera();
 
+	const glm::vec3& get_position();
+
 	void setPosition(const glm::vec3& position) override;
 	void setCameraPosition(const glm::vec3& position);
 	void move(bool forward, bool backward, bool left, bool right, bool jump, float delta);

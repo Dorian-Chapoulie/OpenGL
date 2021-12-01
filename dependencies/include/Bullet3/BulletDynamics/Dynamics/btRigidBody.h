@@ -4,22 +4,21 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-
 #ifndef BT_RIGIDBODY_H
 #define BT_RIGIDBODY_H
-
+/*
 #include "LinearMath/btAlignedObjectArray.h"
 #include "LinearMath/btTransform.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
-#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObject.h"*/
 
 class btCollisionShape;
 class btMotionState;
@@ -142,22 +141,22 @@ public:
 		btScalar m_additionalAngularDampingFactor;
 
 		btRigidBodyConstructionInfo(btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia = btVector3(0, 0, 0)) : m_mass(mass),
-																																									   m_motionState(motionState),
-																																									   m_collisionShape(collisionShape),
-																																									   m_localInertia(localInertia),
-																																									   m_linearDamping(btScalar(0.)),
-																																									   m_angularDamping(btScalar(0.)),
-																																									   m_friction(btScalar(0.5)),
-																																									   m_rollingFriction(btScalar(0)),
-																																									   m_spinningFriction(btScalar(0)),
-																																									   m_restitution(btScalar(0.)),
-																																									   m_linearSleepingThreshold(btScalar(0.8)),
-																																									   m_angularSleepingThreshold(btScalar(1.f)),
-																																									   m_additionalDamping(false),
-																																									   m_additionalDampingFactor(btScalar(0.005)),
-																																									   m_additionalLinearDampingThresholdSqr(btScalar(0.01)),
-																																									   m_additionalAngularDampingThresholdSqr(btScalar(0.01)),
-																																									   m_additionalAngularDampingFactor(btScalar(0.01))
+			m_motionState(motionState),
+			m_collisionShape(collisionShape),
+			m_localInertia(localInertia),
+			m_linearDamping(btScalar(0.)),
+			m_angularDamping(btScalar(0.)),
+			m_friction(btScalar(0.5)),
+			m_rollingFriction(btScalar(0)),
+			m_spinningFriction(btScalar(0)),
+			m_restitution(btScalar(0.)),
+			m_linearSleepingThreshold(btScalar(0.8)),
+			m_angularSleepingThreshold(btScalar(1.f)),
+			m_additionalDamping(false),
+			m_additionalDampingFactor(btScalar(0.005)),
+			m_additionalLinearDampingThresholdSqr(btScalar(0.01)),
+			m_additionalAngularDampingThresholdSqr(btScalar(0.01)),
+			m_additionalAngularDampingFactor(btScalar(0.01))
 		{
 			m_startWorldTransform.setIdentity();
 		}
@@ -205,8 +204,8 @@ public:
 	void saveKinematicState(btScalar step);
 
 	void applyGravity();
-    
-    void clearGravity();
+
+	void clearGravity();
 
 	void setGravity(const btVector3& acceleration);
 
@@ -334,48 +333,48 @@ public:
 			}
 		}
 	}
-    
-    void applyPushImpulse(const btVector3& impulse, const btVector3& rel_pos)
-    {
-        if (m_inverseMass != btScalar(0.))
-        {
-            applyCentralPushImpulse(impulse);
-            if (m_angularFactor)
-            {
-                applyTorqueTurnImpulse(rel_pos.cross(impulse * m_linearFactor));
-            }
-        }
-    }
-    
-    btVector3 getPushVelocity()
-    {
-        return m_pushVelocity;
-    }
-    
-    btVector3 getTurnVelocity()
-    {
-        return m_turnVelocity;
-    }
-    
-    void setPushVelocity(const btVector3& v)
-    {
-        m_pushVelocity = v;
-    }
-    
-    void setTurnVelocity(const btVector3& v)
-    {
-        m_turnVelocity = v;
-    }
-    
-    void applyCentralPushImpulse(const btVector3& impulse)
-    {
-        m_pushVelocity += impulse * m_linearFactor * m_inverseMass;
-    }
-    
-    void applyTorqueTurnImpulse(const btVector3& torque)
-    {
-        m_turnVelocity += m_invInertiaTensorWorld * torque * m_angularFactor;
-    }
+
+	void applyPushImpulse(const btVector3& impulse, const btVector3& rel_pos)
+	{
+		if (m_inverseMass != btScalar(0.))
+		{
+			applyCentralPushImpulse(impulse);
+			if (m_angularFactor)
+			{
+				applyTorqueTurnImpulse(rel_pos.cross(impulse * m_linearFactor));
+			}
+		}
+	}
+
+	btVector3 getPushVelocity()
+	{
+		return m_pushVelocity;
+	}
+
+	btVector3 getTurnVelocity()
+	{
+		return m_turnVelocity;
+	}
+
+	void setPushVelocity(const btVector3& v)
+	{
+		m_pushVelocity = v;
+	}
+
+	void setTurnVelocity(const btVector3& v)
+	{
+		m_turnVelocity = v;
+	}
+
+	void applyCentralPushImpulse(const btVector3& impulse)
+	{
+		m_pushVelocity += impulse * m_linearFactor * m_inverseMass;
+	}
+
+	void applyTorqueTurnImpulse(const btVector3& torque)
+	{
+		m_turnVelocity += m_invInertiaTensorWorld * torque * m_angularFactor;
+	}
 
 	void clearForces()
 	{

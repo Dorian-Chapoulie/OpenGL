@@ -3,8 +3,8 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
-#include "Model.h"
 #include "Bone.h"
+#include "SkeletalModel.h"
 
 struct AssimpNodeData
 {
@@ -19,7 +19,7 @@ class Animation
 public:
 	Animation() = default;
 
-	Animation(const std::string& animationPath, Model* model);
+	Animation(const std::string_view& animationPath, SkeletalModel* skeletalModel);
 
 	~Animation();
 
@@ -28,14 +28,14 @@ public:
 	inline float GetTicksPerSecond() { return m_TicksPerSecond; }
 	inline float GetDuration() { return m_Duration; }
 	inline const AssimpNodeData& GetRootNode() { return m_RootNode; }
-	inline const std::map<std::string, BoneInfo>& GetBoneIDMap()
+	inline const std::map<std::string, bone_info>& GetBoneIDMap()
 	{
 		return m_BoneInfoMap;
 	}
-	Model* model = nullptr;
+	SkeletalModel* skeletalModel = nullptr;
 	glm::vec3 test;
 private:
-	void ReadMissingBones(const aiAnimation* animation, Model& model);
+	void ReadMissingBones(const aiAnimation* animation);
 
 	void ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src);
 
@@ -43,5 +43,5 @@ private:
 	int m_TicksPerSecond;
 	std::vector<Bone> m_Bones;
 	AssimpNodeData m_RootNode;
-	std::map<std::string, BoneInfo> m_BoneInfoMap;
+	std::map<std::string, bone_info> m_BoneInfoMap;
 };

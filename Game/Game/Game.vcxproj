@@ -120,6 +120,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,12 +147,17 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Animator.cpp" />
+    <ClCompile Include="HitBox.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DefaultLoader.cpp" />
+    <ClCompile Include="DynamicModel.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLDebugDrawer.cpp" />
+    <ClCompile Include="ILoader.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="LoaderFactory.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -160,7 +166,10 @@
     <ClCompile Include="OpenGLine.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SkeletalModel.cpp" />
+    <ClCompile Include="SkeletonLoader.cpp" />
     <ClCompile Include="SkyBox.cpp" />
+    <ClCompile Include="StaticModel.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
@@ -168,12 +177,17 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Animator.h" />
     <ClInclude Include="AssimpHelper.hpp" />
+    <ClInclude Include="HitBox.h" />
     <ClInclude Include="Bone.h" />
     <ClInclude Include="BoneInfo.hpp" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DefaultLoader.h" />
+    <ClInclude Include="DynamicModel.h" />
     <ClInclude Include="GLDebugDrawer.h" />
+    <ClInclude Include="ILoader.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="LoaderFactory.h" />
     <ClInclude Include="LocalPlayer.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Mesh.h" />
@@ -182,7 +196,10 @@
     <ClInclude Include="OpenGLine.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SkeletalModel.h" />
+    <ClInclude Include="SkeletonLoader.h" />
     <ClInclude Include="SkyBox.h" />
+    <ClInclude Include="StaticModel.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />

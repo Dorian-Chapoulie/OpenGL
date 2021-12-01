@@ -52,6 +52,12 @@
     <Filter Include="animation">
       <UniqueIdentifier>{e94b25b6-58e9-480d-bc51-9129177aa0e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hitbox">
+      <UniqueIdentifier>{2288831a-4d62-46ee-bfbf-63822ef5d48e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="loader">
+      <UniqueIdentifier>{b83e94e8-da84-49ee-940d-5581f7d99204}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -110,6 +116,30 @@
     </ClCompile>
     <ClCompile Include="Animator.cpp">
       <Filter>animation</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticModel.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicModel.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="HitBox.cpp">
+      <Filter>hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletalModel.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="LoaderFactory.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
+    <ClCompile Include="ILoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultLoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonLoader.cpp">
+      <Filter>loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +205,30 @@
     </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicModel.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticModel.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="HitBox.h">
+      <Filter>hitbox</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletalModel.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="LoaderFactory.h">
+      <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="ILoader.h">
+      <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultLoader.h">
+      <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonLoader.h">
+      <Filter>loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

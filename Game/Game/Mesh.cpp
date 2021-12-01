@@ -69,7 +69,7 @@ void Mesh::draw(Shader& shader) const
 		//shader.setValue<int>("material." + name + number, i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
-	glActiveTexture(GL_TEXTURE0);
+	//glActiveTexture(GL_TEXTURE0);
 
 	// draw mesh
 	glBindVertexArray(VAO);
@@ -77,7 +77,7 @@ void Mesh::draw(Shader& shader) const
 	glBindVertexArray(0);
 }
 
-std::vector<Vertex> Mesh::getVertices()
+std::vector<Vertex>& Mesh::getVertices()
 {
 	return vertices;
 }

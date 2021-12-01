@@ -1,5 +1,5 @@
 #pragma once
-#include "Model.h"
+#include "DynamicModel.h"
 
 class Player
 {
@@ -18,7 +18,7 @@ public:
 	void increaseCameraYOffset();
 	void decreaseCameraYOffset();
 
-	Model* getModel() const;
+	DynamicModel* getModel() const;
 
 private:
 	glm::vec3 position = glm::vec3(1.0f);
@@ -29,7 +29,7 @@ private:
 
 
 protected:
-	Model* model = nullptr;
+	DynamicModel* dynamicModel = nullptr;
 	float offsetCameraY = 10.0f;
 	const float offsetCameraYStep = 1.0f;
 };

@@ -1,8 +1,10 @@
+#pragma once
+
 #include <glm/glm.hpp>
 
-struct BoneInfo
+struct bone_info
 {
-    int id;
-    /*offset matrix transforms vertex from model space to bone space*/
-    glm::mat4 offset;
+	int id;
+	/*offset matrix transforms vertex from model space to bone space*/
+	glm::mat4 offset;
 };
