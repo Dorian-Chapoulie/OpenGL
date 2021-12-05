@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#include "DynamicModel.h"
+
 Player::Player(const std::string& bodyModelPath, const glm::vec3& position)
 {
 	this->position = position;
@@ -58,5 +60,5 @@ void Player::initModel(const std::string& modelPath)
 {
 	delete model;
 	this->modelPath = modelPath;
-	model = new Model(modelPath, position, 90.0f, true, false, glm::vec3(0.05f));
+	model = new DynamicModel(modelPath, position, 90.0f, true, false, glm::vec3(0.05f));
 }

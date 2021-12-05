@@ -18,6 +18,8 @@
 #include "SkyBox.h"
 #include "Animation.h"
 #include "Animator.h"
+#include "DynamicModel.h"
+#include "StaticModel.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -246,14 +248,16 @@ int main() {
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(debugDraw);
+	dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
-	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
-	Model model2("../../models/die/die.dae", glm::vec3(0.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.05f));
-	Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
+	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), false, true, glm::vec3(1.0f));
+	StaticModel model2("../../models/die/die.dae", glm::vec3(25.0f, 10.0f, 0.0f), true, false, glm::vec3(0.2f));
+	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	localPlayer = new LocalPlayer("../../models/swat/swat.dae", glm::vec3(5, 1, 0));
+	DynamicModel model3("../../models/die/die.dae", glm::vec3(5.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.05f));
+
+	localPlayer = new LocalPlayer("../../models/die/die.dae", glm::vec3(5, 1, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -275,6 +279,9 @@ int main() {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 	for (auto* rigidBody : model2.getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}
+	for (auto* rigidBody : model3.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
@@ -309,9 +316,9 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		animator.UpdateAnimation(deltaTime);
+		/*animator.UpdateAnimation(deltaTime);
 		animator2.UpdateAnimation(deltaTime);
-		animator3.UpdateAnimation(deltaTime);
+		animator3.UpdateAnimation(deltaTime);*/
 
 		double currentTime = glfwGetTime();
 		nbFrames++;
@@ -323,7 +330,7 @@ int main() {
 		}
 		//std::cout << currentFrame << std::endl;
 
-		animationShader.use();
+		/*animationShader.use();
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i) {
@@ -344,7 +351,7 @@ int main() {
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
-		model3.draw(animationShader);
+		model3.draw(animationShader);*/
 
 		shader.use();
 
@@ -357,10 +364,10 @@ int main() {
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
-		//localPlayer->draw(shader);
+		localPlayer->draw(shader);
 		model.draw(shader);
-		//model2.draw(shader);
-		//model3.draw(shader);
+		model2.draw(shader);
+		model3.draw(shader);
 		//model4.draw(shader);
 
 #pragma region SKYBOX

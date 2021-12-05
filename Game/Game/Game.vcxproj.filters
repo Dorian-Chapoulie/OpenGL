@@ -52,6 +52,15 @@
     <Filter Include="animation">
       <UniqueIdentifier>{e94b25b6-58e9-480d-bc51-9129177aa0e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="model\Loader">
+      <UniqueIdentifier>{080c33da-b626-497a-9362-5847918dbc33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="model\DynamicModel">
+      <UniqueIdentifier>{d2c30832-2048-4e24-94e0-466742923c33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="model\StaticModel">
+      <UniqueIdentifier>{b201f6b7-f351-417a-b815-1d145e99f612}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -110,6 +119,21 @@
     </ClCompile>
     <ClCompile Include="Animator.cpp">
       <Filter>animation</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>model\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="ILoader.cpp">
+      <Filter>model\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicModel.cpp">
+      <Filter>model\DynamicModel</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultLoader.cpp">
+      <Filter>model\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticModel.cpp">
+      <Filter>model\StaticModel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +199,21 @@
     </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>model\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="ILoader.h">
+      <Filter>model\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicModel.h">
+      <Filter>model\DynamicModel</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultLoader.h">
+      <Filter>model\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticModel.h">
+      <Filter>model\StaticModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

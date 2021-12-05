@@ -11,14 +11,12 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "BoneInfo.hpp"
+#include "ModelLoader.h"
 
 class Model {
 public:
-	Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox, bool hasMultipleHitboxes);
 	Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox, bool hasMultipleHitboxes, glm::vec3 scale);
-	Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox);
-	Model(const std::string& path, const glm::vec3& position, bool hasHitbox);
-	Model(const std::string& path, const glm::vec3& position, const glm::vec3& scale, bool hasHitbox);
+	Model(const std::string& path, const glm::vec3& position, bool hasHitbox, bool hasMultipleHitboxes, glm::vec3 scale);
 	~Model();
 	void draw(Shader& shader);
 
@@ -37,13 +35,15 @@ public:
 
 	auto& GetBoneInfoMap() { return m_BoneInfoMap; }
 	int& GetBoneCount() { return m_BoneCounter; }
+
+protected:
+	ModelData* modelData;
+	void init(const std::string& path, bool hasMultiple);
 private:
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
 	float centerRotation = 0.0f;
 	glm::vec3 basePosition = glm::vec3(0.0f);
-	std::vector<Texture> loadedTextures;
-	std::vector<Mesh*> meshes;
 	std::string directory;
 
 	std::vector<glm::vec3> sizes;
@@ -52,7 +52,7 @@ private:
 
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-	void loadModel(const std::string& path);
+	virtual void loadModel(const std::string& path);
 	void processNode(aiNode* node, const aiScene* scene);
 	Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName);

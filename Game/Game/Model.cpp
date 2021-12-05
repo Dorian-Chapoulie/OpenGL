@@ -4,20 +4,6 @@
 #include "AssimpHelper.hpp"
 
 //TODO: VERIFY EVERY CONSTRUCTORS
-
-Model::Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox, bool hasMultipleHitboxes)
-{
-	this->weight = weight;
-	this->position = position;
-	this->basePosition = position;
-	this->hasHitbox = hasHitbox;
-	setPosition(position);
-	loadModel(path);
-	if (hasHitbox) setupHitbox();
-	else if (hasMultipleHitboxes) setupHitboxes();
-	std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
-}
-
 Model::Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox, bool hasMultipleHitboxes,
 	glm::vec3 scale)
 {
@@ -25,56 +11,35 @@ Model::Model(const std::string& path, const glm::vec3& position, float weight, b
 	this->position = position;
 	this->basePosition = position;
 	this->hasHitbox = hasHitbox;
-	this->modelMatrix = glm::scale(this->modelMatrix, scale);
 	this->scale = scale;
+	this->modelMatrix = glm::scale(glm::mat4(1.0f), scale);
 	setPosition(position);
-	loadModel(path);
+}
+
+Model::Model(const std::string& path, const glm::vec3& position, bool hasHitbox, bool hasMultipleHitboxes,
+	glm::vec3 scale)
+{
+	this->position = position;
+	this->basePosition = position;
+	this->hasHitbox = hasHitbox;
+	this->scale = scale;
+	this->modelMatrix = glm::scale(glm::mat4(1.0f), scale);
+	this->modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::DEFAULT);
+	setPosition(position);
+	init(path, hasMultipleHitboxes);
+}
+
+void Model::init(const std::string& path, bool hasMultipleHitboxes)
+{
+	//loadModel(path);
 	if (hasHitbox) setupHitbox();
 	else if (hasMultipleHitboxes) setupHitboxes();
 
-	for (auto* m : meshes)
+	/*for (auto* m : meshes)
 	{
 		m->cleanUp();
-	}
+	}*/
 
-	std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
-}
-
-Model::Model(const std::string& path, const glm::vec3& position, float weight, bool hasHitbox)
-{
-	this->weight = weight;
-	this->position = position;
-	this->basePosition = position;
-	this->hasHitbox = hasHitbox;
-	setPosition(position);
-	loadModel(path);
-	if (hasHitbox) setupHitboxes();
-	std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
-}
-//TODO: stipulate that this is a static object
-Model::Model(const std::string& path, const glm::vec3& position, bool hasHitbox)
-{
-	this->position = position;
-	this->hasHitbox = hasHitbox;
-	this->position = position;
-	this->basePosition = position;
-	setPosition(position);
-	loadModel(path);
-	if (hasHitbox) setupHitboxes();
-	std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
-}
-
-Model::Model(const std::string& path, const glm::vec3& position, const glm::vec3& scale, bool hasHitbox)
-{
-	this->position = position;
-	this->hasHitbox = hasHitbox;
-	this->position = position;
-	this->basePosition = position;
-	this->modelMatrix = glm::scale(this->modelMatrix, scale);
-	this->scale = scale;
-	setPosition(position);
-	loadModel(path);
-	if (hasHitbox) setupHitboxes();
 	std::cout << "model : " << path << " has: " << boxCollisionShapes.size() << " hitboxex " << std::endl;
 }
 
@@ -105,7 +70,7 @@ const glm::vec3 Model::getCenter() const {
 void Model::draw(Shader& shader)
 {
 	shader.setMatrix("model", modelMatrix);
-	for (Mesh* m : meshes) {
+	for (Mesh* m : modelData->meshes) {
 		m->draw(shader);
 	}
 }
@@ -211,6 +176,7 @@ void Model::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* 
 
 void Model::loadModel(const std::string& path)
 {
+	std::cout << "Model load model" << std::endl;
 	Assimp::Importer import;
 	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -229,7 +195,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(mesh, scene));
+		modelData->meshes.push_back(processMesh(mesh, scene));
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -254,7 +220,7 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
 		vector.z = mesh->mVertices[i].z;
 		vertex.Position = vector;
 
-		SetVertexBoneDataToDefault(vertex);
+		//SetVertexBoneDataToDefault(vertex);
 
 		if (mesh->mNormals) {
 			vector.x = mesh->mNormals[i].x;
@@ -300,7 +266,7 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
 
 	//TODO create an animated model class
-	ExtractBoneWeightForVertices(vertices, mesh, scene);
+	//ExtractBoneWeightForVertices(vertices, mesh, scene);
 
 	return new Mesh(vertices, indices, textures);
 }
@@ -313,11 +279,11 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		bool skip = false;
-		for (unsigned int j = 0; j < loadedTextures.size(); j++)
+		for (unsigned int j = 0; j < modelData->loadedTextures.size(); j++)
 		{
-			if (std::strcmp(loadedTextures[j].path.data(), str.C_Str()) == 0)
+			if (std::strcmp(modelData->loadedTextures[j].path.data(), str.C_Str()) == 0)
 			{
-				textures.push_back(loadedTextures[j]);
+				textures.push_back(modelData->loadedTextures[j]);
 				skip = true;
 				break;
 			}
@@ -329,7 +295,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 			texture.type = typeName;
 			texture.path = str.C_Str();
 			textures.push_back(texture);
-			loadedTextures.push_back(texture); // add to loaded textures
+			modelData->loadedTextures.push_back(texture); // add to loaded textures
 		}
 	}
 	return textures;
@@ -337,7 +303,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 
 void Model::setupHitboxes()
 {
-	for (Mesh* mesh : meshes) {
+	for (Mesh* mesh : modelData->meshes) {
 		const std::vector<glm::vec3> dataSize = getMeshCenterAndSize(mesh->getVertices());
 		sizes.emplace_back(glm::vec3(dataSize[0] * glm::vec3(0.5)));
 		centers.emplace_back(dataSize[1]);
@@ -366,7 +332,7 @@ void Model::setupHitboxes()
 
 void Model::setupHitbox()
 {
-	if (meshes.empty()) return;
+	if (modelData->meshes.empty()) return;
 	const std::vector<glm::vec3> dataSize = getBiggestHitBox();
 	sizes.emplace_back(glm::vec3(dataSize[0] * glm::vec3(0.5)));
 	centers.emplace_back(dataSize[1]);
@@ -390,7 +356,7 @@ void Model::setupHitbox()
 	//TODO: find best way
 	rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
 
-	for (Mesh* m : meshes)
+	for (Mesh* m : modelData->meshes)
 	{
 		m->cleanUp();
 	}
@@ -411,6 +377,7 @@ std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& ve
 		if (vertices[i].Position.z < min_z) min_z = vertices[i].Position.z;
 		if (vertices[i].Position.z > max_z) max_z = vertices[i].Position.z;
 	}
+	std::cout << "scale: " << scale.x << std::endl;
 	glm::vec3 size = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z) * scale;
 	glm::vec3 center = glm::vec3((min_x + max_x) / 2, (min_y + max_y) / 2, (min_z + max_z) / 2) * scale;
 
@@ -424,10 +391,10 @@ std::vector<glm::vec3> Model::getMeshCenterAndSize(const std::vector<Vertex>& ve
 
 std::vector<glm::vec3> Model::getBiggestHitBox() const
 {
-	if (meshes.empty()) return std::vector<glm::vec3> { glm::vec3(0) };
-	std::vector<glm::vec3> sizeCenter = getMeshCenterAndSize(meshes[0]->getVertices());
+	if (modelData->meshes.empty()) return std::vector<glm::vec3> { glm::vec3(0) };
+	std::vector<glm::vec3> sizeCenter = getMeshCenterAndSize(modelData->meshes[0]->getVertices());
 	glm::vec3 maxSize = glm::vec3(sizeCenter[0]);
-	for (Mesh* m : meshes)
+	for (Mesh* m : modelData->meshes)
 	{
 		const std::vector<glm::vec3> temp = getMeshCenterAndSize(m->getVertices());
 		const glm::vec3 size = temp[0];
