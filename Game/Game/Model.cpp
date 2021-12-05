@@ -23,6 +23,7 @@ Model::Model(const std::string& path, const glm::vec3& position, bool hasHitbox,
 	this->basePosition = position;
 	this->hasHitbox = hasHitbox;
 	this->scale = scale;
+	this->directory = path;
 	//this->modelMatrix = glm::scale(glm::mat4(1.0f), scale);
 	setPosition(position);
 	loadModel(path);
@@ -96,6 +97,13 @@ void Model::setPosition(const glm::vec3& position)
 {
 	this->position = position;
 	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale);
+	btTransform transform;
+	transform.setIdentity();
+	for (auto& rigidBody : rigidBodys) {
+		transform.setOrigin(btVector3(position.x, position.y, position.z));
+		rigidBody->setWorldTransform(transform);
+		rigidBody->getMotionState()->setWorldTransform(transform);
+	}
 }
 
 void Model::setRotationAroundCenter(const float angle)
@@ -112,7 +120,9 @@ void Model::setRotationAroundCenter(const float angle)
 void Model::setWorldTransform(const glm::vec3& position, const glm::quat& rot)
 {
 	//glm::quat r = glm::quat(glm::vec3(0, centerRotation, 0));
-	setPosition(position);
+	//setPosition(position);
+	this->position = position;
+	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale);
 	modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.f, 0.f));
 }
 
