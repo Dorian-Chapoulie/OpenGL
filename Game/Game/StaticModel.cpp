@@ -10,7 +10,7 @@ StaticModel::StaticModel(
 	glm::vec3 scale)
 	: Model(path, position, 0.0f, hasHitbox, hasMultipleHitboxes, scale)
 {
-	StaticModel::loadModel(path);
+	loadModel(path);
 	Model::init(path, false);
 }
 

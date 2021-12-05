@@ -39,7 +39,7 @@ public:
 protected:
 	ModelData* modelData;
 	void init(const std::string& path, bool hasMultiple);
-private:
+
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
 	float centerRotation = 0.0f;
@@ -53,9 +53,6 @@ private:
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 
 	virtual void loadModel(const std::string& path);
-	void processNode(aiNode* node, const aiScene* scene);
-	Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
-	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName);
 
 	void setupHitboxes();
 	void setupHitbox();

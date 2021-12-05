@@ -252,12 +252,13 @@ int main() {
 #pragma endregion physics
 
 	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), false, true, glm::vec3(1.0f));
-	StaticModel model2("../../models/die/die.dae", glm::vec3(25.0f, 10.0f, 0.0f), true, false, glm::vec3(0.2f));
+	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	DynamicModel model3("../../models/die/die.dae", glm::vec3(5.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.05f));
+	DynamicModel model2("../../models/crate/Wooden Crate.obj", glm::vec3(15.0f, 1.0f, 5.0f), 1.0f, true, false, glm::vec3(0.5f));
+	StaticModel model3("../../models/crate/Wooden Crate.obj", glm::vec3(20.0f, 1.0f, 5.0f), true, false, glm::vec3(0.5f));
 
-	localPlayer = new LocalPlayer("../../models/die/die.dae", glm::vec3(5, 1, 0));
+	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(5, 1, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -286,13 +287,13 @@ int main() {
 	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 
-	Animation danceAnimation("../../models/swat/swat.dae", localPlayer->getModel());
-	Animation dieAnimation("../../models/die/die.dae", &model2);
-	Animation idleAnimation("../../models/idle/idle.dae", &model3);
+	//Animation danceAnimation("../../models/swat/swat.dae", localPlayer->getModel());
+	//Animation dieAnimation("../../models/die/die.dae", &model2);
+	//Animation idleAnimation("../../models/idle/idle.dae", &model3);
 
-	Animator animator(&danceAnimation);
-	Animator animator2(&dieAnimation);
-	Animator animator3(&idleAnimation);
+	//Animator animator(&danceAnimation);
+	//Animator animator2(&dieAnimation);
+	//Animator animator3(&idleAnimation);
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 30.0f;
