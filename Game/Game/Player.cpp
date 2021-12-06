@@ -51,7 +51,7 @@ void Player::decreaseCameraYOffset()
 	this->offsetCameraY -= offsetCameraYStep;
 }
 
-Model* Player::getModel() const
+DynamicModel* Player::getModel() const
 {
 	return model;
 }
@@ -60,5 +60,5 @@ void Player::initModel(const std::string& modelPath)
 {
 	delete model;
 	this->modelPath = modelPath;
-	model = new DynamicModel(modelPath, position, 90.0f, true, false, glm::vec3(0.5f));
+	model = new DynamicModel(modelPath, position, 90.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 }

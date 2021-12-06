@@ -1,5 +1,8 @@
 #include "Animation.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
 Animation::Animation(const std::string& animationPath, Model* model)
 {
 	this->model = model;

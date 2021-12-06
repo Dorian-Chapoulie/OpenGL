@@ -6,18 +6,18 @@
 
 class MyMotionState : public btMotionState {
 private:
-    Model* model = nullptr;
-    btTransform m_graphicsWorldTrans;
-    btTransform m_centerOfMassOffset;
-    btTransform m_startWorldTrans;
+	Model* model = nullptr;
+	btTransform m_graphicsWorldTrans;
+	btTransform m_centerOfMassOffset;
+	btTransform m_startWorldTrans;
 
 public:
-    MyMotionState(
-        Model* model,
-        const btTransform& startTrans = btTransform::getIdentity(),
-        const btTransform& centerOfMassOffset = btTransform::getIdentity()
-    );
+	MyMotionState(
+		Model* model,
+		const btTransform& startTrans = btTransform::getIdentity(),
+		const btTransform& centerOfMassOffset = btTransform::getIdentity()
+	);
 
-    void getWorldTransform(btTransform& worldTrans) const override;
-    void setWorldTransform(const btTransform& worldTrans) override;
+	void getWorldTransform(btTransform& worldTrans) const override;
+	void setWorldTransform(const btTransform& worldTrans) override;
 };

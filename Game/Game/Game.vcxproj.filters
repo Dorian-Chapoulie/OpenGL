@@ -61,6 +61,9 @@
     <Filter Include="model\StaticModel">
       <UniqueIdentifier>{b201f6b7-f351-417a-b815-1d145e99f612}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hitbox">
+      <UniqueIdentifier>{0c1b6fb0-05ee-4652-b345-a8e68d2937bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -134,6 +137,18 @@
     </ClCompile>
     <ClCompile Include="StaticModel.cpp">
       <Filter>model\StaticModel</Filter>
+    </ClCompile>
+    <ClCompile Include="HitBoxFactory.cpp">
+      <Filter>hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="IHitBox.cpp">
+      <Filter>hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="AABBHitbox.cpp">
+      <Filter>hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="AABBMultipleHitBox.cpp">
+      <Filter>hitbox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +229,18 @@
     </ClInclude>
     <ClInclude Include="StaticModel.h">
       <Filter>model\StaticModel</Filter>
+    </ClInclude>
+    <ClInclude Include="HitBoxFactory.h">
+      <Filter>hitbox</Filter>
+    </ClInclude>
+    <ClInclude Include="IHitBox.h">
+      <Filter>hitbox</Filter>
+    </ClInclude>
+    <ClInclude Include="AABBHitbox.h">
+      <Filter>hitbox</Filter>
+    </ClInclude>
+    <ClInclude Include="AABBMultipleHitBox.h">
+      <Filter>hitbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

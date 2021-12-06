@@ -66,7 +66,7 @@ void LocalPlayer::move(bool forward, bool backward, bool left, bool right, bool 
 	const float compensation = (1.0f + delta);
 	moveVector *= SPEED * compensation;
 
-	for (auto rigidBody : getModel()->getRigidBodys()) {
+	for (auto* rigidBody : getModel()->getRigidBodys()) {
 		rigidBody->activate();
 		rigidBody->setLinearVelocity(btVector3(
 			moveVector.x,
