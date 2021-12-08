@@ -22,6 +22,9 @@ public:
 	void setCenter(glm::vec3 center);
 	glm::vec3 getCenter() const;
 
+	void setSize(glm::vec3 size);
+	glm::vec3 getSize() const;
+
 	glm::vec3 getPosition();
 	const glm::vec3 getBasePosition() const;
 	glm::mat4& getModelMatrix();
@@ -37,6 +40,7 @@ protected:
 	ModelData* modelData;
 
 	glm::vec3 center = glm::vec3(0.0f);
+	glm::vec3 size = glm::vec3(0.0f);
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 basePosition = glm::vec3(0.0f);

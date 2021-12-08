@@ -24,18 +24,15 @@ void MyMotionState::setWorldTransform(const btTransform& worldTrans) {
 		worldTrans.getOrigin().getZ()
 	);
 
-	const glm::vec3 center = model->getCenter();
-	const glm::vec3 basePosition = model->getBasePosition();
+	//const glm::vec3 center = model->getCenter();
+	//const glm::vec3 size = model->getSize();
+	//const glm::vec3 basePosition = model->getBasePosition();
 
-	const glm::vec3 tmp = glm::vec3(
-		position.x - center.x + basePosition.x,
-		position.y - center.y + basePosition.y,
-		position.z - center.z + basePosition.z
-	);
+	const glm::vec3 pos = position; // -center + basePosition;
 
-	btQuaternion physicsQuat = worldTrans.getRotation();
-	glm::quat rotation = glm::quat(glm::vec3(0, abs(physicsQuat.getY()), 0));
+	const btQuaternion physicsQuat = worldTrans.getRotation();
+	const glm::quat rotation = glm::quat(physicsQuat.w(), physicsQuat.x(), physicsQuat.y(), physicsQuat.z());
 
-	model->getHitBox()->setWorldTransform(tmp, rotation);
+	model->getHitBox()->setWorldTransform(pos, rotation);
 	m_graphicsWorldTrans = worldTrans * m_centerOfMassOffset;
 }

@@ -101,7 +101,7 @@ void processInput(GLFWwindow* window)
 		left = false;
 	}
 
-	//jump = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+	jump = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -244,21 +244,21 @@ int main() {
 
 	// The world.
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
-	dynamicsWorld->setGravity(btVector3(0.0f, -1.0f, 0.0f));
+	dynamicsWorld->setGravity(btVector3(0.0f, -9.0f, 0.0f));
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(debugDraw);
+	//dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
-	StaticModel model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
+	StaticModel model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(10.0f, 0.01f, 10.0f));
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	DynamicModel model2("../../models/die/die.dae", glm::vec3(35.0f, 1.0f, 5.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(0.05f), true);
-	StaticModel model3("../../models/crate/Wooden Crate.obj", glm::vec3(20.0f, 1.0f, 5.0f), HitBoxFactory::AABB, glm::vec3(0.5f));
+	DynamicModel model2("../../models/crate/Wooden Crate.obj", glm::vec3(20.0f, 10.0f, 8.0f), 0.1f, HitBoxFactory::AABB, glm::vec3(1.0f));
+	StaticModel model3("../../models/cube/cube.obj", glm::vec3(20.0f, 15.0f, 8.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/die/die.dae", glm::vec3(5, 1, 0));
+	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(5, 1, -15));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -272,6 +272,25 @@ int main() {
 	setupSkyBoxShader(skyboxShader, projection);
 	setupSound();
 	createLights(shader);
+
+	std::vector<DynamicModel*> models;
+	int x = 0;
+	int y = 20;
+	int z = 8;
+	for (int i = 0; i < 10; i++)
+	{
+		x += 10;
+		if (i == 4)
+		{
+			x = 3;
+			y += 20;
+			z = 12;
+		}
+		models.emplace_back(new DynamicModel("../../models/crate/Wooden Crate.obj", glm::vec3(x, y, z), 1.0f, HitBoxFactory::AABB, glm::vec3(1.0f)));
+		for (auto* rigidBody : models.back()->getRigidBodys()) {
+			dynamicsWorld->addRigidBody(rigidBody);
+		}
+	}
 
 	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
@@ -291,19 +310,19 @@ int main() {
 	//Animation dieAnimation("../../models/die/die.dae", &model2);
 	//Animation idleAnimation("../../models/idle/idle.dae", &model3);
 
-	Animator animator(model2.getAnimation());
-	Animator animator2(localPlayer->getModel()->getAnimation());
+	//Animator animator(model2.getAnimation());
+	//Animator animator2(localPlayer->getModel()->getAnimation());
 	//Animator animator3(&idleAnimation);
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
-	float timeStep = 1.0 / 30.0f;
+	float timeStep = 1 / 3000.0f;
 	int nbFrames = 0;
 	double lastTime = glfwGetTime();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
 	//force y = 9.1
 
-	std::thread([&]()
+	/*std::thread([&]()
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 			model2.setPosition(glm::vec3(35.0f, 20.0f, 5.0f));
@@ -317,78 +336,83 @@ int main() {
 				));
 			}
 
-		}).detach();
+		});*/
 
-		bool test = true;
-		while (!glfwWindowShouldClose(window))
-		{
-			processInput(window);
-			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	bool test = true;
+	while (!glfwWindowShouldClose(window))
+	{
+		processInput(window);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		if (jump) {
 			dynamicsWorld->stepSimulation(timeStep, 10);
 			dynamicsWorld->debugDrawWorld();
-
-			const float currentFrame = glfwGetTime();
-			deltaTime = currentFrame - lastFrame;
-			lastFrame = currentFrame;
-
-			animator.UpdateAnimation(deltaTime);
-			animator2.UpdateAnimation(deltaTime);
-
-			double currentTime = glfwGetTime();
-			nbFrames++;
-			if (currentTime - lastTime >= 1.0) {
-				std::cout << nbFrames << " FPS\n";
-				nbFrames = 0;
-				lastTime += 1.0;
-			}
-
-			localPlayer->move(forward, backward, left, right, jump, deltaTime);
-			localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
-			localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
-
-			animationShader.use();
-			animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-			auto transforms = animator2.GetFinalBoneMatrices();
-			for (int i = 0; i < transforms.size(); ++i) {
-				animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-			}
-			localPlayer->draw(animationShader);
-
-			animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-			transforms = animator.GetFinalBoneMatrices();
-			for (int i = 0; i < transforms.size(); ++i) {
-				animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-			}
-			model2.draw(animationShader);
-
-			shader.use();
-
-
-
-			//viewpos inutile
-			shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
-			shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-
-			//localPlayer->draw(shader);
-			model.draw(shader);
-			//model2.draw(shader);
-			model3.draw(shader);
-			//model4.draw(shader);
-
-#pragma region SKYBOX
-			glDepthFunc(GL_LEQUAL);
-			skyboxShader.use();
-			glm::mat4 view = glm::mat4(glm::mat3(localPlayer->getCamera()->getViewMatrix()));
-			skyboxShader.setMatrix("view", view);
-			skyboxShader.setMatrix("projection", projection);
-			skybox.draw();
-#pragma endregion 
-			glfwSwapBuffers(window);
-			glfwPollEvents();
 		}
 
-		glfwTerminate();
-		return 0;
+		const float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		//animator.UpdateAnimation(deltaTime);
+		//animator2.UpdateAnimation(deltaTime);
+
+		double currentTime = glfwGetTime();
+		nbFrames++;
+		if (currentTime - lastTime >= 1.0) {
+			std::cout << nbFrames << " FPS\n";
+			nbFrames = 0;
+			lastTime += 1.0;
+		}
+
+		localPlayer->move(forward, backward, left, right, jump, deltaTime);
+		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
+		localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
+
+		/*animationShader.use();
+		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+		auto transforms = animator2.GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i) {
+			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+		}
+		localPlayer->draw(animationShader);
+
+		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+		transforms = animator.GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i) {
+			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+		}
+		model2.draw(animationShader);*/
+
+		shader.use();
+
+		//viewpos inutile
+		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
+		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+
+		for (auto dynamic_model : models)
+		{
+			dynamic_model->draw(shader);
+		}
+
+		localPlayer->draw(shader);
+		model.draw(shader);
+		model2.draw(shader);
+		model3.draw(shader);
+		//model4.draw(shader);
+
+#pragma region SKYBOX
+		glDepthFunc(GL_LEQUAL);
+		skyboxShader.use();
+		glm::mat4 view = glm::mat4(glm::mat3(localPlayer->getCamera()->getViewMatrix()));
+		skyboxShader.setMatrix("view", view);
+		skyboxShader.setMatrix("projection", projection);
+		skybox.draw();
+#pragma endregion 
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	glfwTerminate();
+	return 0;
 }

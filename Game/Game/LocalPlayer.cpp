@@ -54,7 +54,7 @@ void LocalPlayer::move(bool forward, bool backward, bool left, bool right, bool 
 		moveVector += glm::cross(view, UP);
 	}
 
-	if (jump && !isJumping) {
+	if (false && jump && !isJumping) {
 		isJumping = true;
 		std::thread([&]() {
 			using namespace std::chrono_literals;

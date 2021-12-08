@@ -1,4 +1,5 @@
 #include "Model.h"
+#include <glm/gtx/euler_angles.hpp>
 
 Model::Model(
 	const std::string& path,
@@ -51,11 +52,18 @@ IHitBox* Model::getHitBox()
 	return nullptr;
 }
 
+//modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.f, 0.f));
 void Model::setWorldTransform(const glm::vec3& position, const glm::quat& rot, float centerRotation)
 {
 	this->position = position;
-	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale);
-	modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.f, 0.f));
+	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale) * glm::toMat4(rot);
+
+	//glm::vec3 euler = glm::eulerAngles(rot);
+	//std::cout << euler.x << " " << glm::normalize(glm::vec3(sin(euler.y))).y << " " << euler.z << std::endl;
+
+	//modelMatrix *= glm::rotate(glm::mat4(1.0f), rot.x, glm::vec3(1.f, 0.f, 0.f));
+
+	//modelMatrix *= glm::toMat4(rot);
 }
 
 Model::~Model()
@@ -94,6 +102,16 @@ void Model::setCenter(glm::vec3 center)
 glm::vec3 Model::getCenter() const
 {
 	return center;
+}
+
+void Model::setSize(glm::vec3 size)
+{
+	this->size = size;
+}
+
+glm::vec3 Model::getSize() const
+{
+	return size;
 }
 
 glm::vec3 Model::getPosition() {

@@ -60,5 +60,5 @@ void Player::initModel(const std::string& modelPath)
 {
 	delete model;
 	this->modelPath = modelPath;
-	model = new DynamicModel(modelPath, position, 1.0f, HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	model = new DynamicModel(modelPath, position, 1.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 }

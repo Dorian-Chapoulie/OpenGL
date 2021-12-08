@@ -12,13 +12,10 @@ public:
 
 	virtual std::vector<btRigidBody*>& generateHitBoxes(Model* model) = 0;
 
-	glm::vec3 getCenter() const;
-
 	virtual void setRotationAroundCenter(const float angle) = 0;
 	virtual void setWorldTransform(const glm::vec3& position, const glm::quat& rot) = 0;
 
 protected:
 	float centerRotation = 0.0f;
-	glm::vec3 center = glm::vec3(0.0f);
 };
 

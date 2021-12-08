@@ -16,8 +16,11 @@ std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 	const glm::vec3 size = glm::vec3(dataSize[0] * glm::vec3(0.5));
 	const glm::vec3 center = dataSize[1];
 	model->setCenter(center);
+	model->setSize(size);
 
+	btVector3 startingInertia(0, 0, 0);
 	boxCollisionShape = new btBoxShape(btVector3(size.x, size.y, size.z));
+	boxCollisionShape->calculateLocalInertia(model->getWeight(), startingInertia);
 	btTransform transform;
 	transform.setIdentity();
 	transform.setOrigin(btVector3(center.x, center.y, center.z));
@@ -25,7 +28,8 @@ std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 	rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
 		model->getWeight(),
 		nullptr,
-		boxCollisionShape
+		boxCollisionShape,
+		startingInertia
 	)));
 
 	rigidBodys.back()->setMotionState(new MyMotionState(model, transform));
