@@ -1,8 +1,9 @@
 #include "Animation.h"
 
-Animation::Animation(const std::string& animationPath, Model* model)
+Animation::Animation(const std::string& animationPath, SkeletalModelData& data, glm::mat4& modelMatrix)
 {
-	this->model = model;
+	this->modelData = data;
+	this->modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2]));
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
 
@@ -11,7 +12,7 @@ Animation::Animation(const std::string& animationPath, Model* model)
 	m_Duration = animation->mDuration;
 	m_TicksPerSecond = animation->mTicksPerSecond;
 	ReadHeirarchyData(m_RootNode, scene->mRootNode);
-	ReadMissingBones(animation, *model);
+	ReadMissingBones(animation);
 }
 
 Animation::~Animation()
@@ -30,12 +31,12 @@ Bone* Animation::FindBone(const std::string& name)
 	else return &(*iter);
 }
 
-void Animation::ReadMissingBones(const aiAnimation* animation, Model& model)
+void Animation::ReadMissingBones(const aiAnimation* animation)
 {
 	int size = animation->mNumChannels;
 
-	auto& boneInfoMap = model.GetBoneInfoMap();//getting m_BoneInfoMap from Model class
-	int& boneCount = model.GetBoneCount(); //getting the m_BoneCounter from Model class
+	auto& boneInfoMap = modelData.m_BoneInfoMap;//getting m_BoneInfoMap from Model class
+	int& boneCount = modelData.m_BoneCounter;//getting the m_BoneCounter from Model class
 
 	//reading channels(bones engaged in an animation and their keyframes)
 	for (int i = 0; i < size; i++)
@@ -60,7 +61,7 @@ void Animation::ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src)
 	assert(src);
 
 	dest.name = src->mName.data;
-	dest.transformation = model->getModelMatrix(); //AssimpHelper::ConvertMatrixToGLMFormat(src->mTransformation);
+	dest.transformation = modelMatrix; //AssimpHelper::ConvertMatrixToGLMFormat(src->mTransformation);
 	dest.childrenCount = src->mNumChildren;
 
 	for (int i = 0; i < src->mNumChildren; i++)

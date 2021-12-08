@@ -1,10 +1,13 @@
 #pragma once
-
-#include <glm/glm.hpp>
-#include <string>
-#include <vector>
-#include "Model.h"
 #include "Bone.h"
+#include <map>
+#include <assimp/scene.h>
+#include <glm/glm.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
+#include "ModelLoader.h"
+
 
 struct AssimpNodeData
 {
@@ -19,7 +22,7 @@ class Animation
 public:
 	Animation() = default;
 
-	Animation(const std::string& animationPath, Model* model);
+	Animation(const std::string& animationPath, SkeletalModelData& data, glm::mat4& modelMatrix);
 
 	~Animation();
 
@@ -32,10 +35,10 @@ public:
 	{
 		return m_BoneInfoMap;
 	}
-	Model* model = nullptr;
-	glm::vec3 test;
+	SkeletalModelData modelData;
+	glm::mat4 modelMatrix;
 private:
-	void ReadMissingBones(const aiAnimation* animation, Model& model);
+	void ReadMissingBones(const aiAnimation* animation);
 
 	void ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src);
 

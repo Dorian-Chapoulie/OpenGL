@@ -18,6 +18,8 @@
 #include "SkyBox.h"
 #include "Animation.h"
 #include "Animator.h"
+#include "DynamicModel.h"
+#include "StaticModel.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -246,14 +248,17 @@ int main() {
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(debugDraw);
+	dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
-	Model model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), true);
-	Model model2("../../models/die/die.dae", glm::vec3(0.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.05f));
-	Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
+	StaticModel model("../../models/map/map.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
+	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
+	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	localPlayer = new LocalPlayer("../../models/swat/swat.dae", glm::vec3(5, 1, 0));
+	DynamicModel model2("../../models/die/die.dae", glm::vec3(35.0f, 1.0f, 5.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	StaticModel model3("../../models/crate/Wooden Crate.obj", glm::vec3(20.0f, 1.0f, 5.0f), HitBoxFactory::AABB, glm::vec3(0.5f));
+
+	localPlayer = new LocalPlayer("../../models/die/die.dae", glm::vec3(5, 1, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -277,15 +282,18 @@ int main() {
 	for (auto* rigidBody : model2.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
+	for (auto* rigidBody : model3.getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 
-	Animation danceAnimation("../../models/swat/swat.dae", localPlayer->getModel());
-	Animation dieAnimation("../../models/die/die.dae", &model2);
-	Animation idleAnimation("../../models/idle/idle.dae", &model3);
+	//Animation danceAnimation("../../models/die/die.dae", reinterpret_cast<SkeletalModelData&>(*model2.getModelData()), &model2.getModelMatrix());
+	//Animation dieAnimation("../../models/die/die.dae", &model2);
+	//Animation idleAnimation("../../models/idle/idle.dae", &model3);
 
-	Animator animator(&danceAnimation);
-	Animator animator2(&dieAnimation);
-	Animator animator3(&idleAnimation);
+	Animator animator(model2.getAnimation());
+	Animator animator2(localPlayer->getModel()->getAnimation());
+	//Animator animator3(&idleAnimation);
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1.0 / 30.0f;
@@ -295,86 +303,92 @@ int main() {
 	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
 	//force y = 9.1
 
-	bool test = true;
-	while (!glfwWindowShouldClose(window))
-	{
-		processInput(window);
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	std::thread([&]()
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+			model2.setPosition(glm::vec3(35.0f, 20.0f, 5.0f));
 
-		dynamicsWorld->stepSimulation(timeStep, 10);
-		dynamicsWorld->debugDrawWorld();
+			for (auto* rigidBody : model2.getRigidBodys()) {
+				//rigidBody->activate();
+				rigidBody->setLinearVelocity(btVector3(
+					-10.0f,
+					0.0f,
+					0.0f
+				));
+			}
 
-		const float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		}).detach();
 
-		animator.UpdateAnimation(deltaTime);
-		animator2.UpdateAnimation(deltaTime);
-		animator3.UpdateAnimation(deltaTime);
+		bool test = true;
+		while (!glfwWindowShouldClose(window))
+		{
+			processInput(window);
+			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		double currentTime = glfwGetTime();
-		nbFrames++;
-		if (currentTime - lastTime >= 1.0) {
-			//printf("%d FPS   ", nbFrames);
-			std::cout << nbFrames << " FPS\n";
-			nbFrames = 0;
-			lastTime += 1.0;
-		}
-		//std::cout << currentFrame << std::endl;
+			dynamicsWorld->stepSimulation(timeStep, 10);
+			dynamicsWorld->debugDrawWorld();
 
-		animationShader.use();
-		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-		auto transforms = animator.GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i) {
-			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-		}
-		localPlayer->draw(animationShader);
+			const float currentFrame = glfwGetTime();
+			deltaTime = currentFrame - lastFrame;
+			lastFrame = currentFrame;
+
+			animator.UpdateAnimation(deltaTime);
+			animator2.UpdateAnimation(deltaTime);
+
+			double currentTime = glfwGetTime();
+			nbFrames++;
+			if (currentTime - lastTime >= 1.0) {
+				std::cout << nbFrames << " FPS\n";
+				nbFrames = 0;
+				lastTime += 1.0;
+			}
+
+			localPlayer->move(forward, backward, left, right, jump, deltaTime);
+			localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
+			localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
+
+			animationShader.use();
+			animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+			auto transforms = animator2.GetFinalBoneMatrices();
+			for (int i = 0; i < transforms.size(); ++i) {
+				animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+			}
+			localPlayer->draw(animationShader);
+
+			animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+			transforms = animator.GetFinalBoneMatrices();
+			for (int i = 0; i < transforms.size(); ++i) {
+				animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+			}
+			model2.draw(animationShader);
+
+			shader.use();
 
 
-		transforms = animator2.GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i) {
-			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-		}
-		model2.draw(animationShader);
 
+			//viewpos inutile
+			shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
+			shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
-
-		transforms = animator3.GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i) {
-			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-		}
-		model3.draw(animationShader);
-
-		shader.use();
-
-		localPlayer->move(forward, backward, left, right, jump, deltaTime);
-		//localPlayer->setCameraPosition(danceAnimation.test, localPlayer->getModel()->getSize());
-		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
-		localPlayer->getModel()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
-
-		//viewpos inutile
-		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
-		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-
-		//localPlayer->draw(shader);
-		model.draw(shader);
-		//model2.draw(shader);
-		//model3.draw(shader);
-		//model4.draw(shader);
+			//localPlayer->draw(shader);
+			model.draw(shader);
+			//model2.draw(shader);
+			model3.draw(shader);
+			//model4.draw(shader);
 
 #pragma region SKYBOX
-		glDepthFunc(GL_LEQUAL);
-		skyboxShader.use();
-		glm::mat4 view = glm::mat4(glm::mat3(localPlayer->getCamera()->getViewMatrix()));
-		skyboxShader.setMatrix("view", view);
-		skyboxShader.setMatrix("projection", projection);
-		skybox.draw();
+			glDepthFunc(GL_LEQUAL);
+			skyboxShader.use();
+			glm::mat4 view = glm::mat4(glm::mat3(localPlayer->getCamera()->getViewMatrix()));
+			skyboxShader.setMatrix("view", view);
+			skyboxShader.setMatrix("projection", projection);
+			skybox.draw();
 #pragma endregion 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
 
-	glfwTerminate();
-	return 0;
+		glfwTerminate();
+		return 0;
 }
