@@ -9,7 +9,8 @@ public:
 	StaticModel(const std::string& path,
 		const glm::vec3& position,
 		HitBoxFactory::TYPE type = HitBoxFactory::TYPE::NONE,
-		glm::vec3 scale = glm::vec3(1.0f)
+		glm::vec3 scale = glm::vec3(1.0f),
+		bool isAnimated = false
 	);
 
 	void setPosition(const glm::vec3& position) override;

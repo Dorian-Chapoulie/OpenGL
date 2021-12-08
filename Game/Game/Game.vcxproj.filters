@@ -150,6 +150,9 @@
     <ClCompile Include="AABBMultipleHitBox.cpp">
       <Filter>hitbox</Filter>
     </ClCompile>
+    <ClCompile Include="SkeletalLoader.cpp">
+      <Filter>model\Loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -241,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="AABBMultipleHitBox.h">
       <Filter>hitbox</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletalLoader.h">
+      <Filter>model\Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

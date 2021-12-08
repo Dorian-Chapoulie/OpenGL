@@ -1,13 +1,8 @@
 #pragma once
-#include <map>
 #include <string>
-#include <vector>
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
-#include <Bullet3/btBulletDynamicsCommon.h>
 #include <glm/vec3.hpp>
 
-#include "BoneInfo.hpp"
+#include "Animation.h"
 #include "IHitBox.h"
 #include "ModelLoader.h"
 #include "Shader.h"
@@ -15,7 +10,7 @@
 class IHitBox;
 class Model {
 public:
-	Model(const std::string& path, const glm::vec3& position, glm::vec3 scale);
+	Model(const std::string& path, const glm::vec3& position, glm::vec3 scale, bool isAnimated = false);
 	~Model();
 
 	void draw(Shader& shader);
@@ -25,22 +20,19 @@ public:
 	virtual void setWorldTransform(const glm::vec3& position, const glm::quat& rot, float centerRotation);
 
 	void setCenter(glm::vec3 center);
-
-
 	glm::vec3 getCenter() const;
+
 	glm::vec3 getPosition();
 	const glm::vec3 getBasePosition() const;
-	const glm::mat4 getModelMatrix() const;
-
-	auto& GetBoneInfoMap() { return m_BoneInfoMap; }
-	int& GetBoneCount() { return m_BoneCounter; }
+	glm::mat4& getModelMatrix();
 
 	glm::vec3 getScale() const;
 	float getWeight() const;
 	ModelData* getModelData();
+	Animation* getAnimation();
 
 protected:
-	Model(const std::string& path, const glm::vec3& position, float weight, glm::vec3 scale);
+	Model(const std::string& path, const glm::vec3& position, float weight, glm::vec3 scale, bool isAnimated = false);
 
 	ModelData* modelData;
 
@@ -53,18 +45,11 @@ protected:
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 
 	virtual void loadModel(const std::string& path);
+	bool isAnimated = false;
+	Animation* animation;
 
-	//BulletPhysics
 private:
 	float weight = 0.0f;
-
-	//Animation
-	std::map<std::string, BoneInfo> m_BoneInfoMap;
-	int m_BoneCounter = 0;
-	const int MAX_BONE_WEIGHTS = 4;
-
-	void SetVertexBoneDataToDefault(Vertex& vertex);
-	void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
-	void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
+	std::string directory;
 };
 

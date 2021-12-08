@@ -8,8 +8,9 @@ DynamicModel::DynamicModel(
 	const glm::vec3& position,
 	float weight,
 	HitBoxFactory::TYPE type,
-	glm::vec3 scale)
-	: Model(path, position, weight, scale)
+	glm::vec3 scale,
+	bool isAnimated)
+	: Model(path, position, weight, scale, isAnimated)
 {
 	loadModel(path);
 	hitbox = HitBoxFactory::getInstance()->getHitBoxes(type);
@@ -41,5 +42,12 @@ IHitBox* DynamicModel::getHitBox()
 
 void DynamicModel::loadModel(const std::string& path)
 {
-	modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::DEFAULT);
+	if (isAnimated)
+	{
+		this->modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::SKELETAL);
+		this->animation = new Animation(path, reinterpret_cast<SkeletalModelData&>(*modelData), modelMatrix);
+	}
+	else {
+		this->modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::DEFAULT);
+	}
 }

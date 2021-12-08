@@ -7,8 +7,9 @@ StaticModel::StaticModel(
 	const std::string& path,
 	const glm::vec3& position,
 	HitBoxFactory::TYPE type,
-	glm::vec3 scale)
-	: Model(path, position, 0.0f, scale)
+	glm::vec3 scale,
+	bool isAnimated)
+	: Model(path, position, 0.0f, scale, isAnimated)
 {
 	loadModel(path);
 	hitbox = HitBoxFactory::getInstance()->getHitBoxes(type);
@@ -39,5 +40,12 @@ IHitBox* StaticModel::getHitBox()
 
 void StaticModel::loadModel(const std::string& path)
 {
-	modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::DEFAULT);
+	if (isAnimated)
+	{
+		this->modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::SKELETAL);
+		this->animation = new Animation(path, reinterpret_cast<SkeletalModelData&>(*modelData), modelMatrix);
+	}
+	else {
+		this->modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::DEFAULT);
+	}
 }

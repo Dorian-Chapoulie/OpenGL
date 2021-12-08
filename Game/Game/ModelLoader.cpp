@@ -1,5 +1,6 @@
 #include "ModelLoader.h"
 #include "DefaultLoader.h"
+#include "SkeletalLoader.h"
 
 ModelLoader* ModelLoader::instance = nullptr;
 
@@ -19,9 +20,9 @@ ModelData* ModelLoader::loadModel(const std::string& path, Type&& type)
 	{
 	case DEFAULT:
 		return DefaultLoader().loadModel(path);
-		break;
+	case SKELETAL:
+		return SkeletalLoader().loadModel(path);
 	default:
 		return DefaultLoader().loadModel(path);
-		break;
 	}
 }

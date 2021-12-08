@@ -255,10 +255,10 @@ int main() {
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	DynamicModel model2("../../models/crate/Wooden Crate.obj", glm::vec3(15.0f, 1.0f, 5.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(0.5f));
+	DynamicModel model2("../../models/die/die.dae", glm::vec3(35.0f, 1.0f, 5.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	StaticModel model3("../../models/crate/Wooden Crate.obj", glm::vec3(20.0f, 1.0f, 5.0f), HitBoxFactory::AABB, glm::vec3(0.5f));
 
-	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(5, 1, 0));
+	localPlayer = new LocalPlayer("../../models/die/die.dae", glm::vec3(5, 1, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -287,12 +287,12 @@ int main() {
 	}
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 
-	//Animation danceAnimation("../../models/swat/swat.dae", localPlayer->getModel());
+	//Animation danceAnimation("../../models/die/die.dae", reinterpret_cast<SkeletalModelData&>(*model2.getModelData()), &model2.getModelMatrix());
 	//Animation dieAnimation("../../models/die/die.dae", &model2);
 	//Animation idleAnimation("../../models/idle/idle.dae", &model3);
 
-	//Animator animator(&danceAnimation);
-	//Animator animator2(&dieAnimation);
+	Animator animator(model2.getAnimation());
+	Animator animator2(localPlayer->getModel()->getAnimation());
 	//Animator animator3(&idleAnimation);
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
@@ -306,7 +306,17 @@ int main() {
 	std::thread([&]()
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-			model2.setPosition(glm::vec3(20.0f, 10.0f, 5.0f));
+			model2.setPosition(glm::vec3(35.0f, 20.0f, 5.0f));
+
+			for (auto* rigidBody : model2.getRigidBodys()) {
+				//rigidBody->activate();
+				rigidBody->setLinearVelocity(btVector3(
+					-10.0f,
+					0.0f,
+					0.0f
+				));
+			}
+
 		}).detach();
 
 		bool test = true;
@@ -323,57 +333,47 @@ int main() {
 			deltaTime = currentFrame - lastFrame;
 			lastFrame = currentFrame;
 
-			/*animator.UpdateAnimation(deltaTime);
+			animator.UpdateAnimation(deltaTime);
 			animator2.UpdateAnimation(deltaTime);
-			animator3.UpdateAnimation(deltaTime);*/
 
 			double currentTime = glfwGetTime();
 			nbFrames++;
 			if (currentTime - lastTime >= 1.0) {
-				//printf("%d FPS   ", nbFrames);
 				std::cout << nbFrames << " FPS\n";
 				nbFrames = 0;
 				lastTime += 1.0;
 			}
-			//std::cout << currentFrame << std::endl;
 
-			/*animationShader.use();
+			localPlayer->move(forward, backward, left, right, jump, deltaTime);
+			localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
+			localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
+
+			animationShader.use();
 			animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-			auto transforms = animator.GetFinalBoneMatrices();
+			auto transforms = animator2.GetFinalBoneMatrices();
 			for (int i = 0; i < transforms.size(); ++i) {
 				animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 			}
 			localPlayer->draw(animationShader);
 
-
-			transforms = animator2.GetFinalBoneMatrices();
+			animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+			transforms = animator.GetFinalBoneMatrices();
 			for (int i = 0; i < transforms.size(); ++i) {
 				animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 			}
 			model2.draw(animationShader);
 
-
-
-			transforms = animator3.GetFinalBoneMatrices();
-			for (int i = 0; i < transforms.size(); ++i) {
-				animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-			}
-			model3.draw(animationShader);*/
-
 			shader.use();
 
-			localPlayer->move(forward, backward, left, right, jump, deltaTime);
-			//localPlayer->setCameraPosition(danceAnimation.test, localPlayer->getModel()->getSize());
-			localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
-			localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
+
 
 			//viewpos inutile
 			shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 			shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
-			localPlayer->draw(shader);
+			//localPlayer->draw(shader);
 			model.draw(shader);
-			model2.draw(shader);
+			//model2.draw(shader);
 			model3.draw(shader);
 			//model4.draw(shader);
 

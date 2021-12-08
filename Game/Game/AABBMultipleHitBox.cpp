@@ -95,7 +95,5 @@ void AABBMultipleHitBox::setRotationAroundCenter(const float angle)
 //TODO: is setPosition mandatory ?
 void AABBMultipleHitBox::setWorldTransform(const glm::vec3& position, const glm::quat& rot)
 {
-	//glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), model->getScale());
-	//modelMatrix *= glm::rotate(glm::mat4(1.0f), centerRotation, glm::vec3(0.f, 1.f, 0.f));
 	model->setWorldTransform(position, rot, centerRotation);
 }

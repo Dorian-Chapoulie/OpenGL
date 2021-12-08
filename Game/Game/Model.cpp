@@ -1,22 +1,27 @@
 #include "Model.h"
-#include "AssimpHelper.hpp"
 
-Model::Model(const std::string& path, const glm::vec3& position, float weight,
-	glm::vec3 scale)
+Model::Model(
+	const std::string& path,
+	const glm::vec3& position,
+	float weight,
+	glm::vec3 scale,
+	bool isAnimated)
 {
+	this->directory = path;
 	this->weight = weight;
 	this->position = position;
 	this->basePosition = position;
 	this->scale = scale;
+	this->isAnimated = isAnimated;
 	setPosition(position);
 }
 
-Model::Model(const std::string& path, const glm::vec3& position,
-	glm::vec3 scale)
+Model::Model(const std::string& path, const glm::vec3& position, glm::vec3 scale, bool isAnimated)
 {
 	this->position = position;
 	this->basePosition = position;
 	this->scale = scale;
+	this->isAnimated = isAnimated;
 	setPosition(position);
 	loadModel(path);
 }
@@ -34,6 +39,11 @@ float Model::getWeight() const
 ModelData* Model::getModelData()
 {
 	return modelData;
+}
+
+Animation* Model::getAnimation()
+{
+	return animation;
 }
 
 IHitBox* Model::getHitBox()
@@ -54,7 +64,14 @@ Model::~Model()
 
 void Model::loadModel(const std::string& path)
 {
-	this->modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::DEFAULT);
+	if (isAnimated)
+	{
+		this->modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::SKELETAL);
+		this->animation = new Animation(path, reinterpret_cast<SkeletalModelData&>(*modelData), modelMatrix);
+	}
+	else {
+		this->modelData = ModelLoader::getInstance()->loadModel(path, ModelLoader::DEFAULT);
+	}
 }
 
 const glm::vec3 Model::getBasePosition() const {
@@ -83,7 +100,7 @@ glm::vec3 Model::getPosition() {
 	return position;
 }
 
-const glm::mat4 Model::getModelMatrix() const
+glm::mat4& Model::getModelMatrix()
 {
 	return modelMatrix;
 }
@@ -93,65 +110,3 @@ void Model::setPosition(const glm::vec3& position)
 	this->position = position;
 	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale);
 }
-
-
-
-
-
-void Model::SetVertexBoneDataToDefault(Vertex& vertex)
-{
-	for (int i = 0; i < MAX_BONE_WEIGHTS; i++)
-	{
-		vertex.m_BoneIDs[i] = -1;
-		vertex.m_Weights[i] = 0.0f;
-	}
-}
-
-void Model::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
-{
-	for (int i = 0; i < MAX_BONE_WEIGHTS; ++i)
-	{
-		if (vertex.m_BoneIDs[i] < 0)
-		{
-			vertex.m_Weights[i] = weight;
-			vertex.m_BoneIDs[i] = boneID;
-			break;
-		}
-	}
-}
-
-void Model::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
-{
-	for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
-	{
-		int boneID = -1;
-		std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-		if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
-		{
-			BoneInfo newBoneInfo;
-			newBoneInfo.id = m_BoneCounter;
-			newBoneInfo.offset = AssimpHelper::ConvertMatrixToGLMFormat(
-				mesh->mBones[boneIndex]->mOffsetMatrix);
-			m_BoneInfoMap[boneName] = newBoneInfo;
-			boneID = m_BoneCounter;
-			m_BoneCounter++;
-		}
-		else
-		{
-			boneID = m_BoneInfoMap[boneName].id;
-		}
-		assert(boneID != -1);
-		auto weights = mesh->mBones[boneIndex]->mWeights;
-		int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-
-		for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
-		{
-			int vertexId = weights[weightIndex].mVertexId;
-			float weight = weights[weightIndex].mWeight;
-			assert(vertexId <= vertices.size());
-			SetVertexBoneData(vertices[vertexId], boneID, weight);
-		}
-	}
-}
-
-
