@@ -45,6 +45,7 @@ LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 //TODO: desctructeur model & mesh
 //TODO: change model via model as param and not path
+//TODO: Static object should not have access to setWorldTransform
 /*
  * model[0][0] => WIDTH
  * model[1][1] => HEIGHT
@@ -244,21 +245,24 @@ int main() {
 
 	// The world.
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
-	dynamicsWorld->setGravity(btVector3(0.0f, -9.0f, 0.0f));
+	dynamicsWorld->setGravity(btVector3(0.0f, -90.0f, 0.0f));
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(debugDraw);
+	dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
 	StaticModel model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(10.0f, 0.01f, 10.0f));
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	DynamicModel model2("../../models/crate/Wooden Crate.obj", glm::vec3(20.0f, 10.0f, 8.0f), 0.1f, HitBoxFactory::AABB, glm::vec3(1.0f));
-	StaticModel model3("../../models/cube/cube.obj", glm::vec3(20.0f, 15.0f, 8.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
+	StaticModel model2("../../models/arch/arch.obj", glm::vec3(0.0f, 10.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
+	StaticModel model3("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, -20.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(5, 1, -15));
+	DynamicModel model4("../../models/cube/cube.obj", glm::vec3(20.0f, 30.0f, -20.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
+	DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
+
+	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(20, 1, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -273,27 +277,10 @@ int main() {
 	setupSound();
 	createLights(shader);
 
-	std::vector<DynamicModel*> models;
-	int x = 0;
-	int y = 20;
-	int z = 8;
-	for (int i = 0; i < 10; i++)
-	{
-		x += 10;
-		if (i == 4)
-		{
-			x = 3;
-			y += 20;
-			z = 12;
-		}
-		models.emplace_back(new DynamicModel("../../models/crate/Wooden Crate.obj", glm::vec3(x, y, z), 1.0f, HitBoxFactory::AABB, glm::vec3(1.0f)));
-		for (auto* rigidBody : models.back()->getRigidBodys()) {
-			dynamicsWorld->addRigidBody(rigidBody);
-		}
-	}
-
+	btVector3 g = btVector3(0, 0, 0);
 	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
+		//rigidBody->setGravity(g);
 	}
 	for (auto* rigidBody : model.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
@@ -304,6 +291,13 @@ int main() {
 	for (auto* rigidBody : model3.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
+	for (auto* rigidBody : model4.getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}
+	for (auto* rigidBody : model5.getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}
+
 	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 
 	//Animation danceAnimation("../../models/die/die.dae", reinterpret_cast<SkeletalModelData&>(*model2.getModelData()), &model2.getModelMatrix());
@@ -314,30 +308,34 @@ int main() {
 	//Animator animator2(localPlayer->getModel()->getAnimation());
 	//Animator animator3(&idleAnimation);
 
+	std::thread t([&]()
+		{
+			int dx = 1;
+			int i = 0;
+			std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+			while (false) {
+				if (model5.getPosition().x >= 30) dx = -1;
+				if (model5.getPosition().x <= 1) dx = 1;
+				for (btRigidBody* body : model5.getRigidBodys())
+				{
+					//model5.setWorldTransform(glm::vec3(10 * dx, 0, 0), glm::quat(0, 0, 0, 1), 0);
+					//model5.setPosition(glm::vec3(10 + i, 2, 0));
+					//b->setLinearVelocity(btVector3(10 * dx, 0, 0));
+					//body->setFriction(5);
+					body->setLinearVelocity(btVector3(10 * dx, 0, 0));
+				}
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+		});
+
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
-	float timeStep = 1 / 3000.0f;
+	float timeStep = 1 / 10.0f;
 	int nbFrames = 0;
 	double lastTime = glfwGetTime();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
 	//force y = 9.1
-
-	/*std::thread([&]()
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-			model2.setPosition(glm::vec3(35.0f, 20.0f, 5.0f));
-
-			for (auto* rigidBody : model2.getRigidBodys()) {
-				//rigidBody->activate();
-				rigidBody->setLinearVelocity(btVector3(
-					-10.0f,
-					0.0f,
-					0.0f
-				));
-			}
-
-		});*/
-
 	bool test = true;
 	while (!glfwWindowShouldClose(window))
 	{
@@ -345,10 +343,10 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		if (jump) {
-			dynamicsWorld->stepSimulation(timeStep, 10);
-			dynamicsWorld->debugDrawWorld();
-		}
+
+		dynamicsWorld->stepSimulation(timeStep, 10);
+		dynamicsWorld->debugDrawWorld();
+
 
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -390,16 +388,12 @@ int main() {
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
-		for (auto dynamic_model : models)
-		{
-			dynamic_model->draw(shader);
-		}
-
 		localPlayer->draw(shader);
 		model.draw(shader);
 		model2.draw(shader);
 		model3.draw(shader);
-		//model4.draw(shader);
+		model4.draw(shader);
+		model5.draw(shader);
 
 #pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);

@@ -33,6 +33,7 @@ void MyMotionState::setWorldTransform(const btTransform& worldTrans) {
 	const btQuaternion physicsQuat = worldTrans.getRotation();
 	const glm::quat rotation = glm::quat(physicsQuat.w(), physicsQuat.x(), physicsQuat.y(), physicsQuat.z());
 
+	//TODO: replace by call model->setWorldTransform 
 	model->getHitBox()->setWorldTransform(pos, rotation);
 	m_graphicsWorldTrans = worldTrans * m_centerOfMassOffset;
 }

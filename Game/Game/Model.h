@@ -10,7 +10,7 @@
 class IHitBox;
 class Model {
 public:
-	Model(const std::string& path, const glm::vec3& position, glm::vec3 scale, bool isAnimated = false);
+	Model(const std::string& path, const glm::vec3& position, glm::vec3 scale = glm::vec3(1.0f), bool isAnimated = false);
 	~Model();
 
 	void draw(Shader& shader);
@@ -33,7 +33,7 @@ public:
 	float getWeight() const;
 	ModelData* getModelData();
 	Animation* getAnimation();
-
+	std::string directory;
 protected:
 	Model(const std::string& path, const glm::vec3& position, float weight, glm::vec3 scale, bool isAnimated = false);
 
@@ -54,6 +54,6 @@ protected:
 
 private:
 	float weight = 0.0f;
-	std::string directory;
+	//std::string directory;
 };
 

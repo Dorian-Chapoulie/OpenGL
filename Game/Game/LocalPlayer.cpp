@@ -70,7 +70,7 @@ void LocalPlayer::move(bool forward, bool backward, bool left, bool right, bool 
 		rigidBody->activate();
 		rigidBody->setLinearVelocity(btVector3(
 			moveVector.x,
-			isJumping ? JUMP_FORCE : FALL_FORCE,
+			isJumping ? JUMP_FORCE : 0,
 			moveVector.z
 		));
 	}

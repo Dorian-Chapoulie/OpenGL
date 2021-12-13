@@ -13,6 +13,7 @@ std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 {
 	this->model = model;
 	const std::array<glm::vec3, 2> dataSize = getBiggestHitBox();
+	//TODO: rename size by extents
 	const glm::vec3 size = glm::vec3(dataSize[0] * glm::vec3(0.5));
 	const glm::vec3 center = dataSize[1];
 	model->setCenter(center);

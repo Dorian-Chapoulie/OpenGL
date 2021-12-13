@@ -9,10 +9,14 @@ AABBMultipleHitBox::~AABBMultipleHitBox()
 	rigidBodys.clear();
 }
 
+//TODO: refactor as compound shapes
+//TODO: add a triangle mesh shape
 std::vector<btRigidBody*>& AABBMultipleHitBox::generateHitBoxes(Model* model)
 {
 	this->model = model;
-	for (Mesh* mesh : model->getModelData()->meshes) {
+	Model* test = new Model("../../models/arch/arch_hitbox.obj", model->getPosition());
+
+	for (Mesh* mesh : test->getModelData()->meshes) {
 		const std::array<glm::vec3, 2> dataSize = getMeshCenterAndSize(mesh->getVertices());
 		const glm::vec3 size = glm::vec3(dataSize[0] * glm::vec3(0.5));
 		const glm::vec3 center = dataSize[1];
@@ -35,6 +39,7 @@ std::vector<btRigidBody*>& AABBMultipleHitBox::generateHitBoxes(Model* model)
 		//TODO: find best way
 		rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
 	}
+	std::cout << model->directory << " has: " << rigidBodys.size() << " hitboxes." << std::endl;
 	return rigidBodys;
 }
 
