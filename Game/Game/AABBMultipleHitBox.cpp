@@ -1,4 +1,6 @@
 #include "AABBMultipleHitBox.h"
+
+#include <filesystem>
 #include <glad/glad.h>
 #include "MyMotionState.h"
 
@@ -14,9 +16,23 @@ AABBMultipleHitBox::~AABBMultipleHitBox()
 std::vector<btRigidBody*>& AABBMultipleHitBox::generateHitBoxes(Model* model)
 {
 	this->model = model;
-	Model* test = new Model("../../models/arch/arch_hitbox.obj", model->getPosition());
+	Model* hitboxModel = nullptr;
 
-	for (Mesh* mesh : test->getModelData()->meshes) {
+	std::string path = model->directory;
+	const int pathLength = path.length();
+	const std::string dir = path.substr(0, pathLength - 4);
+	const std::string ext = path.substr(pathLength - 4);
+
+	if (std::filesystem::exists(dir + "_hitbox" + ext))
+	{
+		hitboxModel = new Model("../../models/arch/arch_hitbox.obj", model->getPosition());
+	}
+	else
+	{
+		hitboxModel = model;
+	}
+
+	for (Mesh* mesh : hitboxModel->getModelData()->meshes) {
 		const std::array<glm::vec3, 2> dataSize = getMeshCenterAndSize(mesh->getVertices());
 		const glm::vec3 size = glm::vec3(dataSize[0] * glm::vec3(0.5));
 		const glm::vec3 center = dataSize[1];
