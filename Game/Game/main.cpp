@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <irrKlang/irrKlang.h>
 #include "Light.h"
 #include "Model.h"
@@ -256,13 +257,13 @@ int main() {
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	StaticModel model2("../../models/arch/arch.obj", glm::vec3(0.0f, 10.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
+	StaticModel model2("../../models/swat/swat.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	StaticModel model3("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, -20.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
 
 	DynamicModel model4("../../models/cube/cube.obj", glm::vec3(20.0f, 30.0f, -20.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 	DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/crate/Wooden Crate.obj", glm::vec3(20, 1, 0));
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(20, 1, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -305,7 +306,7 @@ int main() {
 	//Animation idleAnimation("../../models/idle/idle.dae", &model3);
 
 	//Animator animator(model2.getAnimation());
-	//Animator animator2(localPlayer->getModel()->getAnimation());
+	Animator animator(model2.getAnimation(), &model2);
 	//Animator animator3(&idleAnimation);
 
 	std::thread t([&]()
@@ -314,16 +315,17 @@ int main() {
 			int i = 0;
 			std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
-			while (false) {
-				if (model5.getPosition().x >= 30) dx = -1;
-				if (model5.getPosition().x <= 1) dx = 1;
-				for (btRigidBody* body : model5.getRigidBodys())
+			while (true) {
+				for (btRigidBody* body : model2.getRigidBodys())
 				{
+					std::cout << "ici" << std::endl;
 					//model5.setWorldTransform(glm::vec3(10 * dx, 0, 0), glm::quat(0, 0, 0, 1), 0);
 					//model5.setPosition(glm::vec3(10 + i, 2, 0));
 					//b->setLinearVelocity(btVector3(10 * dx, 0, 0));
 					//body->setFriction(5);
-					body->setLinearVelocity(btVector3(10 * dx, 0, 0));
+					//body->setLinearVelocity(btVector3(10, 0, 0));
+					model2.setPosition(glm::vec3(10, 10, 10));
+					model2.setRotation(glm::vec3(0, 1, 0), 90);
 				}
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
@@ -352,7 +354,7 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		//animator.UpdateAnimation(deltaTime);
+		animator.UpdateAnimation(deltaTime * 0.5f);
 		//animator2.UpdateAnimation(deltaTime);
 
 		double currentTime = glfwGetTime();
@@ -367,13 +369,14 @@ int main() {
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 		localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
-		/*animationShader.use();
+		animationShader.use();
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-		auto transforms = animator2.GetFinalBoneMatrices();
+		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
-		localPlayer->draw(animationShader);
+		model2.draw(animationShader);
+		/*
 
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		transforms = animator.GetFinalBoneMatrices();
@@ -390,7 +393,7 @@ int main() {
 
 		localPlayer->draw(shader);
 		model.draw(shader);
-		model2.draw(shader);
+		//model2.draw(shader);
 		model3.draw(shader);
 		model4.draw(shader);
 		model5.draw(shader);

@@ -14,13 +14,12 @@ public:
 	);
 
 	void setPosition(const glm::vec3& position) override;
-	std::vector<btRigidBody*>& getRigidBodys();
+	std::vector<btRigidBody*>& getRigidBodys() override;
 	IHitBox* getHitBox() override;
 
 private:
 	void loadModel(const std::string& path) override;
 
 	IHitBox* hitbox;
-	std::vector<btRigidBody*> rigidBodys;
 };
 

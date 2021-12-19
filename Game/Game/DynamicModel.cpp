@@ -24,9 +24,11 @@ void DynamicModel::setPosition(const glm::vec3& position)
 	btTransform transform;
 	transform.setIdentity();
 	for (auto* rigidBody : rigidBodys) {
-		transform.setOrigin(btVector3(position.x, position.y, position.z));
-		rigidBody->setWorldTransform(transform);
-		rigidBody->getMotionState()->setWorldTransform(transform);
+		if (rigidBody->getMotionState() != nullptr) {
+			transform.setOrigin(btVector3(position.x, position.y, position.z));
+			rigidBody->setWorldTransform(transform);
+			rigidBody->getMotionState()->setWorldTransform(transform);
+		}
 	}
 }
 

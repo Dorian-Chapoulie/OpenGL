@@ -12,6 +12,7 @@ struct ModelData
 struct SkeletalModelData : ModelData
 {
 	std::map<std::string, BoneInfo> m_BoneInfoMap;
+	std::map<std::string, int> hitboxesBones;
 	int m_BoneCounter = 0;
 };
 

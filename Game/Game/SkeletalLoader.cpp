@@ -13,11 +13,23 @@ ModelData* SkeletalLoader::loadModel(const std::string& path)
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
+		std::cout << "error: " << import.GetErrorString() << std::endl;
 		throw std::exception(import.GetErrorString());
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 
 	processNode(scene->mRootNode, scene);
+
+	if (data->hitboxesBones.size() < bonesHitboxNames.size())
+	{
+		for (const auto& key : bonesHitboxNames)
+		{
+			if (data->hitboxesBones.find(key) == data->hitboxesBones.end())
+			{
+				std::cout << "missing bone: " << key << std::endl;
+			}
+		}
+	}
 	return data;
 }
 
@@ -182,6 +194,16 @@ void SkeletalLoader::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices,
 			float weight = weights[weightIndex].mWeight;
 			assert(vertexId <= vertices.size());
 			SetVertexBoneData(vertices[vertexId], boneID, weight);
+		}
+
+		std::string tmpBoneName = boneName;
+		const std::string bannedStr = "mixamorig_";
+		if (tmpBoneName.find(bannedStr) != std::string::npos) {
+			tmpBoneName = tmpBoneName.replace(0, bannedStr.length(), "");
+		}
+		std::transform(tmpBoneName.begin(), tmpBoneName.end(), tmpBoneName.begin(), ::tolower);
+		if (std::find(bonesHitboxNames.begin(), bonesHitboxNames.end(), tmpBoneName) != bonesHitboxNames.end()) {
+			data->hitboxesBones.insert(std::pair(tmpBoneName, boneID));
 		}
 	}
 }

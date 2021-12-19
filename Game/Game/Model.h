@@ -16,6 +16,7 @@ public:
 	void draw(Shader& shader);
 
 	virtual void setPosition(const glm::vec3& position);
+	virtual void setRotation(const glm::vec3& rotationAxis, float angle);
 	virtual IHitBox* getHitBox();
 	virtual void setWorldTransform(const glm::vec3& position, const glm::quat& rot, float centerRotation);
 
@@ -26,6 +27,7 @@ public:
 	glm::vec3 getSize() const;
 
 	glm::vec3 getPosition();
+	glm::vec3 getRotation();
 	const glm::vec3 getBasePosition() const;
 	glm::mat4& getModelMatrix();
 
@@ -33,7 +35,13 @@ public:
 	float getWeight() const;
 	ModelData* getModelData();
 	Animation* getAnimation();
+
+	virtual std::vector<btRigidBody*>& getRigidBodys();
+	void setHitboxToBone(std::string boneName, btRigidBody* hitbox);
+	btRigidBody* getHitboxFromBoneName(const std::string& boneName);
+
 	std::string directory;
+	bool isAnimated = false;
 protected:
 	Model(const std::string& path, const glm::vec3& position, float weight, glm::vec3 scale, bool isAnimated = false);
 
@@ -43,14 +51,18 @@ protected:
 	glm::vec3 size = glm::vec3(0.0f);
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
+	glm::vec3 rotation = glm::vec3(0.0f);
+	//TODO: remove base position
 	glm::vec3 basePosition = glm::vec3(0.0f);
 
 	glm::vec3 scale = glm::vec3(1.0f);
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 
 	virtual void loadModel(const std::string& path);
-	bool isAnimated = false;
 	Animation* animation;
+
+	std::vector<btRigidBody*> rigidBodys;
+	std::map<std::string, btRigidBody*> bonesHitboxes;
 
 private:
 	float weight = 0.0f;

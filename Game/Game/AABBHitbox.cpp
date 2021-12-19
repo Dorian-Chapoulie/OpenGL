@@ -12,33 +12,101 @@ AABBHitbox::~AABBHitbox()
 std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 {
 	this->model = model;
-	const std::array<glm::vec3, 2> dataSize = getBiggestHitBox();
-	//TODO: rename size by extents
-	const glm::vec3 size = glm::vec3(dataSize[0] * glm::vec3(0.5));
-	const glm::vec3 center = dataSize[1];
-	model->setCenter(center);
-	model->setSize(size);
 
-	btVector3 startingInertia(0, 0, 0);
-	boxCollisionShape = new btBoxShape(btVector3(size.x, size.y, size.z));
-	boxCollisionShape->calculateLocalInertia(model->getWeight(), startingInertia);
-	btTransform transform;
-	transform.setIdentity();
-	transform.setOrigin(btVector3(center.x, center.y, center.z));
+	if (model->isAnimated) {
+		test();
+	}
+	else {
 
-	rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
-		model->getWeight(),
-		nullptr,
-		boxCollisionShape,
-		startingInertia
-	)));
+		const std::array<glm::vec3, 2> dataSize = getBiggestHitBox();
+		//TODO: rename size by extents
+		const glm::vec3 size = glm::vec3(dataSize[0] * glm::vec3(0.5));
+		const glm::vec3 center = dataSize[1];
+		model->setCenter(center);
+		model->setSize(size);
 
-	rigidBodys.back()->setMotionState(new MyMotionState(model, transform));
-	rigidBodys.back()->setCenterOfMassTransform(transform);
-	//TODO: find best way
-	rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
+		btVector3 startingInertia(0, 0, 0);
+		boxCollisionShape = new btBoxShape(btVector3(size.x, size.y, size.z));
+		boxCollisionShape->calculateLocalInertia(model->getWeight(), startingInertia);
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(btVector3(center.x, center.y, center.z));
+
+		rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
+			model->getWeight(),
+			nullptr,
+			boxCollisionShape,
+			startingInertia
+		)));
+
+		rigidBodys.back()->setMotionState(new MyMotionState(model, transform));
+		rigidBodys.back()->setCenterOfMassTransform(transform);
+		//TODO: find best way
+		rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
+	}
 
 	return rigidBodys;
+}
+
+void AABBHitbox::test()
+{
+	//get all bone ids
+	/*std::vector<int> ids;
+	for (Mesh* m : model->getModelData()->meshes) {
+		for (Vertex vertex : m->vertices) {
+			for (int i = 0; i < 4; i++) {
+				if (vertex.m_BoneIDs[i] >= 0) {
+					if (std::find(ids.begin(), ids.end(), vertex.m_BoneIDs[i]) == ids.end()) {
+						ids.emplace_back(vertex.m_BoneIDs[i]);
+					}
+				}
+			}
+		}
+	}*/
+
+	//TODO: fix for dynamic objects: rigidbody are linked to the model
+	std::map<std::string, int> bones = reinterpret_cast<SkeletalModelData*>(model->getModelData())->hitboxesBones;
+	for (auto const [boneName, boneId] : bones) {
+
+		//Get all vertices affected by the bone
+		std::vector<Vertex> v;
+		for (Mesh* m : model->getModelData()->meshes) {
+			for (Vertex vertex : m->vertices) {
+				for (int i = 0; i < 4; i++) {
+					if (vertex.m_BoneIDs[i] == boneId) {
+						v.emplace_back(vertex);
+					}
+				}
+			}
+		}
+		if (v.empty()) return;
+
+
+		const std::array<glm::vec3, 2> d = getMeshCenterAndSize(v);
+		const glm::vec3 s = glm::vec3(d[0] * glm::vec3(0.25));
+		const glm::vec3 c = d[1];
+
+		btVector3 startingInertia2(0, 0, 0);
+		btBoxShape* box = new btBoxShape(btVector3(s.x, s.y, s.z));
+		box->calculateLocalInertia(model->getWeight(), startingInertia2);
+		btTransform transform2;
+		transform2.setIdentity();
+		transform2.setOrigin(btVector3(c.x, c.y, c.z));
+
+		rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
+			0.0f,
+			nullptr,
+			box,
+			startingInertia2
+		)));
+
+		rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+		rigidBodys.back()->setCenterOfMassTransform(transform2);
+		//TODO: find best way
+		//rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
+
+		model->setHitboxToBone(boneName, rigidBodys.back());
+	}
 }
 
 std::array<glm::vec3, 2> AABBHitbox::getBiggestHitBox() const

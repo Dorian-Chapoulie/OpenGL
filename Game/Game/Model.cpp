@@ -47,6 +47,21 @@ Animation* Model::getAnimation()
 	return animation;
 }
 
+std::vector<btRigidBody*>& Model::getRigidBodys()
+{
+	return rigidBodys;
+}
+
+void Model::setHitboxToBone(std::string boneName, btRigidBody* hitbox)
+{
+	bonesHitboxes.insert(std::make_pair(std::string(boneName), hitbox));
+}
+
+btRigidBody* Model::getHitboxFromBoneName(const std::string& boneName)
+{
+	return bonesHitboxes[boneName];
+}
+
 IHitBox* Model::getHitBox()
 {
 	return nullptr;
@@ -118,6 +133,11 @@ glm::vec3 Model::getPosition() {
 	return position;
 }
 
+glm::vec3 Model::getRotation()
+{
+	return rotation;
+}
+
 glm::mat4& Model::getModelMatrix()
 {
 	return modelMatrix;
@@ -127,4 +147,10 @@ void Model::setPosition(const glm::vec3& position)
 {
 	this->position = position;
 	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale);
+}
+
+void Model::setRotation(const glm::vec3& rotationAxis, float angle)
+{
+	this->rotation = rotationAxis;
+	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale) * glm::rotate(glm::mat4(1.0f), angle, rotationAxis);
 }
