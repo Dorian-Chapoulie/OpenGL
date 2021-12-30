@@ -79,6 +79,7 @@ void AABBHitbox::test()
 				}
 			}
 		}
+
 		if (v.empty()) return;
 
 
@@ -88,10 +89,12 @@ void AABBHitbox::test()
 
 		btVector3 startingInertia2(0, 0, 0);
 		btBoxShape* box = new btBoxShape(btVector3(s.x, s.y, s.z));
+		//btCapsuleShape* box = new btCapsuleShape(s.x / 2, s.y);
 		box->calculateLocalInertia(model->getWeight(), startingInertia2);
 		btTransform transform2;
 		transform2.setIdentity();
 		transform2.setOrigin(btVector3(c.x, c.y, c.z));
+
 
 		rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
 			0.0f,
@@ -100,7 +103,7 @@ void AABBHitbox::test()
 			startingInertia2
 		)));
 
-		rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+		rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 		rigidBodys.back()->setCenterOfMassTransform(transform2);
 		//TODO: find best way
 		//rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);

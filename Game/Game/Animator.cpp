@@ -53,7 +53,7 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
 		m_FinalBoneMatrices[index] = globalTransformation * offset;
 
 		std::string tmpBoneName = nodeName;
-		const std::string bannedStr = "mixamorig_";
+		const std::string bannedStr = "mixamorig1_";
 		if (tmpBoneName.find(bannedStr) != std::string::npos) {
 			tmpBoneName = tmpBoneName.replace(0, bannedStr.length(), "");
 		}
@@ -61,7 +61,11 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
 		btRigidBody* hitbox = model->getHitboxFromBoneName(tmpBoneName);
 		if (hitbox != nullptr)
 		{
-			const glm::mat4 matrix = globalTransformation;
+			const float modelRotationY = model->getYRotation();
+			const glm::vec3 position = model->getPosition();
+			const glm::vec3 scale = model->getScale();
+
+			const glm::mat4 matrix = globalTransformation * glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale) * glm::rotate(glm::mat4(1.0f), modelRotationY, glm::vec3(0, 1, 0));
 			glm::vec3 s;
 			glm::quat rotation;
 			glm::vec3 translation;
@@ -71,14 +75,14 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
 
 			btTransform tr;
 			tr.setIdentity();
-			tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
-			const glm::vec3 position = model->getPosition();
-			const glm::vec3 scale = model->getScale();
+
+
 			const btVector3 vec(
 				matrix[3][0] * scale.x + position.x,
 				matrix[3][1] * scale.y + position.y,
 				matrix[3][2] * scale.z + position.z
 			);
+			tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
 			tr.setOrigin(vec);
 			hitbox->setWorldTransform(tr);
 		}

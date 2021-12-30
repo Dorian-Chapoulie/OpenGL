@@ -25,7 +25,7 @@ private:
 	const int MAX_BONE_WEIGHTS = 4;
 
 	//LOWERCASE ONLY
-	const std::array<std::string, 21> bonesHitboxNames = {
+	const std::array<std::string, 25> bonesHitboxNames = {
 		"hips",
 		"spine",
 		"spine1",
@@ -47,10 +47,14 @@ private:
 		"leftupleg",
 		"leftleg",
 		"leftfoot",
+		"lefttoebase",
+		"lefttoe_end",
 
 		"rightupleg",
 		"rightleg",
-		"rightfoot"
+		"rightfoot",
+		"righttoebase",
+		"righttoe_end",
 	};
 
 };

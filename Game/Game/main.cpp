@@ -257,13 +257,13 @@ int main() {
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	StaticModel model2("../../models/swat/swat.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	StaticModel model2("../../models/manequin/manequin.fbx", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	StaticModel model3("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, -20.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
 
 	DynamicModel model4("../../models/cube/cube.obj", glm::vec3(20.0f, 30.0f, -20.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 	DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(20, 1, 0));
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(10, 1, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -312,22 +312,25 @@ int main() {
 	std::thread t([&]()
 		{
 			int dx = 1;
-			int i = 0;
+			float i = 0;
 			std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
 			while (true) {
-				for (btRigidBody* body : model2.getRigidBodys())
-				{
-					std::cout << "ici" << std::endl;
+				//for (btRigidBody* body : model2.getRigidBodys())
+				//{
 					//model5.setWorldTransform(glm::vec3(10 * dx, 0, 0), glm::quat(0, 0, 0, 1), 0);
 					//model5.setPosition(glm::vec3(10 + i, 2, 0));
 					//b->setLinearVelocity(btVector3(10 * dx, 0, 0));
 					//body->setFriction(5);
-					//body->setLinearVelocity(btVector3(10, 0, 0));
-					model2.setPosition(glm::vec3(10, 10, 10));
-					model2.setRotation(glm::vec3(0, 1, 0), 90);
-				}
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					//body->setLinearVelocity(btVector3(10, 10, 0));
+
+					//model2.setPosition(glm::vec3(10, 10, 10));
+					//model2.setRotation(glm::vec3(0, 1, 0), 90);
+				//}
+				i += 0.1f;
+				std::cout << i << std::endl;
+				model2.setRotation(glm::vec3(0, 1, 0), i);
+				std::this_thread::sleep_for(std::chrono::milliseconds(500));
 			}
 		});
 
@@ -354,7 +357,7 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		animator.UpdateAnimation(deltaTime * 0.5f);
+		animator.UpdateAnimation(deltaTime * 0.05f);
 		//animator2.UpdateAnimation(deltaTime);
 
 		double currentTime = glfwGetTime();

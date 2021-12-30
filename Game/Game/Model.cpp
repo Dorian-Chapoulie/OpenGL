@@ -138,6 +138,11 @@ glm::vec3 Model::getRotation()
 	return rotation;
 }
 
+float Model::getYRotation() const
+{
+	return rotationY;
+}
+
 glm::mat4& Model::getModelMatrix()
 {
 	return modelMatrix;
@@ -151,6 +156,7 @@ void Model::setPosition(const glm::vec3& position)
 
 void Model::setRotation(const glm::vec3& rotationAxis, float angle)
 {
+	rotationY = angle;
 	this->rotation = rotationAxis;
 	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale) * glm::rotate(glm::mat4(1.0f), angle, rotationAxis);
 }

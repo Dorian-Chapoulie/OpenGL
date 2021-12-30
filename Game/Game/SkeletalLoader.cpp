@@ -197,10 +197,11 @@ void SkeletalLoader::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices,
 		}
 
 		std::string tmpBoneName = boneName;
-		const std::string bannedStr = "mixamorig_";
+		const std::string bannedStr = "mixamorig1_";
 		if (tmpBoneName.find(bannedStr) != std::string::npos) {
 			tmpBoneName = tmpBoneName.replace(0, bannedStr.length(), "");
 		}
+
 		std::transform(tmpBoneName.begin(), tmpBoneName.end(), tmpBoneName.begin(), ::tolower);
 		if (std::find(bonesHitboxNames.begin(), bonesHitboxNames.end(), tmpBoneName) != bonesHitboxNames.end()) {
 			data->hitboxesBones.insert(std::pair(tmpBoneName, boneID));

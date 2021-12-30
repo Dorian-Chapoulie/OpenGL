@@ -28,6 +28,7 @@ public:
 
 	glm::vec3 getPosition();
 	glm::vec3 getRotation();
+	float getYRotation() const;
 	const glm::vec3 getBasePosition() const;
 	glm::mat4& getModelMatrix();
 
@@ -52,6 +53,9 @@ protected:
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 rotation = glm::vec3(0.0f);
+	//TODO: create 3 rotations (x, y, z)
+	float rotationY = 0.0f;
+
 	//TODO: remove base position
 	glm::vec3 basePosition = glm::vec3(0.0f);
 
