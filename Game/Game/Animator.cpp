@@ -32,6 +32,7 @@ void Animator::PlayAnimation(Animation* pAnimation)
 
 void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform)
 {
+
 	std::string nodeName = node->name;
 	glm::mat4 nodeTransform = node->transformation;
 
@@ -52,41 +53,7 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
 		glm::mat4 offset = boneInfoMap[nodeName].offset;
 		m_FinalBoneMatrices[index] = globalTransformation * offset;
 
-		std::string tmpBoneName = nodeName;
-		const std::string bannedStr = "mixamorig1_";
-		if (tmpBoneName.find(bannedStr) != std::string::npos) {
-			tmpBoneName = tmpBoneName.replace(0, bannedStr.length(), "");
-		}
-		std::transform(tmpBoneName.begin(), tmpBoneName.end(), tmpBoneName.begin(), ::tolower);
-		btRigidBody* hitbox = model->getHitboxFromBoneName(tmpBoneName);
-		if (hitbox != nullptr)
-		{
-			const float modelRotationY = model->getYRotation();
-			const glm::vec3 position = model->getPosition();
-			const glm::vec3 scale = model->getScale();
-
-			const glm::mat4 matrix = globalTransformation * glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale) * glm::rotate(glm::mat4(1.0f), modelRotationY, glm::vec3(0, 1, 0));
-			glm::vec3 s;
-			glm::quat rotation;
-			glm::vec3 translation;
-			glm::vec3 skew;
-			glm::vec4 perspective;
-			glm::decompose(matrix, s, rotation, translation, skew, perspective);
-
-			btTransform tr;
-			tr.setIdentity();
-
-
-			const btVector3 vec(
-				matrix[3][0] * scale.x + position.x,
-				matrix[3][1] * scale.y + position.y,
-				matrix[3][2] * scale.z + position.z
-			);
-			tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
-			tr.setOrigin(vec);
-			hitbox->setWorldTransform(tr);
-		}
-
+		updateBoneHitbox(globalTransformation, nodeName);
 	}
 
 	for (int i = 0; i < node->childrenCount; i++)
@@ -96,4 +63,47 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
 std::vector<glm::mat4> Animator::GetFinalBoneMatrices()
 {
 	return m_FinalBoneMatrices;
+}
+
+void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::string_view& boneName) const
+{
+	std::string tmpBoneName = std::string(boneName);
+	const std::string bannedStr = "mixamorig";
+	if (tmpBoneName.find(bannedStr) != std::string::npos) {
+		tmpBoneName = tmpBoneName.replace(0, bannedStr.length() + 2, "");
+	}
+	std::transform(tmpBoneName.begin(), tmpBoneName.end(), tmpBoneName.begin(), ::tolower);
+	btRigidBody* hitbox = model->getHitboxFromBoneName(tmpBoneName);
+	if (hitbox != nullptr)
+	{
+		const float modelRotationY = model->getYRotation();
+		const glm::vec3 position = model->getPosition();
+		const glm::vec3 scale = model->getScale();
+		const glm::vec3 modelRotation = model->getRotation();
+
+		const glm::mat4 matrix =
+			glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), modelRotationY, modelRotation)
+			* glm::translate(glm::mat4(1.0f), -position)
+			* boneTransformation;
+
+		glm::vec3 s;
+		glm::quat rotation;
+		glm::vec3 translation;
+		glm::vec3 skew;
+		glm::vec4 perspective;
+		glm::decompose(matrix, s, rotation, translation, skew, perspective);
+
+		btTransform tr;
+		tr.setIdentity();
+		const btVector3 vec = btVector3(
+			translation.x * scale.x + position.x,
+			translation.y * scale.y + position.y,
+			translation.z * scale.z + position.z
+		);
+
+		tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
+		tr.setOrigin(vec);
+		hitbox->setWorldTransform(tr);
+	}
 }

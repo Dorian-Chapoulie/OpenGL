@@ -21,4 +21,6 @@ private:
 	float m_DeltaTime;
 
 	Model* model = nullptr;
+
+	void updateBoneHitbox(const glm::mat4& boneTransformation, const std::string_view& boneName) const;
 };

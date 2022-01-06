@@ -257,7 +257,7 @@ int main() {
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	StaticModel model2("../../models/manequin/manequin.fbx", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	StaticModel model2("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 10.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	StaticModel model3("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, -20.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
 
 	DynamicModel model4("../../models/cube/cube.obj", glm::vec3(20.0f, 30.0f, -20.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
@@ -313,7 +313,7 @@ int main() {
 		{
 			int dx = 1;
 			float i = 0;
-			std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 			while (true) {
 				//for (btRigidBody* body : model2.getRigidBodys())
@@ -328,7 +328,7 @@ int main() {
 					//model2.setRotation(glm::vec3(0, 1, 0), 90);
 				//}
 				i += 0.1f;
-				std::cout << i << std::endl;
+				//std::cout << i << std::endl;
 				model2.setRotation(glm::vec3(0, 1, 0), i);
 				std::this_thread::sleep_for(std::chrono::milliseconds(500));
 			}
@@ -363,7 +363,7 @@ int main() {
 		double currentTime = glfwGetTime();
 		nbFrames++;
 		if (currentTime - lastTime >= 1.0) {
-			std::cout << nbFrames << " FPS\n";
+			//std::cout << nbFrames << " FPS\n";
 			nbFrames = 0;
 			lastTime += 1.0;
 		}

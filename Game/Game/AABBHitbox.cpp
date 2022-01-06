@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include "MyMotionState.h"
 
-
+//TODO: FOR ALL HITBOXES (AABB AND MULTIPLE): refactor as compound for non animated models
 AABBHitbox::~AABBHitbox()
 {
 	delete boxCollisionShape;
@@ -47,27 +47,25 @@ std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 
 	return rigidBodys;
 }
-
-void AABBHitbox::test()
-{
-	//get all bone ids
-	/*std::vector<int> ids;
-	for (Mesh* m : model->getModelData()->meshes) {
-		for (Vertex vertex : m->vertices) {
-			for (int i = 0; i < 4; i++) {
-				if (vertex.m_BoneIDs[i] >= 0) {
-					if (std::find(ids.begin(), ids.end(), vertex.m_BoneIDs[i]) == ids.end()) {
-						ids.emplace_back(vertex.m_BoneIDs[i]);
-					}
+//get all bone ids
+/*std::vector<int> ids;
+for (Mesh* m : model->getModelData()->meshes) {
+	for (Vertex vertex : m->vertices) {
+		for (int i = 0; i < 4; i++) {
+			if (vertex.m_BoneIDs[i] >= 0) {
+				if (std::find(ids.begin(), ids.end(), vertex.m_BoneIDs[i]) == ids.end()) {
+					ids.emplace_back(vertex.m_BoneIDs[i]);
 				}
 			}
 		}
-	}*/
+	}
+}*/
 
+void AABBHitbox::test()
+{
 	//TODO: fix for dynamic objects: rigidbody are linked to the model
 	std::map<std::string, int> bones = reinterpret_cast<SkeletalModelData*>(model->getModelData())->hitboxesBones;
-	for (auto const [boneName, boneId] : bones) {
-
+	for (auto const& [boneName, boneId] : bones) {
 		//Get all vertices affected by the bone
 		std::vector<Vertex> v;
 		for (Mesh* m : model->getModelData()->meshes) {
@@ -80,7 +78,7 @@ void AABBHitbox::test()
 			}
 		}
 
-		if (v.empty()) return;
+		if (v.empty()) continue;
 
 
 		const std::array<glm::vec3, 2> d = getMeshCenterAndSize(v);
@@ -94,8 +92,7 @@ void AABBHitbox::test()
 		btTransform transform2;
 		transform2.setIdentity();
 		transform2.setOrigin(btVector3(c.x, c.y, c.z));
-
-
+		std::cout << boneName << "=> size: " << d[0].x << "," << d[0].y << "," << d[0].z << ";\tcenter: " << d[1].x << "," << d[1].y << "," << d[1].z << std::endl;
 		rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
 			0.0f,
 			nullptr,

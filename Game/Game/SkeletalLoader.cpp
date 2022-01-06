@@ -174,8 +174,7 @@ void SkeletalLoader::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices,
 		{
 			BoneInfo newBoneInfo;
 			newBoneInfo.id = data->m_BoneCounter;
-			newBoneInfo.offset = AssimpHelper::ConvertMatrixToGLMFormat(
-				mesh->mBones[boneIndex]->mOffsetMatrix);
+			newBoneInfo.offset = AssimpHelper::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
 			data->m_BoneInfoMap[boneName] = newBoneInfo;
 			boneID = data->m_BoneCounter;
 			data->m_BoneCounter++;
@@ -197,9 +196,9 @@ void SkeletalLoader::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices,
 		}
 
 		std::string tmpBoneName = boneName;
-		const std::string bannedStr = "mixamorig1_";
+		const std::string bannedStr = "mixamorig";
 		if (tmpBoneName.find(bannedStr) != std::string::npos) {
-			tmpBoneName = tmpBoneName.replace(0, bannedStr.length(), "");
+			tmpBoneName = tmpBoneName.replace(0, bannedStr.length() + 2, "");
 		}
 
 		std::transform(tmpBoneName.begin(), tmpBoneName.end(), tmpBoneName.begin(), ::tolower);

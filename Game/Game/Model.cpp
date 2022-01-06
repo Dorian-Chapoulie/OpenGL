@@ -54,7 +54,7 @@ std::vector<btRigidBody*>& Model::getRigidBodys()
 
 void Model::setHitboxToBone(std::string boneName, btRigidBody* hitbox)
 {
-	bonesHitboxes.insert(std::make_pair(std::string(boneName), hitbox));
+	bonesHitboxes.insert(std::make_pair(boneName, hitbox));
 }
 
 btRigidBody* Model::getHitboxFromBoneName(const std::string& boneName)
