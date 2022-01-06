@@ -298,15 +298,8 @@ int main() {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 
-	//dynamicsWorld->addRigidBody(model2.getRigidBody());
 
-	//Animation danceAnimation("../../models/die/die.dae", reinterpret_cast<SkeletalModelData&>(*model2.getModelData()), &model2.getModelMatrix());
-	//Animation dieAnimation("../../models/die/die.dae", &model2);
-	//Animation idleAnimation("../../models/idle/idle.dae", &model3);
-
-	//Animator animator(model2.getAnimation());
 	Animator animator(model2.getAnimation(), &model2);
-	//Animator animator3(&idleAnimation);
 
 	std::thread t([&]()
 		{
