@@ -56,6 +56,5 @@ private:
 		"righttoebase",
 		"righttoe_end",
 	};
-
 };
 

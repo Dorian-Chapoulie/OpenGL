@@ -41,7 +41,6 @@ bool left = false;
 bool right = false;
 bool jump = false;
 
-
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 //TODO: desctructeur model & mesh
