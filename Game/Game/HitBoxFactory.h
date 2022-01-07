@@ -12,6 +12,7 @@ public:
 	{
 		AABB,
 		AABB_MULTIPLE,
+		TRIANGLE,
 		NONE,
 	};
 

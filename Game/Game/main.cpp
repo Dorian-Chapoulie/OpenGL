@@ -256,13 +256,15 @@ int main() {
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	StaticModel model2("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 10.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
-	StaticModel model3("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, -20.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
+	StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 10.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	StaticModel model2("../../models/bar/bar.obj", glm::vec3(10.0f, -2.0f, 15.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
+	//StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(10.0f, 5.0f, 15.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	//StaticModel model3("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, -20.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	DynamicModel model4("../../models/cube/cube.obj", glm::vec3(20.0f, 30.0f, -20.0f), 1.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
-	DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
+	DynamicModel model4("../../models/bar/bar_h.obj", glm::vec3(10.0f, 0.0f, 0.0f), 0.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
+	//DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(10, 1, 0));
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(10, 10, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -289,17 +291,17 @@ int main() {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 	for (auto* rigidBody : model3.getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
+		//dynamicsWorld->addRigidBody(rigidBody);
 	}
 	for (auto* rigidBody : model4.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
-	}
+	}/*
 	for (auto* rigidBody : model5.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
-	}
+	}*/
 
 
-	Animator animator(model2.getAnimation(), &model2);
+	Animator animator(model3.getAnimation(), &model3);
 
 	std::thread t([&]()
 		{
@@ -308,21 +310,26 @@ int main() {
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 			while (true) {
-				//for (btRigidBody* body : model2.getRigidBodys())
-				//{
-					//model5.setWorldTransform(glm::vec3(10 * dx, 0, 0), glm::quat(0, 0, 0, 1), 0);
-					//model5.setPosition(glm::vec3(10 + i, 2, 0));
-					//b->setLinearVelocity(btVector3(10 * dx, 0, 0));
-					//body->setFriction(5);
-					//body->setLinearVelocity(btVector3(10, 10, 0));
+				//model5.setWorldTransform(glm::vec3(10 * dx, 0, 0), glm::quat(0, 0, 0, 1), 0);
+				//model5.setPosition(glm::vec3(10 + i, 2, 0));
+				//b->setLinearVelocity(btVector3(10 * dx, 0, 0));
+				//body->setFriction(5);
+				//body->setLinearVelocity(btVector3(10, 10, 0));
 
-					//model2.setPosition(glm::vec3(10, 10, 10));
-					//model2.setRotation(glm::vec3(0, 1, 0), 90);
+				for (auto* rigidBody : model4.getRigidBodys()) {
+					rigidBody->setFriction(100);
+				}
+
+				model4.setPosition(glm::vec3(10 + i, i, 0));
+				model3.setRotation(glm::vec3(0, 1, 0), i);
+
+				//model2.setPosition(glm::vec3(10, i, 0));
+				//model2.setRotation(glm::vec3(0, 1, 0), i);
 				//}
 				i += 0.1f;
 				//std::cout << i << std::endl;
-				model2.setRotation(glm::vec3(0, 1, 0), i);
-				std::this_thread::sleep_for(std::chrono::milliseconds(500));
+				//model2.setRotation(glm::vec3(0, 1, 0), i);
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			}
 		});
 
@@ -349,7 +356,7 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		animator.UpdateAnimation(deltaTime * 0.05f);
+		//animator.UpdateAnimation(deltaTime * 0.05f);
 		//animator2.UpdateAnimation(deltaTime);
 
 		double currentTime = glfwGetTime();
@@ -370,7 +377,7 @@ int main() {
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
-		model2.draw(animationShader);
+		model3.draw(animationShader);
 		/*
 
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
@@ -388,10 +395,10 @@ int main() {
 
 		localPlayer->draw(shader);
 		model.draw(shader);
-		//model2.draw(shader);
-		model3.draw(shader);
+		model2.draw(shader);
+		//model3.draw(shader);
 		model4.draw(shader);
-		model5.draw(shader);
+		//model5.draw(shader);
 
 #pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);

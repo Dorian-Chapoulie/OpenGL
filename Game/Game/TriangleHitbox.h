@@ -1,22 +1,15 @@
 #pragma once
-#include <glm/vec3.hpp>
-#include <array>
 #include "IHitBox.h"
-#include "Model.h"
-#include "Vertex.h"
 
-class AABBHitbox :
+class TriangleHitbox :
 	public IHitBox
 {
+
 public:
-	~AABBHitbox();
+	~TriangleHitbox();
 
 	std::vector<btRigidBody*>& generateHitBoxes(Model* model) override;
 
-private:
-	std::array<glm::vec3, 2> getBiggestHitBox() const;
-	std::array<glm::vec3, 2> getMeshCenterAndSize(const std::vector<Vertex>& vertices) const;
-	void test();
 protected:
 	void setRotationAroundCenter(const float angle) override;
 	void setWorldTransform(const glm::vec3& position, const glm::quat& rot) override;

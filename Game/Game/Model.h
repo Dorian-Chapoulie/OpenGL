@@ -52,11 +52,14 @@ protected:
 	glm::vec3 size = glm::vec3(0.0f);
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
-	glm::vec3 rotation = glm::vec3(0.0f);
+
+	//DONT TOUCH THIS LINE (TODO: try to understand)
+	glm::vec3 rotation = glm::vec3(0, 1, 0);
+
+
 	//TODO: create 3 rotations (x, y, z)
 	float rotationY = 0.0f;
 
-	//TODO: remove base position
 	glm::vec3 basePosition = glm::vec3(0.0f);
 
 	glm::vec3 scale = glm::vec3(1.0f);

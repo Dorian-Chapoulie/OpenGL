@@ -77,7 +77,7 @@ void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::
 	if (hitbox != nullptr)
 	{
 		const float modelRotationY = model->getYRotation();
-		const glm::vec3 position = model->getPosition();
+		const glm::vec3 position = model->getBasePosition();
 		const glm::vec3 scale = model->getScale();
 		const glm::vec3 modelRotation = model->getRotation();
 
@@ -96,10 +96,11 @@ void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::
 
 		btTransform tr;
 		tr.setIdentity();
+		const glm::vec3 modelPosition = model->getPosition();
 		const btVector3 vec = btVector3(
-			translation.x * scale.x + position.x,
-			translation.y * scale.y + position.y,
-			translation.z * scale.z + position.z
+			translation.x * scale.x + modelPosition.x,
+			translation.y * scale.y + modelPosition.y,
+			translation.z * scale.z + modelPosition.z
 		);
 
 		tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));

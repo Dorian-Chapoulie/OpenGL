@@ -17,7 +17,6 @@ std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 		test();
 	}
 	else {
-
 		const std::array<glm::vec3, 2> dataSize = getBiggestHitBox();
 		//TODO: rename size by extents
 		const glm::vec3 size = glm::vec3(dataSize[0] * glm::vec3(0.5));
@@ -39,6 +38,10 @@ std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 			startingInertia
 		)));
 
+		//TODO: add isStatic or isKinematic and set the flag
+		if (model->getWeight() == 0.0f) {
+			rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+		}
 		rigidBodys.back()->setMotionState(new MyMotionState(model, transform));
 		rigidBodys.back()->setCenterOfMassTransform(transform);
 		//TODO: find best way
@@ -92,7 +95,7 @@ void AABBHitbox::test()
 		btTransform transform2;
 		transform2.setIdentity();
 		transform2.setOrigin(btVector3(c.x, c.y, c.z));
-		std::cout << boneName << "=> size: " << d[0].x << "," << d[0].y << "," << d[0].z << ";\tcenter: " << d[1].x << "," << d[1].y << "," << d[1].z << std::endl;
+
 		rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
 			0.0f,
 			nullptr,
@@ -129,7 +132,6 @@ std::array<glm::vec3, 2> AABBHitbox::getBiggestHitBox() const
 
 std::array<glm::vec3, 2> AABBHitbox::getMeshCenterAndSize(const std::vector<Vertex>& vertices) const
 {
-
 	GLfloat max_x, max_y, max_z;
 	GLfloat min_x = max_x = vertices[0].Position.x;
 	GLfloat min_y = max_y = vertices[0].Position.y;

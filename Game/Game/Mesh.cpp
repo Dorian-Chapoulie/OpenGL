@@ -82,6 +82,11 @@ std::vector<Vertex> Mesh::getVertices()
 	return vertices;
 }
 
+std::vector<unsigned> Mesh::getIndices()
+{
+	return indices;
+}
+
 void Mesh::cleanUp()
 {
 	this->vertices.clear();

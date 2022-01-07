@@ -14,6 +14,7 @@ public:
 	);
 
 	void setPosition(const glm::vec3& position) override;
+	void setRotation(const glm::vec3& rotationAxis, float angle) override;
 	std::vector<btRigidBody*>& getRigidBodys() override;
 
 	IHitBox* getHitBox() override;

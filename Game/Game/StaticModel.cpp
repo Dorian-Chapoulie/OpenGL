@@ -18,14 +18,43 @@ StaticModel::StaticModel(
 
 void StaticModel::setPosition(const glm::vec3& position)
 {
-	Model::setPosition(position);
-	btTransform transform;
-	transform.setIdentity();
-	for (auto* rigidBody : rigidBodys) {
-		if (rigidBody->getMotionState() != nullptr) {
+	if (isAnimated) {
+		Model::setPosition(position);
+		/*btTransform transform;
+		transform.setIdentity();
+		for (auto* rigidBody : rigidBodys) {
+			if (rigidBody->getMotionState() != nullptr) {
+				transform.setOrigin(btVector3(position.x, position.y, position.z));
+				rigidBody->setWorldTransform(transform);
+				rigidBody->getMotionState()->setWorldTransform(transform);
+			}
+		}*/
+	}
+	else
+	{
+		Model::setPosition(position);
+		btTransform transform;
+		transform.setIdentity();
+		for (auto* rigidBody : rigidBodys) {
 			transform.setOrigin(btVector3(position.x, position.y, position.z));
 			rigidBody->setWorldTransform(transform);
-			rigidBody->getMotionState()->setWorldTransform(transform);
+		}
+	}
+}
+void StaticModel::setRotation(const glm::vec3& rotationAxis, float angle)
+{
+	Model::setRotation(rotationAxis, angle);
+	if (!isAnimated) {
+		btTransform transform;
+		glm::quat q = glm::angleAxis(angle, rotationAxis);
+		transform.setIdentity();
+		transform.setRotation(btQuaternion(q.x, q.y, q.z, q.w));
+		for (auto* rigidBody : rigidBodys) { //is animated
+			if (rigidBody->getMotionState() != nullptr) {
+				rigidBody->getMotionState()->setWorldTransform(transform);
+			}
+			transform.setOrigin(btVector3(position.x, position.y, position.z));
+			rigidBody->setWorldTransform(transform);
 		}
 	}
 }

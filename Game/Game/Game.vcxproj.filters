@@ -153,6 +153,9 @@
     <ClCompile Include="SkeletalLoader.cpp">
       <Filter>model\Loader</Filter>
     </ClCompile>
+    <ClCompile Include="TriangleHitbox.cpp">
+      <Filter>hitbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="SkeletalLoader.h">
       <Filter>model\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleHitbox.h">
+      <Filter>hitbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

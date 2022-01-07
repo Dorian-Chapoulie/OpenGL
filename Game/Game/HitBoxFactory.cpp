@@ -1,6 +1,7 @@
 #include "HitBoxFactory.h"
 #include "AABBHitbox.h"
 #include "AABBMultipleHitBox.h"
+#include "TriangleHitbox.h"
 
 HitBoxFactory* HitBoxFactory::instance = nullptr;
 
@@ -18,6 +19,8 @@ IHitBox* HitBoxFactory::getHitBoxes(TYPE type)
 		return new AABBHitbox();
 	case AABB_MULTIPLE:
 		return new AABBMultipleHitBox();
+	case TRIANGLE:
+		return new TriangleHitbox();
 	default:
 	case NONE:
 		return nullptr;

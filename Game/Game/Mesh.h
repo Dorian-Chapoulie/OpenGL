@@ -16,6 +16,7 @@ public:
 	void draw(Shader& shader) const;
 
 	std::vector<Vertex> getVertices();
+	std::vector<unsigned int> getIndices();
 
 	void cleanUp();
 
