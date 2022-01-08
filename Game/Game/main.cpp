@@ -22,9 +22,9 @@
 #include "DynamicModel.h"
 #include "StaticModel.h"
 
-#define WIDTH 800
-#define HEIGHT 600
-#define FULLSCREEN false
+#define WIDTH 1920.0f
+#define HEIGHT 1080.0f
+#define FULLSCREEN true
 //TODO: change this value 
 #define DRAW_DISTANCE 500.0f
 #define FOV 70.0f
@@ -264,14 +264,14 @@ int main() {
 	//DynamicModel model4("../../models/bar/bar_h.obj", glm::vec3(10.0f, 0.0f, 0.0f), 0.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 	//DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(35, 11, 4));
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(35, 50, 4));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	Shader animationShader("./animation.vert", "./animation.frag");
 	SkyBox skybox("../../textures/skybox");
 
-	glm::mat4 projection = glm::perspective(glm::radians(FOV), static_cast<float>(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
+	glm::mat4 projection = glm::perspective(glm::radians(FOV), WIDTH / HEIGHT, 0.1f, DRAW_DISTANCE);
 
 	setupShader(animationShader, projection);
 	setupShader(shader, projection);
