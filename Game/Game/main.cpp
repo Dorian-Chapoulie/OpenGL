@@ -245,26 +245,26 @@ int main() {
 
 	// The world.
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
-	dynamicsWorld->setGravity(btVector3(0.0f, -90.0f, 0.0f));
+	dynamicsWorld->setGravity(btVector3(0.0f, -9.0f, 0.0f));
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(debugDraw);
+	//dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
-	StaticModel model("../../models/floor_2/floor.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(10.0f, 0.01f, 10.0f));
+	StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 10.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
-	StaticModel model2("../../models/bar/bar.obj", glm::vec3(10.0f, -2.0f, 15.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
+	//StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 10.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	//StaticModel model2("../../models/bar/bar.obj", glm::vec3(10.0f, -2.0f, 15.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
 	//StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(10.0f, 5.0f, 15.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	//StaticModel model3("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, -20.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	DynamicModel model4("../../models/bar/bar_h.obj", glm::vec3(10.0f, 0.0f, 0.0f), 0.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
+	//DynamicModel model4("../../models/bar/bar_h.obj", glm::vec3(10.0f, 0.0f, 0.0f), 0.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 	//DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(10, 10, 0));
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(35, 11, 4));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -287,7 +287,7 @@ int main() {
 	for (auto* rigidBody : model.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
-	for (auto* rigidBody : model2.getRigidBodys()) {
+	/*for (auto* rigidBody : model2.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 	for (auto* rigidBody : model3.getRigidBodys()) {
@@ -295,15 +295,15 @@ int main() {
 	}
 	for (auto* rigidBody : model4.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
-	}/*
+	}
 	for (auto* rigidBody : model5.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}*/
 
 
-	Animator animator(model3.getAnimation(), &model3);
+	//Animator animator(model3.getAnimation(), &model3);
 
-	std::thread t([&]()
+	/*std::thread t([&]()
 		{
 			int dx = 1;
 			float i = 0;
@@ -317,11 +317,11 @@ int main() {
 				//body->setLinearVelocity(btVector3(10, 10, 0));
 
 				for (auto* rigidBody : model4.getRigidBodys()) {
-					rigidBody->setFriction(100);
+					//rigidBody->setFriction(100);
 				}
 
-				model4.setPosition(glm::vec3(10 + i, i, 0));
-				model3.setRotation(glm::vec3(0, 1, 0), i);
+				//model4.setPosition(glm::vec3(10 + i, i, 0));
+				//model3.setRotation(glm::vec3(0, 1, 0), i);
 
 				//model2.setPosition(glm::vec3(10, i, 0));
 				//model2.setRotation(glm::vec3(0, 1, 0), i);
@@ -331,7 +331,7 @@ int main() {
 				//model2.setRotation(glm::vec3(0, 1, 0), i);
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			}
-		});
+		});*/
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1 / 10.0f;
@@ -362,7 +362,7 @@ int main() {
 		double currentTime = glfwGetTime();
 		nbFrames++;
 		if (currentTime - lastTime >= 1.0) {
-			//std::cout << nbFrames << " FPS\n";
+			std::cout << nbFrames << " FPS\n";
 			nbFrames = 0;
 			lastTime += 1.0;
 		}
@@ -371,13 +371,13 @@ int main() {
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 		localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
-		animationShader.use();
+		/*animationShader.use();
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
-		model3.draw(animationShader);
+		model3.draw(animationShader);*/
 		/*
 
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
@@ -395,9 +395,9 @@ int main() {
 
 		localPlayer->draw(shader);
 		model.draw(shader);
-		model2.draw(shader);
+		//model2.draw(shader);
 		//model3.draw(shader);
-		model4.draw(shader);
+		//model4.draw(shader);
 		//model5.draw(shader);
 
 #pragma region SKYBOX
