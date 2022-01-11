@@ -22,9 +22,9 @@
 #include "DynamicModel.h"
 #include "StaticModel.h"
 
-#define WIDTH 1920.0f
-#define HEIGHT 1080.0f
-#define FULLSCREEN true
+#define WIDTH 800
+#define HEIGHT 600
+#define FULLSCREEN false
 //TODO: change this value 
 #define DRAW_DISTANCE 500.0f
 #define FOV 70.0f
@@ -243,29 +243,30 @@ int main() {
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(debugDraw);
+	dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
-	StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
+	//StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
+	StaticModel model("../../models/floor_2/floor.obj", glm::vec3(0.0f, -5.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	//StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 10.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	DynamicModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 5.0f, 0.0f), 1.0f, HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
 	//StaticModel model2("../../models/bar/bar.obj", glm::vec3(10.0f, -2.0f, 15.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
 	//StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(10.0f, 5.0f, 15.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
-	//StaticModel model3("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, -20.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
+	//StaticModel model4("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
 
 	//DynamicModel model4("../../models/bar/bar_h.obj", glm::vec3(10.0f, 0.0f, 0.0f), 0.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 	//DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(35, 50, 4));
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(10, 0, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
 	Shader animationShader("./animation.vert", "./animation.frag");
 	SkyBox skybox("../../textures/skybox");
 
-	glm::mat4 projection = glm::perspective(glm::radians(FOV), WIDTH / HEIGHT, 0.1f, DRAW_DISTANCE);
+	glm::mat4 projection = glm::perspective(glm::radians(FOV), float(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
 
 	setupShader(animationShader, projection);
 	setupShader(shader, projection);
@@ -281,21 +282,11 @@ int main() {
 	for (auto* rigidBody : model.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
-	/*for (auto* rigidBody : model2.getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
-	}
 	for (auto* rigidBody : model3.getRigidBodys()) {
-		//dynamicsWorld->addRigidBody(rigidBody);
-	}
-	for (auto* rigidBody : model4.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
-	for (auto* rigidBody : model5.getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
-	}*/
 
-
-	//Animator animator(model3.getAnimation(), &model3);
+	Animator animator(model3.getAnimation(), &model3);
 
 	/*std::thread t([&]()
 		{
@@ -348,7 +339,7 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		//animator.UpdateAnimation(deltaTime * 0.05f);
+		animator.UpdateAnimation(deltaTime * 0.05f);
 		//animator2.UpdateAnimation(deltaTime);
 
 		double currentTime = glfwGetTime();
@@ -363,13 +354,13 @@ int main() {
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 		localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
-		/*animationShader.use();
+		animationShader.use();
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
-		model3.draw(animationShader);*/
+		model3.draw(animationShader);
 		/*
 
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());

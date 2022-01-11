@@ -13,6 +13,7 @@ public:
 		AABB,
 		AABB_MULTIPLE,
 		TRIANGLE,
+		SKELETAL,
 		NONE,
 	};
 

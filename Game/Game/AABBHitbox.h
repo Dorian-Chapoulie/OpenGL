@@ -20,7 +20,6 @@ private:
 protected:
 	void setRotationAroundCenter(const float angle) override;
 	void setWorldTransform(const glm::vec3& position, const glm::quat& rot) override;
-
 private:
 	Model* model = nullptr;
 

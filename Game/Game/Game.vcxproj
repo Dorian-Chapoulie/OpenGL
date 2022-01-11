@@ -169,6 +169,7 @@
     <ClCompile Include="OpenGLine.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SkeletalHitbox.cpp" />
     <ClCompile Include="SkeletalLoader.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="StaticModel.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="OpenGLine.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SkeletalHitbox.h" />
     <ClInclude Include="SkeletalLoader.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="StaticModel.h" />
