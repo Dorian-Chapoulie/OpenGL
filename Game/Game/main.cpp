@@ -338,8 +338,6 @@ int main() {
 	int nbFrames = 0;
 	double lastTime = glfwGetTime();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
-	//model2.getRigidBody()->setLinearVelocity(btVector3(forceX, forceY, forceZ)); FOR PLAYER
-	//force y = 9.1
 	bool test = true;
 	while (!glfwWindowShouldClose(window))
 	{
