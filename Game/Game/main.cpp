@@ -47,12 +47,6 @@ irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 //TODO: change model via model as param and not path
 //TODO: Static object should not have access to setWorldTransform
 /*
- * model[0][0] => WIDTH
- * model[1][1] => HEIGHT
- * model[3][0] => x
- * model[3][1] => y
- * model[3][2] => z
- * [3][3] => max
  *
  * TODO: DESTRUCTEUR glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &VBO);
@@ -186,7 +180,7 @@ void createLights(Shader& shader)
 	const glm::vec3 blue = glm::vec3(0.0f, 1.0f, 1.0f);
 	const glm::vec3 green = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	auto* light = new Light(&shader, glm::vec3(0.f, 50.0f, 0.f), white);
+	auto* light = new Light(&shader, glm::vec3(0.f, 5.0f, 0.f), white);
 
 	//auto* light2 = new Light(&shader, glm::vec3(0, 10, 0), downVector, red, 100.0f);
 	//auto* light4 = new Light(&shader, glm::vec3(0.5, 8, 0), downVector, red, 100.0f);
