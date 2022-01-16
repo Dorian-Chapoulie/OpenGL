@@ -86,11 +86,22 @@ void SkeletalHitbox::generateBonesHitboxes()
 		const glm::vec3 c = d[1];
 
 		btVector3 startingInertia2(0, 0, 0);
-		btBoxShape* box = new btBoxShape(btVector3(s.x, s.y, s.z));
-		//btCapsuleShape* box = new btCapsuleShape(s.x / 2, s.y);
-		box->calculateLocalInertia(model->getWeight(), startingInertia2);
+		btCapsuleShape* box = nullptr;
 		btTransform transform2;
 		transform2.setIdentity();
+
+		if (s.x > s.y || s.z > s.y)//Horizontal
+		{
+			box = new btCapsuleShape(s.y / 2.0f, c.x + s.x / 4.0f );
+			transform2.setRotation(btQuaternion(0, glm::radians(90.0f), 0));
+;		} else
+		{
+			box = new btCapsuleShape(s.x / 2.0f, s.y);
+		}
+
+		//new btBoxShape(btVector3(s.x, s.y, s.z));
+		//btCapsuleShape* box = new btCapsuleShape(s.x / 2, s.y);
+		box->calculateLocalInertia(model->getWeight(), startingInertia2);
 		transform2.setOrigin(btVector3(c.x, c.y, c.z));
 
 		rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(

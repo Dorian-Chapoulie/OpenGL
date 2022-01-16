@@ -251,7 +251,7 @@ int main() {
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	DynamicModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 5.0f, 0.0f), 1.0f, HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
+	StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 5.0f, 5.0f), HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
 	//StaticModel model2("../../models/bar/bar.obj", glm::vec3(10.0f, -2.0f, 15.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
 	//StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(10.0f, 5.0f, 15.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	//StaticModel model4("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
@@ -259,7 +259,7 @@ int main() {
 	//DynamicModel model4("../../models/bar/bar_h.obj", glm::vec3(10.0f, 0.0f, 0.0f), 0.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 	//DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
 
-	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(10, 0, 0));
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(0, 0, 0));
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -339,7 +339,7 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		animator.UpdateAnimation(deltaTime * 0.05f);
+		//animator.UpdateAnimation(deltaTime * 0.05f);
 		//animator2.UpdateAnimation(deltaTime);
 
 		double currentTime = glfwGetTime();
