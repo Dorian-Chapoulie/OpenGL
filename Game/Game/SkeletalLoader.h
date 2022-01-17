@@ -10,6 +10,17 @@ class SkeletalLoader :
 public:
 	[[nodiscard]] ModelData* loadModel(const std::string& path) override;
 
+	struct boneHierarchy
+	{
+		std::string name;
+		int parentId = -1;
+	};
+
+	static inline const std::array<boneHierarchy, 3> bonesHitboxNames = { {
+		{"leftarm"},
+		{"leftforearm"},
+		{"lefthand"}
+	} };
 
 private:
 	void processNode(aiNode* node, const aiScene* scene);
@@ -25,7 +36,7 @@ private:
 	const int MAX_BONE_WEIGHTS = 4;
 
 	//LOWERCASE ONLY
-	const std::array<std::string, 25> bonesHitboxNames = {
+	/*const std::array<std::string, 25> bonesHitboxNames = {
 		"hips",
 		"spine",
 		"spine1",
@@ -55,6 +66,6 @@ private:
 		"rightfoot",
 		"righttoebase",
 		"righttoe_end",
-	};
+	};*/
 };
 

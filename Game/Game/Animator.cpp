@@ -1,5 +1,6 @@
 #include "Animator.h"
 #include <glm/gtx/matrix_decompose.hpp>
+#include "SkeletalLoader.h"
 
 Animator::Animator(Animation* Animation, Model* model)
 {
@@ -102,6 +103,38 @@ void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::
 			translation.y * scale.y + modelPosition.y,
 			translation.z * scale.z + modelPosition.z
 		);
+		/*
+		const btRigidBody* parentBody = nullptr;
+		const std::string name = tmpBoneName;
+		auto boneHierarchy = SkeletalLoader::bonesHitboxNames;
+		SkeletalLoader::boneHierarchy currentBone = *std::find_if(
+			boneHierarchy.begin(),
+			boneHierarchy.end(),
+			[&](const SkeletalLoader::boneHierarchy h)
+			{
+				return h.name == name;
+			});
+		if (currentBone.parentId == -1 && index > 0)
+		{
+			parentBody = rigidBodys.at(index - 1);
+			const btCapsuleShape* parentShape = (const btCapsuleShape*)parentBody->getCollisionShape();
+			const btTransform parentTransform = parentBody->getWorldTransform();
+			btScalar parentHalfHeight = parentShape->getHalfHeight();
+			transform2.setOrigin(btVector3(
+				c.x,
+				parentTransform.getOrigin().getY() - parentHalfHeight,
+				c.z
+			));
+			//std::cout << "parent of " << name << ": " << parentTransform.getOrigin().getX() << "," << parentTransform.getOrigin().getY() << "," << parentTransform.getOrigin().getZ() << std::endl;
+		}
+		else
+		{
+			transform2.setOrigin(btVector3(
+				c.x,
+				c.y,
+				c.z
+			));
+		}*/
 
 		tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
 		tr.setOrigin(vec);

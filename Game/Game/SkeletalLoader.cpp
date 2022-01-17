@@ -24,9 +24,9 @@ ModelData* SkeletalLoader::loadModel(const std::string& path)
 	{
 		for (const auto& key : bonesHitboxNames)
 		{
-			if (data->hitboxesBones.find(key) == data->hitboxesBones.end())
+			if (data->hitboxesBones.find(key.name) == data->hitboxesBones.end())
 			{
-				std::cout << "missing bone: " << key << std::endl;
+				std::cout << "missing bone: " << key.name << std::endl;
 			}
 		}
 	}
@@ -164,6 +164,7 @@ void SkeletalLoader::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
 	}
 }
 
+//TODO: remove unused scene params
 void SkeletalLoader::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
 {
 	for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
@@ -202,7 +203,11 @@ void SkeletalLoader::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices,
 		}
 
 		std::transform(tmpBoneName.begin(), tmpBoneName.end(), tmpBoneName.begin(), ::tolower);
-		if (std::find(bonesHitboxNames.begin(), bonesHitboxNames.end(), tmpBoneName) != bonesHitboxNames.end()) {
+		if (std::find_if(
+			bonesHitboxNames.begin(),
+			bonesHitboxNames.end(),
+			[&](const boneHierarchy& h) { return h.name == tmpBoneName; }) != bonesHitboxNames.end()
+			) {
 			data->hitboxesBones.insert(std::pair(tmpBoneName, boneID));
 		}
 	}
