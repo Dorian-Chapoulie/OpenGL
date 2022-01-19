@@ -83,68 +83,37 @@ void SkeletalHitbox::generateBonesHitboxes()
 
 		if (v.empty()) continue;
 
-		const std::array<glm::vec3, 2> d = getMeshCenterAndSize(v);
-		const glm::vec3 s = glm::vec3(d[0] * glm::vec3(0.25));
-		const glm::vec3 c = d[1];
-		btTransform transform2;
-		transform2.setIdentity();
-		transform2.setOrigin(btVector3(c.x, c.y, c.z));
+		const std::array<glm::vec3, 2> centerSize = getMeshCenterAndSize(v);
+		const glm::vec3 size = glm::vec3(centerSize[0] * glm::vec3(0.25));
+		const glm::vec3 center = centerSize[1];
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(btVector3(center.x, center.y, center.z));
 		btScalar radius, height;
 
-		const btRigidBody* parentBody = nullptr;
-		const std::string name = boneName;
-		auto boneHierarchy = SkeletalLoader::bonesHitboxNames;
-		SkeletalLoader::boneHierarchy currentBone = *std::find_if(
-			boneHierarchy.begin(),
-			boneHierarchy.end(),
-			[&](const SkeletalLoader::boneHierarchy h)
+		const std::string s = boneName;
+		SkeletalLoader::BoneHierarchy currentBone = *std::find_if(
+			SkeletalLoader::bonesHitboxNames.begin(),
+			SkeletalLoader::bonesHitboxNames.end(),
+			[&](const SkeletalLoader::BoneHierarchy h)
 			{
-				return h.name == name;
+				return h.name == s;
 			});
-		if (currentBone.parentId == -1 && index > 0)
-		{
-			parentBody = rigidBodys.at(index - 1);
-			const btCapsuleShape* parentShape = (const btCapsuleShape*)parentBody->getCollisionShape();
-			const btTransform parentTransform = parentBody->getWorldTransform();
-			btScalar parentHalfHeight = parentShape->getHalfHeight();
-			btVector3 parentOrigin = parentTransform.getOrigin();
 
-			auto get2ddist = [&]()
-			{
-				return sqrt(
-					pow(parentOrigin.getX() - c.x, 2) +
-					pow(parentOrigin.getY() - c.y, 2) +
-					pow(parentOrigin.getZ() - c.z, 2)
-				);
-			};
+		if (!currentBone.horizontal) {
+			height = centerSize[0].y;
+			radius = (size.x + size.z) / 4.0f;
+		}
+		else {
+			height = (size.x + size.z);
+			//radius = size.x + size.z;
+			radius = (size.x + size.z) / 2.0f;
+		}
 
-			height = parentHalfHeight / 2.0f; //get2ddist();
-			radius = (s.x + s.z) / 2.0f;
-			//std::cout << "parent of " << name << ": " << parentTransform.getOrigin().getX() << "," << parentTransform.getOrigin().getY() << "," << parentTransform.getOrigin().getZ() << std::endl;
-		}
-		else
-		{
-			radius = (s.x + s.z) / 2.0f;
-			height = s.y;
-		}
-		//std::cout << "my transfo: " << name << ": " << c.x << "," << c.y << "," << c.z << std::endl;
+
 
 		btVector3 startingInertia2(0, 0, 0);
-		btCapsuleShape* box = nullptr;
-
-
-		if (s.x > s.y || s.z > s.y)//Horizontal
-		{
-			box = new btCapsuleShape(radius, height);
-			//transform2.setRotation(btQuaternion(0, glm::radians(90.0f), 0));
-		}
-		else
-		{
-			//box = new btCapsuleShape(s.x, s.y / 2.0f);
-		}
-
-		//new btBoxShape(btVector3(s.x, s.y, s.z));
-		//btCapsuleShape* box = new btCapsuleShape(s.x / 2, s.y);
+		auto* box = new btCapsuleShape(radius, height);
 		box->calculateLocalInertia(model->getWeight(), startingInertia2);
 
 		rigidBodys.emplace_back(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(
@@ -155,7 +124,7 @@ void SkeletalHitbox::generateBonesHitboxes()
 		)));
 
 		rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
-		rigidBodys.back()->setCenterOfMassTransform(transform2);
+		rigidBodys.back()->setCenterOfMassTransform(transform);
 		//TODO: find best way
 		//rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
 

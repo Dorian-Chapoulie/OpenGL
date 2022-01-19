@@ -309,8 +309,8 @@ int main() {
 				//}
 				//std::cout << i << std::endl;
 				//model2.setRotation(glm::vec3(0, 1, 0), i);
-				animator.UpdateAnimation(deltaTime * 0.05f);
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				animator.UpdateAnimation(deltaTime * 0.05f);
 			}
 		});
 
@@ -356,7 +356,7 @@ int main() {
 		for (int i = 0; i < transforms.size(); ++i) {
 			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 		}
-		model3.draw(animationShader);
+		if (jump) model3.draw(animationShader);
 		/*
 
 		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());

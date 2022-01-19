@@ -10,18 +10,70 @@ class SkeletalLoader :
 public:
 	[[nodiscard]] ModelData* loadModel(const std::string& path) override;
 
-	struct boneHierarchy
+	struct BoneHierarchy
 	{
 		std::string name;
 		int parentId = -1;
+		bool horizontal = false;
 	};
 
-	static inline const std::array<boneHierarchy, 3> bonesHitboxNames = { {
-		{"leftarm"},
-		{"leftforearm"},
-		{"lefthand"}
+	static inline const std::array<BoneHierarchy, 25> bonesHitboxNames = { {
+		{ "leftshoulder", -1, true},
+		{"leftarm_", 0},
+		{"leftforearm_", 1},
+		{"lefthand_", 2},
+
+		{ "rightshoulder", -1, true},
+		{ "rightarm_", 4},
+		{ "rightforearm_", 5},
+		{ "righthand_", 6},
+
+		{"hips", -1, true},
+		{"spine", 8, true},
+		{"spine1", 9, true},
+		{"spine2", 10, true},
+		//{"neck", 8},//10
+		//{"head", 9}//11
+		/*{"spine1", 9},
+		{"spine2", 10},
+		{"neck", 11},
+		{"head", 12},
+		{ "headtop_end", 13},*/
 	} };
 
+	/*
+	 *
+	 *	{"hips_"},
+		{"spine_", 0},
+		{"spine1_", 1},
+		{"spine2_", 2},
+		{"neck_", 3},
+		{"head_", 4},
+		{ "headtop_end_", 5 },
+
+		{ "leftshoulder_", 3 },
+		{ "leftarm", 8 },
+		{ "leftforearm", 9 },
+		{ "lefthand", 10 },
+
+		{ "rightshoulder_", 3 },
+		{ "rightarm_", 11 },
+		{ "rightforearm_", 12 },
+		{ "righthand_", 13 },
+
+		{ "leftupleg_", 0 },
+		{ "leftleg_", 15 },
+		{ "leftfoot_", 16 },
+		{ "lefttoebase_", 17 },
+		{ "lefttoe_end_", 18 },
+
+		{ "rightupleg_", 0 },
+		{ "rightleg_", 20 },
+		{ "rightfoot_", 21 },
+		{ "righttoebase_", 22 },
+		{ "righttoe_end_", 23 },
+	 *
+	 */
 private:
 	void processNode(aiNode* node, const aiScene* scene);
 	Mesh* processMesh(aiMesh* mesh, const aiScene* scene);

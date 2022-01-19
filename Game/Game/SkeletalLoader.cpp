@@ -206,7 +206,7 @@ void SkeletalLoader::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices,
 		if (std::find_if(
 			bonesHitboxNames.begin(),
 			bonesHitboxNames.end(),
-			[&](const boneHierarchy& h) { return h.name == tmpBoneName; }) != bonesHitboxNames.end()
+			[&](const BoneHierarchy& h) { return h.name == tmpBoneName; }) != bonesHitboxNames.end()
 			) {
 			data->hitboxesBones.insert(std::pair(tmpBoneName, boneID));
 		}

@@ -1,4 +1,6 @@
 #include "Animator.h"
+
+#include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include "SkeletalLoader.h"
 
@@ -81,7 +83,6 @@ void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::
 		const glm::vec3 position = model->getBasePosition();
 		const glm::vec3 scale = model->getScale();
 		const glm::vec3 modelRotation = model->getRotation();
-
 		const glm::mat4 matrix =
 			glm::translate(glm::mat4(1.0f), position)
 			* glm::rotate(glm::mat4(1.0f), modelRotationY, modelRotation)
@@ -95,49 +96,87 @@ void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::
 		glm::vec4 perspective;
 		glm::decompose(matrix, s, rotation, translation, skew, perspective);
 
-		btTransform tr;
-		tr.setIdentity();
-		const glm::vec3 modelPosition = model->getPosition();
-		const btVector3 vec = btVector3(
-			translation.x * scale.x + modelPosition.x,
-			translation.y * scale.y + modelPosition.y,
-			translation.z * scale.z + modelPosition.z
-		);
-		/*
-		const btRigidBody* parentBody = nullptr;
-		const std::string name = tmpBoneName;
-		auto boneHierarchy = SkeletalLoader::bonesHitboxNames;
-		SkeletalLoader::boneHierarchy currentBone = *std::find_if(
-			boneHierarchy.begin(),
-			boneHierarchy.end(),
-			[&](const SkeletalLoader::boneHierarchy h)
-			{
-				return h.name == name;
-			});
-		if (currentBone.parentId == -1 && index > 0)
+
+		btRigidBody* childHitbox = nullptr;
+		bool isHorizontal = false;
+		for (int i = 0; i < SkeletalLoader::bonesHitboxNames.size(); i++)
 		{
-			parentBody = rigidBodys.at(index - 1);
-			const btCapsuleShape* parentShape = (const btCapsuleShape*)parentBody->getCollisionShape();
-			const btTransform parentTransform = parentBody->getWorldTransform();
-			btScalar parentHalfHeight = parentShape->getHalfHeight();
-			transform2.setOrigin(btVector3(
-				c.x,
-				parentTransform.getOrigin().getY() - parentHalfHeight,
-				c.z
+			if (SkeletalLoader::bonesHitboxNames[i].name == tmpBoneName)
+			{
+				isHorizontal = SkeletalLoader::bonesHitboxNames[i].horizontal;
+				for (int j = 0; j < SkeletalLoader::bonesHitboxNames.size(); j++)
+				{
+					if (SkeletalLoader::bonesHitboxNames[j].parentId == i)
+					{
+						childHitbox = model->getHitboxFromBoneName(SkeletalLoader::bonesHitboxNames[j].name);
+					}
+				}
+			}
+		}
+
+		if (childHitbox)
+		{
+			btTransform childTransform = childHitbox->getWorldTransform();
+			btVector3 childOrigin = childTransform.getOrigin();
+			btVector3 currentOrigin = hitbox->getWorldTransform().getOrigin();
+
+			btTransform tr;
+			tr.setIdentity();
+			const glm::vec3 modelPosition = model->getPosition();
+			const glm::vec3* childBasePosition = static_cast<glm::vec3*>(childHitbox->getUserPointer());
+			if (!childBasePosition)
+			{
+				childBasePosition = new glm::vec3(0.0f);
+				return;
+			}
+			const btVector3 vec = btVector3(
+				(((translation.x * scale.x + modelPosition.x) + childBasePosition->x) / 2.0f),
+				(((translation.y * scale.y + modelPosition.y) + childBasePosition->y) / 2.0f),
+				(((translation.z * scale.z + modelPosition.z) + childBasePosition->z) / 2.0f)
+			);
+			hitbox->setUserPointer(new glm::vec3(
+				translation.x * scale.x + modelPosition.x,
+				translation.y * scale.y + modelPosition.y,
+				translation.z * scale.z + modelPosition.z
 			));
-			//std::cout << "parent of " << name << ": " << parentTransform.getOrigin().getX() << "," << parentTransform.getOrigin().getY() << "," << parentTransform.getOrigin().getZ() << std::endl;
+			if (isHorizontal)
+			{
+				glm::quat myquaternion = glm::quat(glm::vec3(glm::radians(90.0f), glm::radians(90.0f), 0));
+				tr.setRotation(btQuaternion(myquaternion.x, myquaternion.y, myquaternion.z, myquaternion.w));
+			}
+			else
+			{
+				tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
+			}
+			tr.setOrigin(vec);
+			hitbox->setWorldTransform(tr);
 		}
 		else
 		{
-			transform2.setOrigin(btVector3(
-				c.x,
-				c.y,
-				c.z
+			btTransform tr;
+			tr.setIdentity();
+			const glm::vec3 modelPosition = model->getPosition();
+			const btVector3 vec = btVector3(
+				(translation.x * scale.x + modelPosition.x),
+				(translation.y * scale.y + modelPosition.y),
+				(translation.z * scale.z + modelPosition.z)
+			);
+			hitbox->setUserPointer(new glm::vec3(
+				translation.x * scale.x + modelPosition.x,
+				translation.y * scale.y + modelPosition.y,
+				translation.z * scale.z + modelPosition.z
 			));
-		}*/
-
-		tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
-		tr.setOrigin(vec);
-		hitbox->setWorldTransform(tr);
+			if (isHorizontal)
+			{
+				glm::quat myquaternion = glm::quat(glm::vec3(glm::radians(90.0f), glm::radians(90.0f), 0));
+				tr.setRotation(btQuaternion(myquaternion.x, myquaternion.y, myquaternion.z, myquaternion.w));
+			}
+			else
+			{
+				tr.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
+			}
+			tr.setOrigin(vec);
+			hitbox->setWorldTransform(tr);
+		}
 	}
 }
