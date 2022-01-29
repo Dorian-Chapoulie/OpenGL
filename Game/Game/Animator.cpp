@@ -108,10 +108,6 @@ void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::
 				{
 					if (SkeletalLoader::bonesHitboxNames[j].parentId == i)
 					{
-						if (tmpBoneName == "rightupleg")
-						{
-							std::cout << SkeletalLoader::bonesHitboxNames[j].name << std::endl;
-						}
 						childHitbox = model->getHitboxFromBoneName(SkeletalLoader::bonesHitboxNames[j].name);
 					}
 				}
