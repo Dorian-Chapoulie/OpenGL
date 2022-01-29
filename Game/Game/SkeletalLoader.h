@@ -20,12 +20,12 @@ public:
 	};
 
 	static inline const std::array<BoneHierarchy, 20> bonesHitboxNames = { {
-			/*0*/{"leftshoulder", -1, true, -0.2f},
+			/*0*/{"leftshoulder", 11, true, -0.2f},
 			/*1*/{"leftarm", 0},
 			/*2*/{"leftforearm", 1},
 			/*3*/{"lefthand", 2},
 
-			/*4*/{"rightshoulder", -1, true, -0.2f},
+			/*4*/{"rightshoulder", 11, true, -0.2f},
 			/*5*/{"rightarm", 4},
 			/*6*/{"rightforearm", 5},
 			/*7*/{"righthand", 6},
@@ -44,7 +44,7 @@ public:
 			/*17*/{"leftfoot", 16, false, 0.0f, -0.8f},
 
 			/*18*/{"neck", 11, false, 0.2f, -0.4f},
-			/*19*/{"head", 12, false, 0.3f, 0.0f},
+			/*19*/{"head", 18, false, 0.3f, 0.0f},
 		} };
 
 	/*

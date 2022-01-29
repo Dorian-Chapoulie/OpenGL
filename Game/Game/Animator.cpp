@@ -84,9 +84,9 @@ void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::
 		const glm::vec3 scale = model->getScale();
 		const glm::vec3 modelRotation = model->getRotation();
 		const glm::mat4 matrix =
-			glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), modelRotationY, modelRotation)
-			* glm::translate(glm::mat4(1.0f), -position)
+			//glm::translate(glm::mat4(1.0f), position)
+			/***/ glm::rotate(glm::mat4(1.0f), modelRotationY, modelRotation)
+			//* glm::translate(glm::mat4(1.0f), -position)
 			* boneTransformation;
 
 		glm::vec3 s;
@@ -108,6 +108,10 @@ void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::
 				{
 					if (SkeletalLoader::bonesHitboxNames[j].parentId == i)
 					{
+						if (tmpBoneName == "rightupleg")
+						{
+							std::cout << SkeletalLoader::bonesHitboxNames[j].name << std::endl;
+						}
 						childHitbox = model->getHitboxFromBoneName(SkeletalLoader::bonesHitboxNames[j].name);
 					}
 				}
