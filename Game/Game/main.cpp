@@ -293,6 +293,8 @@ int main() {
 			int dx = 1;
 			float i = 0;
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			model3.setPosition(glm::vec3(0, 10, 0));
+			model3.setRotation(glm::vec3(0, 1, 0), 90.0f);
 
 			while (true) {
 				//model5.setWorldTransform(glm::vec3(10 * dx, 0, 0), glm::quat(0, 0, 0, 1), 0);

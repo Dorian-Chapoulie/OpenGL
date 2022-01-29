@@ -27,6 +27,13 @@ std::vector<btRigidBody*>& TriangleHitbox::generateHitBoxes(Model* model)
 			btVector3 vertex2(vertices.at(i + 1).Position.x * scale.x, vertices.at(i + 1).Position.y * scale.y, vertices.at(i + 1).Position.z * scale.z);
 			btVector3 vertex3(vertices.at(i + 2).Position.x * scale.x, vertices.at(i + 2).Position.y * scale.y, vertices.at(i + 2).Position.z * scale.z);
 			triangleMeshTerrain->addTriangle(vertex1, vertex2, vertex3);
+			/*p0 = Point3(-10, -10, 0)
+p1 = Point3(-10, 10, 0)
+p2 = Point3(10, -10, 0)
+p3 = Point3(10, 10, 0)
+mesh = BulletTriangleMesh()
+mesh.addTriangle(p0, p1, p2)
+mesh.addTriangle(p1, p2, p3)*/
 		}
 
 		btCollisionShape* collisionShapeTerrain = new btBvhTriangleMeshShape(triangleMeshTerrain, true, true);

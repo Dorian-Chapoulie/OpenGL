@@ -20,7 +20,7 @@ void StaticModel::setPosition(const glm::vec3& position)
 {
 	if (isAnimated) {
 		Model::setPosition(position);
-		/*btTransform transform;
+		btTransform transform;
 		transform.setIdentity();
 		for (auto* rigidBody : rigidBodys) {
 			if (rigidBody->getMotionState() != nullptr) {
@@ -28,7 +28,7 @@ void StaticModel::setPosition(const glm::vec3& position)
 				rigidBody->setWorldTransform(transform);
 				rigidBody->getMotionState()->setWorldTransform(transform);
 			}
-		}*/
+		}
 	}
 	else
 	{

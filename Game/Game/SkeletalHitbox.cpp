@@ -101,13 +101,12 @@ void SkeletalHitbox::generateBonesHitboxes()
 			});
 
 		if (!currentBone.horizontal) {
-			height = centerSize[0].y;
-			radius = (size.x + size.z) / 4.0f;
+			height = centerSize[0].y + currentBone.sizeHeight;
+			radius = (size.x + size.z) / 4.0f + currentBone.sizeRadius;
 		}
 		else {
-			height = (size.x + size.z);
-			//radius = size.x + size.z;
-			radius = (size.x + size.z) / 2.0f;
+			height = (size.x + size.z) + currentBone.sizeHeight;
+			radius = (size.x + size.z) / 2.0f + currentBone.sizeRadius;
 		}
 
 

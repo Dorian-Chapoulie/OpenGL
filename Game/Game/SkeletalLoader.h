@@ -15,31 +15,37 @@ public:
 		std::string name;
 		int parentId = -1;
 		bool horizontal = false;
+		float sizeRadius = 0.0f;
+		float sizeHeight = 0.0f;
 	};
 
-	static inline const std::array<BoneHierarchy, 25> bonesHitboxNames = { {
-		{ "leftshoulder", -1, true},
-		{"leftarm_", 0},
-		{"leftforearm_", 1},
-		{"lefthand_", 2},
+	static inline const std::array<BoneHierarchy, 20> bonesHitboxNames = { {
+			/*0*/{"leftshoulder", -1, true, -0.2f},
+			/*1*/{"leftarm", 0},
+			/*2*/{"leftforearm", 1},
+			/*3*/{"lefthand", 2},
 
-		{ "rightshoulder", -1, true},
-		{ "rightarm_", 4},
-		{ "rightforearm_", 5},
-		{ "righthand_", 6},
+			/*4*/{"rightshoulder", -1, true, -0.2f},
+			/*5*/{"rightarm", 4},
+			/*6*/{"rightforearm", 5},
+			/*7*/{"righthand", 6},
 
-		{"hips", -1, true},
-		{"spine", 8, true},
-		{"spine1", 9, true},
-		{"spine2", 10, true},
-		//{"neck", 8},//10
-		//{"head", 9}//11
-		/*{"spine1", 9},
-		{"spine2", 10},
-		{"neck", 11},
-		{"head", 12},
-		{ "headtop_end", 13},*/
-	} };
+			/*8*/{"hips", -1, true, 0.0f, -0.3f},
+			/*9*/{"spine", 8, true, 0.0f, -0.3f},
+			/*10*/{"spine1", 9, true, 0.0f, -0.3f},
+			/*11*/{"spine2", 10, true, 0.0f, -0.3f},
+
+			/*12*/{"rightupleg", -1, false, 0.1f, -1.8f},
+			/*13*/{"rightleg", 12, false, 0.1f, -1.8f},
+			/*14*/{"rightfoot", 13, false, 0.0f, -0.8f},
+
+			/*15*/{"leftupleg", -1, false, 0.1f, -1.8f},
+			/*16*/{"leftleg", 15, false, 0.1f, -1.8f},
+			/*17*/{"leftfoot", 16, false, 0.0f, -0.8f},
+
+			/*18*/{"neck", 11, false, 0.2f, -0.4f},
+			/*19*/{"head", 12, false, 0.3f, 0.0f},
+		} };
 
 	/*
 	 *
