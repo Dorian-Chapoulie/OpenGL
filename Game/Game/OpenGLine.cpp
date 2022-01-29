@@ -44,7 +44,7 @@ void OpenGLine::setColor(glm::vec3 color)
 void OpenGLine::draw(Shader& shader)
 {
 	shader.setMatrix("MVP", MVP);
-	shader.setVec3("colo", lineColor);
+	shader.setVec3("color", lineColor);
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_LINES, 0, 2);
