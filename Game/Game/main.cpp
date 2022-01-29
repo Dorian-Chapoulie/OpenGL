@@ -251,7 +251,7 @@ int main() {
 	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
 	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
 
-	StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(0.0f, 5.0f, -5.0f), HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
+	StaticModel model3("../../models/manequin/manequin_3.fbx", glm::vec3(0.0f, 5.0f, -5.0f), HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
 	//StaticModel model2("../../models/bar/bar.obj", glm::vec3(10.0f, -2.0f, 15.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
 	//StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(10.0f, 5.0f, 15.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	//StaticModel model4("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
@@ -311,8 +311,8 @@ int main() {
 				//}
 				//std::cout << i << std::endl;
 				//model2.setRotation(glm::vec3(0, 1, 0), i);
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				animator.UpdateAnimation(deltaTime * 0.05f);
+				std::this_thread::sleep_for(std::chrono::milliseconds(5));
+				animator.UpdateAnimation(deltaTime);
 			}
 		});
 

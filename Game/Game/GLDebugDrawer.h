@@ -1,6 +1,8 @@
 #pragma once
 #include <Bullet3/LinearMath/btIDebugDraw.h>
 
+#include "Shader.h"
+
 class GLDebugDrawer : public btIDebugDraw
 {
 	int m_debugMode;
@@ -26,7 +28,11 @@ public:
 
 	virtual void   setDebugMode(int debugMode);
 
-	virtual int      getDebugMode() const { return m_debugMode; }
+	virtual int     getDebugMode() const { return m_debugMode; }
+
+private:
+
+	Shader shader = Shader("./line.vert", "./line.frag");
 
 };
 

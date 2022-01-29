@@ -21,11 +21,12 @@ void GLDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const b
 
 void GLDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 {
+	shader.use();
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), static_cast<float>(800 / 600), 0.1f, 100.0f);
 	OpenGLine l(glm::vec3(from.getX(), from.getY(), from.getZ()), glm::vec3(to.getX(), to.getY(), to.getZ()));
 	l.setColor(glm::vec3(1.0f, 0.0f, 0.0f));
 	l.setMVP(projection * Camera::getInstance()->getViewMatrix());
-	l.draw();
+	l.draw(shader);
 }
 
 void GLDebugDrawer::drawSphere(const btVector3& p, btScalar radius, const btVector3& color)

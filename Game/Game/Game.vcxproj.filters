@@ -280,5 +280,11 @@
     <None Include="animation.frag">
       <Filter>shaders\fragment</Filter>
     </None>
+    <None Include="line.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="line.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
   </ItemGroup>
 </Project>

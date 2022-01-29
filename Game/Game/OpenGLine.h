@@ -12,10 +12,9 @@ public:
 
 	void setMVP(glm::mat4 mvp);
 	void setColor(glm::vec3 color);
-	void draw();
+	void draw(Shader& shader);
 
 private:
-	int shaderProgram;
 	unsigned int VBO, VAO;
 	std::vector<float> vertices;
 	glm::vec3 startPoint;
