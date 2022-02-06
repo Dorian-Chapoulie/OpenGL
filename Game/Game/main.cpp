@@ -19,7 +19,9 @@
 #include "SkyBox.h"
 #include "Animation.h"
 #include "Animator.h"
+#include "DefaultLoader.h"
 #include "DynamicModel.h"
+#include "SkeletalLoader.h"
 #include "StaticModel.h"
 
 #define WIDTH 800
@@ -259,18 +261,18 @@ int main() {
 
 	//StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
 	StaticModel model("../../models/floor_2/floor.obj", glm::vec3(0.0f, -5.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
-	//DynamicModel model2("../../models/die/die.dae", glm::vec3(50.0f, 10.0f, 0.0f), 1.0f, true, false, glm::vec3(0.02f));
-	//Model model3("../../models/idle/idle.dae", glm::vec3(50.0f, 10.0f, 0.0f), 90.0f, true, false, glm::vec3(0.25f));
-
-	StaticModel model3("../../models/manequin/manequin_3.fbx", glm::vec3(0.0f, 5.0f, -5.0f), HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
-	//StaticModel model2("../../models/bar/bar.obj", glm::vec3(10.0f, -2.0f, 15.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
-	//StaticModel model3("../../models/manequin/manequin_2.fbx", glm::vec3(10.0f, 5.0f, 15.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
-	//StaticModel model4("../../models/cube/cube.obj", glm::vec3(5.0f, 2.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(1.0f));
-
-	//DynamicModel model4("../../models/bar/bar_h.obj", glm::vec3(10.0f, 0.0f, 0.0f), 0.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
-	//DynamicModel model5("../../models/cube/cube.obj", glm::vec3(20.0f, 2.0f, -20.0f), 10.0f, HitBoxFactory::AABB, glm::vec3(1.0f));
+	//StaticModel model3("../../models/manequin/manequin_3.fbx", glm::vec3(0.0f, 5.0f, -5.0f), HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
 
 	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(0, 0, 0));
+
+	std::vector<DynamicModel*> dynamicModels;
+	for (int i = 0; i < 100; i++)
+	{
+		dynamicModels.emplace_back(
+			new DynamicModel("../../models/cube/cube.obj", glm::vec3(0, 0, 0), 1.0f, HitBoxFactory::AABB)
+		);
+	}
+
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader skyboxShader("./skybox.vert", "./skybox.frag");
@@ -293,13 +295,19 @@ int main() {
 	for (auto* rigidBody : model.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
-	for (auto* rigidBody : model3.getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
+	for (DynamicModel* m : dynamicModels)
+	{
+		for (auto* rigidBody : m->getRigidBodys()) {
+			dynamicsWorld->addRigidBody(rigidBody);
+		}
 	}
+	/*for (auto* rigidBody : model3.getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}*/
 
-	Animator animator(model3.getAnimation(), &model3);
+	//Animator animator(model3.getAnimation(), &model3);
 
-	std::thread t([&]()
+	/*std::thread t([&]()
 		{
 			int dx = 1;
 			float i = 0;
@@ -310,7 +318,7 @@ int main() {
 				model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
 				animator.UpdateAnimation(deltaTime);
 			}
-		});
+		});*/
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1 / 10.0f;
@@ -318,11 +326,14 @@ int main() {
 	double lastTime = glfwGetTime();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //POUR AVOIR LES TRAIT DES VERTICES
 	bool test = true;
+	SkeletalLoader::cache.clear();
+	DefaultLoader::cache.clear();
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 		dynamicsWorld->stepSimulation(timeStep, 10);
 		dynamicsWorld->debugDrawWorld();
@@ -336,7 +347,7 @@ int main() {
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 		localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
-		model3.draw(animationShader, animator, localPlayer->getCamera()->getViewMatrix());
+		//model3.draw(animationShader, animator, localPlayer->getCamera()->getViewMatrix());
 
 
 		shader.use();
@@ -346,6 +357,11 @@ int main() {
 
 		localPlayer->draw(shader);
 		model.draw(shader);
+
+		for (DynamicModel* m : dynamicModels)
+		{
+			m->draw(shader);
+		}
 
 #pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);

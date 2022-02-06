@@ -1,24 +1,32 @@
 #include "DefaultLoader.h"
 
-#include <iostream>
+#include <thread>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
 #include "Mesh.h"
 
+std::map<std::string, ModelData> DefaultLoader::cache;
 ModelData* DefaultLoader::loadModel(const std::string& path)
 {
+	if (cache.contains(path))
+	{
+		return new ModelData(cache[path]);
+	}
+
 	Assimp::Importer import;
 	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
+		std::cout << "error: " << import.GetErrorString() << std::endl;
 		throw std::exception(import.GetErrorString());
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 
 	processNode(scene->mRootNode, scene);
+	cache[path] = *data;
 	return data;
 }
 
@@ -52,8 +60,6 @@ Mesh* DefaultLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 		vector.z = mesh->mVertices[i].z;
 		vertex.Position = vector;
 
-		//SetVertexBoneDataToDefault(vertex);
-
 		if (mesh->mNormals) {
 			vector.x = mesh->mNormals[i].x;
 			vector.y = mesh->mNormals[i].y;
@@ -75,7 +81,6 @@ Mesh* DefaultLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 			vertex.TexCoords = glm::vec2(0.0f, 0.0f);
 		}
 
-		//vertex.Position += position;
 		vertices.push_back(vertex);
 	}
 
@@ -95,10 +100,6 @@ Mesh* DefaultLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 		std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
-
-
-	//TODO create an animated model class
-	//ExtractBoneWeightForVertices(vertices, mesh, scene);
 
 	return new Mesh(vertices, indices, textures);
 }

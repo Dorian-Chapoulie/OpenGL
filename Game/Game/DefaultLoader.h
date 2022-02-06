@@ -9,6 +9,7 @@ class DefaultLoader :
 {
 public:
 	[[nodiscard]] ModelData* loadModel(const std::string& path) override;
+	static std::map<std::string, ModelData> cache;
 
 private:
 

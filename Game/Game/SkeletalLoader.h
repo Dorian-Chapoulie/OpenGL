@@ -46,40 +46,8 @@ public:
 			/*18*/{"neck", 11, false, 0.2f, -0.4f},
 			/*19*/{"head", 18, false, 0.3f, 0.0f},
 		} };
+	static std::map<std::string, SkeletalModelData> cache;
 
-	/*
-	 *
-	 *	{"hips_"},
-		{"spine_", 0},
-		{"spine1_", 1},
-		{"spine2_", 2},
-		{"neck_", 3},
-		{"head_", 4},
-		{ "headtop_end_", 5 },
-
-		{ "leftshoulder_", 3 },
-		{ "leftarm", 8 },
-		{ "leftforearm", 9 },
-		{ "lefthand", 10 },
-
-		{ "rightshoulder_", 3 },
-		{ "rightarm_", 11 },
-		{ "rightforearm_", 12 },
-		{ "righthand_", 13 },
-
-		{ "leftupleg_", 0 },
-		{ "leftleg_", 15 },
-		{ "leftfoot_", 16 },
-		{ "lefttoebase_", 17 },
-		{ "lefttoe_end_", 18 },
-
-		{ "rightupleg_", 0 },
-		{ "rightleg_", 20 },
-		{ "rightfoot_", 21 },
-		{ "righttoebase_", 22 },
-		{ "righttoe_end_", 23 },
-	 *
-	 */
 private:
 	void processNode(aiNode* node, const aiScene* scene);
 	Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
@@ -92,38 +60,5 @@ private:
 	std::string directory;
 	SkeletalModelData* data = new SkeletalModelData();
 	const int MAX_BONE_WEIGHTS = 4;
-
-	//LOWERCASE ONLY
-	/*const std::array<std::string, 25> bonesHitboxNames = {
-		"hips",
-		"spine",
-		"spine1",
-		"spine2",
-		"neck",
-		"head",
-		"headtop_end",
-
-		"leftshoulder",
-		"leftarm",
-		"leftforearm",
-		"lefthand",
-
-		"rightshoulder",
-		"rightarm",
-		"rightforearm",
-		"righthand",
-
-		"leftupleg",
-		"leftleg",
-		"leftfoot",
-		"lefttoebase",
-		"lefttoe_end",
-
-		"rightupleg",
-		"rightleg",
-		"rightfoot",
-		"righttoebase",
-		"righttoe_end",
-	};*/
 };
 

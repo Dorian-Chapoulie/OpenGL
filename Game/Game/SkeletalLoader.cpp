@@ -6,8 +6,15 @@
 #include "AssimpHelper.hpp"
 #include "Mesh.h"
 
+std::map<std::string, SkeletalModelData> SkeletalLoader::cache;
+
 ModelData* SkeletalLoader::loadModel(const std::string& path)
 {
+	if (cache.contains(path))
+	{
+		return new SkeletalModelData(cache[path]);
+	}
+
 	Assimp::Importer import;
 	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -30,6 +37,7 @@ ModelData* SkeletalLoader::loadModel(const std::string& path)
 			}
 		}
 	}
+	cache[path] = *data;
 	return data;
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 #include <map>
+#include <assimp/scene.h>
+
 #include "BoneInfo.hpp"
 #include "Mesh.h"
 
