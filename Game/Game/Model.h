@@ -8,12 +8,14 @@
 #include "Shader.h"
 
 class IHitBox;
+class Animator;
 class Model {
 public:
 	Model(const std::string& path, const glm::vec3& position, glm::vec3 scale = glm::vec3(1.0f), bool isAnimated = false);
 	~Model();
 
 	void draw(Shader& shader);
+	void draw(Shader& shader, Animator& animator, const glm::mat4 viewMatrix);
 
 	virtual void setPosition(const glm::vec3& position);
 	virtual void setRotation(const glm::vec3& rotationAxis, float angle);
@@ -52,10 +54,7 @@ protected:
 	glm::vec3 size = glm::vec3(0.0f);
 	//TODO: loadedModels
 	glm::vec3 position = glm::vec3(0.0f);
-
-	//DONT TOUCH THIS LINE (TODO: try to understand)
 	glm::vec3 rotation = glm::vec3(0, 1, 0);
-
 
 	//TODO: create 3 rotations (x, y, z)
 	float rotationY = 0.0f;
@@ -73,6 +72,5 @@ protected:
 
 private:
 	float weight = 0.0f;
-	//std::string directory;
 };
 

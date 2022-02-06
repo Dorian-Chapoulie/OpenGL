@@ -194,6 +194,17 @@ void setupSound()
 	//SoundEngine->play3D("../../audio/quake/standard/monsterkill.mp3", position);
 }
 
+void promptFps(int& nbFrames, double& lastTime)
+{
+	const double currentTime = glfwGetTime();
+	nbFrames++;
+	if (currentTime - lastTime >= 1.0) {
+		std::cout << nbFrames << " FPS\n";
+		nbFrames = 0;
+		lastTime += 1.0;
+	}
+}
+
 int main() {
 #pragma region setup
 	glfwInit();
@@ -293,27 +304,10 @@ int main() {
 			int dx = 1;
 			float i = 0;
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			//model3.setPosition(glm::vec3(0, 10, 0));
-			//model3.setRotation(glm::vec3(0, 1, 0), 90.0f);
-
 			while (true) {
-				//model5.setWorldTransform(glm::vec3(10 * dx, 0, 0), glm::quat(0, 0, 0, 1), 0);
-				//model5.setPosition(glm::vec3(10 + i, 2, 0));
-				//b->setLinearVelocity(btVector3(10 * dx, 0, 0));
-				//body->setFriction(5);
-				//body->setLinearVelocity(btVector3(10, 10, 0));
-
-				//model4.setPosition(glm::vec3(10 + i, i, 0));
-				//model3.setRotation(glm::vec3(0, 1, 0), i);
-
-				//model2.setPosition(glm::vec3(10, i, 0));
-				//model2.setRotation(glm::vec3(0, 1, 0), i);
-				//}
-				//std::cout << i << std::endl;
-				//model2.setRotation(glm::vec3(0, 1, 0), i);
 				std::this_thread::sleep_for(std::chrono::milliseconds(5));
-				//model3.setPosition(glm::vec3(0, 0, -5 + i));
-				//model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
+				model3.setPosition(glm::vec3(0, 3, -5 + i));
+				model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
 				animator.UpdateAnimation(deltaTime);
 			}
 		});
@@ -330,58 +324,28 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
 		dynamicsWorld->stepSimulation(timeStep, 10);
 		dynamicsWorld->debugDrawWorld();
-
 
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-
-		//animator.UpdateAnimation(deltaTime * 0.05f);
-		//animator2.UpdateAnimation(deltaTime);
-
-		double currentTime = glfwGetTime();
-		nbFrames++;
-		if (currentTime - lastTime >= 1.0) {
-			std::cout << nbFrames << " FPS\n";
-			nbFrames = 0;
-			lastTime += 1.0;
-		}
+		promptFps(nbFrames, lastTime);
 
 		localPlayer->move(forward, backward, left, right, jump, deltaTime);
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 		localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
-		animationShader.use();
-		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-		auto transforms = animator.GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i) {
-			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-		}
-		if (jump) model3.draw(animationShader);
-		/*
+		model3.draw(animationShader, animator, localPlayer->getCamera()->getViewMatrix());
 
-		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-		transforms = animator.GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i) {
-			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-		}
-		model2.draw(animationShader);*/
 
 		shader.use();
-
 		//viewpos inutile
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
 		localPlayer->draw(shader);
 		model.draw(shader);
-		//model2.draw(shader);
-		//model3.draw(shader);
-		//model4.draw(shader);
-		//model5.draw(shader);
 
 #pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);

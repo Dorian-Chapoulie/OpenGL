@@ -1,5 +1,6 @@
 #include "Model.h"
 #include <glm/gtx/euler_angles.hpp>
+#include "Animator.h"
 
 Model::Model(
 	const std::string& path,
@@ -107,6 +108,17 @@ void Model::draw(Shader& shader)
 	for (Mesh* m : modelData->meshes) {
 		m->draw(shader);
 	}
+}
+
+void Model::draw(Shader& shader, Animator& animator, const glm::mat4 viewMatrix)
+{
+	shader.use();
+	shader.setMatrix("view", viewMatrix);
+	auto transforms = animator.GetFinalBoneMatrices();
+	for (int i = 0; i < transforms.size(); ++i) {
+		shader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+	}
+	this->draw(shader);
 }
 
 void Model::setCenter(glm::vec3 center)
