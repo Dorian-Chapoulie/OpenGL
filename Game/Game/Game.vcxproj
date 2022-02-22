@@ -216,6 +216,8 @@
     <None Include="animation.frag" />
     <None Include="animation.vert" />
     <None Include="fragment.frag" />
+    <None Include="light.frag" />
+    <None Include="light.vert" />
     <None Include="line.frag" />
     <None Include="line.vert" />
     <None Include="skybox.frag" />

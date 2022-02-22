@@ -286,5 +286,11 @@
     <None Include="line.vert">
       <Filter>shaders\vertex</Filter>
     </None>
+    <None Include="light.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="light.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
   </ItemGroup>
 </Project>

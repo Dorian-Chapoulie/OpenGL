@@ -9,6 +9,7 @@ Light::Light(Shader* shader, const glm::vec3& position, const glm::vec3& ambient
 	this->ambiant = ambient;
 	this->id = shader->addLight();
 	this->initShader();
+	this->setupCube();
 }
 
 Light::Light(Shader* shader, const glm::vec3& position, const glm::vec3& direction, const glm::vec3& ambient, float cutOff)
@@ -21,6 +22,7 @@ Light::Light(Shader* shader, const glm::vec3& position, const glm::vec3& directi
 	this->isDirectional = true;
 	this->id = shader->addLight();
 	this->initShader();
+	this->setupCube();
 }
 
 Light::~Light()
@@ -89,8 +91,35 @@ void Light::initShader() const
 		shader->setVec3("lights[" + std::to_string(id) + "].direction", *direction);
 		shader->setValue<float>("lights[" + std::to_string(id) + "].cutOff", glm::cos(glm::radians(*cutOff))); //radius
 		shader->setValue<bool>("lights[" + std::to_string(id) + "].isDirectional", isDirectional);
-	} 
+	}
 	shader->setValue<float>("lights[" + std::to_string(id) + "].linear", linear);
 	shader->setValue<float>("lights[" + std::to_string(id) + "].quadratic", quadratic);
 	shader->setValue<float>("lights[" + std::to_string(id) + "].constant", constant);
+}
+
+void Light::draw(const glm::mat4& viewMatrix, const glm::mat4 projection)
+{
+	debugShader.use();
+
+	debugShader.setMatrix("projection", projection);
+	debugShader.setMatrix("view", viewMatrix);
+	debugShader.setMatrix("model", modelMatrix);
+	debugShader.setVec3("lightcolor", ambiant);
+
+	glBindVertexArray(lightCubeVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+}
+
+void Light::setupCube()
+{
+	modelMatrix = glm::translate(modelMatrix, position);
+
+	glGenVertexArrays(1, &lightCubeVAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(lightCubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, 108 * sizeof(float), &vertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 }

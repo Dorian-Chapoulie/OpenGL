@@ -174,7 +174,7 @@ void setupSkyBoxShader(Shader& shader, const glm::mat4& projection)
 	shader.setMatrix("projection", projection);
 }
 
-void createLights(Shader& shader)
+void createLights(Shader& shader, std::vector<Light*>& lights)
 {
 	const glm::vec3 downVector = glm::vec3(0.0f, -1.0f, 0.0f);
 	const glm::vec3 white = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -183,7 +183,7 @@ void createLights(Shader& shader)
 	const glm::vec3 green = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	auto* light = new Light(&shader, glm::vec3(0.f, 5.0f, 0.f), white);
-
+	lights.emplace_back(light);
 	//auto* light2 = new Light(&shader, glm::vec3(0, 10, 0), downVector, red, 100.0f);
 	//auto* light4 = new Light(&shader, glm::vec3(0.5, 8, 0), downVector, red, 100.0f);
 	//auto* light5 = new Light(&shader, glm::vec3(4, 8, 0), downVector, green, 100.0f);
@@ -256,9 +256,10 @@ int main() {
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(debugDraw);
+	//dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
+	std::vector<Light*> lights;
 	//StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
 	StaticModel model("../../models/floor_2/floor.obj", glm::vec3(0.0f, -5.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
 	//StaticModel model3("../../models/manequin/manequin_3.fbx", glm::vec3(0.0f, 5.0f, -5.0f), HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
@@ -266,10 +267,10 @@ int main() {
 	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(0, 0, 0));
 
 	std::vector<DynamicModel*> dynamicModels;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 0; i++)
 	{
 		dynamicModels.emplace_back(
-			new DynamicModel("../../models/cube/cube.obj", glm::vec3(0, 0, 0), 1.0f, HitBoxFactory::AABB)
+			new DynamicModel("../../models/cube/cube.obj", glm::vec3(5, 0, 0), 1.0f, HitBoxFactory::AABB)
 		);
 	}
 
@@ -285,7 +286,7 @@ int main() {
 	setupShader(shader, projection);
 	setupSkyBoxShader(skyboxShader, projection);
 	setupSound();
-	createLights(shader);
+	createLights(shader, lights);
 
 	btVector3 g = btVector3(0, 0, 0);
 	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
@@ -334,6 +335,10 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		for (Light* l : lights)
+		{
+			l->draw(localPlayer->getCamera()->getViewMatrix(), projection);
+		}
 
 		dynamicsWorld->stepSimulation(timeStep, 10);
 		dynamicsWorld->debugDrawWorld();
