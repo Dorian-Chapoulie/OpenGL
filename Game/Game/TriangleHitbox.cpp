@@ -14,32 +14,29 @@ std::vector<btRigidBody*>& TriangleHitbox::generateHitBoxes(Model* model)
 {
 	this->model = model;
 	const std::vector<Mesh*> meshes = model->getModelData()->meshes;
+	const glm::vec3 scale = model->getScale();
 	for (Mesh* m : meshes) {
-		const std::vector<Vertex> vertices = m->getVertices();
+		const std::vector<Vertex> vertices = m->vertices;
+		const std::vector<unsigned int> indices = m->indices;
 
-		auto* triangleMeshTerrain = new btTriangleMesh();
-
-		for (int i = 0; i < vertices.size() - 4; i += 4)
+		auto meshInterface = new btTriangleMesh();
+		for (int i = 0; i < indices.size(); i += 3)
 		{
-			//TODO: pretty this 
-			const glm::vec3 scale = model->getScale();
-			btVector3 vertex1(vertices.at(i).Position.x * scale.x, vertices.at(i).Position.y * scale.y, vertices.at(i).Position.z * scale.z);
-			btVector3 vertex2(vertices.at(i + 1).Position.x * scale.x, vertices.at(i + 1).Position.y * scale.y, vertices.at(i + 1).Position.z * scale.z);
-			btVector3 vertex3(vertices.at(i + 2).Position.x * scale.x, vertices.at(i + 2).Position.y * scale.y, vertices.at(i + 2).Position.z * scale.z);
-			triangleMeshTerrain->addTriangle(vertex1, vertex2, vertex3);
-			/*p0 = Point3(-10, -10, 0)
-p1 = Point3(-10, 10, 0)
-p2 = Point3(10, -10, 0)
-p3 = Point3(10, 10, 0)
-mesh = BulletTriangleMesh()
-mesh.addTriangle(p0, p1, p2)
-mesh.addTriangle(p1, p2, p3)*/
+			int index1, index2, index3;
+			index1 = indices[i];
+			index2 = indices[i + 1];
+			index3 = indices[i + 2];
+
+			btVector3 v1(vertices[index1].Position.x * scale.x, vertices[index1].Position.y * scale.y, vertices[index1].Position.z * scale.z);
+			btVector3 v2(vertices[index2].Position.x * scale.x, vertices[index2].Position.y * scale.y, vertices[index2].Position.z * scale.z);
+			btVector3 v3(vertices[index3].Position.x * scale.x, vertices[index3].Position.y * scale.y, vertices[index3].Position.z * scale.z);
+
+			meshInterface->addTriangle(v3, v2, v1, true);
 		}
 
-		btCollisionShape* collisionShapeTerrain = new btBvhTriangleMeshShape(triangleMeshTerrain, true, true);
-
+		btCollisionShape* collisionShapeTerrain = new btBvhTriangleMeshShape(meshInterface, true);
 		btRigidBody::btRigidBodyConstructionInfo rigidBodyConstructionInfo(
-			0.0f,
+			model->getWeight(),
 			nullptr,
 			collisionShapeTerrain,
 			btVector3(0, 0, 0)
@@ -51,7 +48,6 @@ mesh.addTriangle(p1, p2, p3)*/
 		tr.setIdentity();
 		tr.setOrigin(btVector3(model->getPosition().x, model->getPosition().y, model->getPosition().z));
 		physicsRigidBody->setWorldTransform(tr);
-
 	}
 	return rigidBodys;
 }

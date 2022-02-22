@@ -256,14 +256,15 @@ int main() {
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(debugDraw);
+	dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
 	std::vector<Light*> lights;
+	//../../models/floor_2/floor.obj
 	//StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
 	StaticModel model("../../models/floor_2/floor.obj", glm::vec3(0.0f, -5.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
-	//StaticModel model3("../../models/manequin/manequin_3.fbx", glm::vec3(0.0f, 5.0f, -5.0f), HitBoxFactory::SKELETAL, glm::vec3(0.05f), true);
-
+	StaticModel model3("../../models/ramp/ramp.obj", glm::vec3(0.0f, -5.0f, -5.0f), HitBoxFactory::TRIANGLE, glm::vec3(0.25f));
+	//../../models/manequin/manequin_3.fbx
 	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(0, 0, 0));
 
 	std::vector<DynamicModel*> dynamicModels;
@@ -291,7 +292,7 @@ int main() {
 	btVector3 g = btVector3(0, 0, 0);
 	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
-		//rigidBody->setGravity(g);
+		rigidBody->setGravity(g);
 	}
 	for (auto* rigidBody : model.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
@@ -302,9 +303,9 @@ int main() {
 			dynamicsWorld->addRigidBody(rigidBody);
 		}
 	}
-	/*for (auto* rigidBody : model3.getRigidBodys()) {
+	for (auto* rigidBody : model3.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
-	}*/
+	}
 
 	//Animator animator(model3.getAnimation(), &model3);
 
@@ -362,6 +363,7 @@ int main() {
 
 		localPlayer->draw(shader);
 		model.draw(shader);
+		//model3.draw(shader);
 
 		for (DynamicModel* m : dynamicModels)
 		{
