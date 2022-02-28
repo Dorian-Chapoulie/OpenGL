@@ -24,6 +24,7 @@
     <ProjectGuid>{e6fa3de9-f26d-4b31-b14f-068428fae659}</ProjectGuid>
     <RootNamespace>Game</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Core</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -158,6 +159,7 @@
     <ClCompile Include="IHitBox.cpp" />
     <ClCompile Include="HitBoxFactory.cpp" />
     <ClCompile Include="ILoader.cpp" />
+    <ClCompile Include="InstancedModel.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
@@ -168,6 +170,7 @@
     <ClCompile Include="MyMotionState.cpp" />
     <ClCompile Include="OpenGLine.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Random.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SkeletalHitbox.cpp" />
     <ClCompile Include="SkeletalLoader.cpp" />
@@ -192,6 +195,7 @@
     <ClInclude Include="IHitBox.h" />
     <ClInclude Include="HitBoxFactory.h" />
     <ClInclude Include="ILoader.h" />
+    <ClInclude Include="InstancedModel.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LocalPlayer.h" />
@@ -202,6 +206,7 @@
     <ClInclude Include="MyMotionState.h" />
     <ClInclude Include="OpenGLine.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SkeletalHitbox.h" />
     <ClInclude Include="SkeletalLoader.h" />
@@ -216,6 +221,8 @@
     <None Include="animation.frag" />
     <None Include="animation.vert" />
     <None Include="fragment.frag" />
+    <None Include="instancedFrag.frag" />
+    <None Include="instancedVert.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
     <None Include="line.frag" />

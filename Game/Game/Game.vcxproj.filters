@@ -159,6 +159,12 @@
     <ClCompile Include="SkeletalHitbox.cpp">
       <Filter>hitbox</Filter>
     </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="InstancedModel.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -260,6 +266,12 @@
     <ClInclude Include="SkeletalHitbox.h">
       <Filter>hitbox</Filter>
     </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="InstancedModel.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.frag">
@@ -290,6 +302,12 @@
       <Filter>shaders\fragment</Filter>
     </None>
     <None Include="light.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="instancedFrag.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="instancedVert.vert">
       <Filter>shaders\vertex</Filter>
     </None>
   </ItemGroup>
