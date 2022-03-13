@@ -1,5 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 #include <iostream>
 #include "Shader.h"
 #include <glm/glm.hpp>
@@ -30,7 +33,7 @@
 #define FULLSCREEN false
 //TODO: change this value 
 #define DRAW_DISTANCE 5000.0f
-#define FOV 70.0f
+#define FOV 50.0f
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -43,22 +46,11 @@ bool backward = false;
 bool left = false;
 bool right = false;
 bool jump = false;
+bool mouseEnabled = true;
+bool canUpdateMouse = true;
 
 LocalPlayer* localPlayer = nullptr;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
-//TODO: desctructeur model & mesh
-//TODO: change model via model as param and not path
-//TODO: Static object should not have access to setWorldTransform
-/*
- *
- * TODO: DESTRUCTEUR glDeleteVertexArrays(1, &VAO);
-		glDeleteBuffers(1, &VBO);
-		glDeleteProgram(shaderProgram);
-			/*const glm::mat4 mtx_trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-	const auto cameraPosition = glm::inverse(camera->getViewMatrix()) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	const glm::vec3 positionTmp = glm::vec3(cameraPosition.x, cameraPosition.y - offsetCameraY, cameraPosition.z);
-
- */
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -100,6 +92,26 @@ void processInput(GLFWwindow* window)
 	}
 
 	jump = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && canUpdateMouse)
+	{
+		canUpdateMouse = false;
+		std::thread([]()
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(700));
+				canUpdateMouse = true;
+			}).detach();
+
+			mouseEnabled = !mouseEnabled;
+			if (mouseEnabled)
+			{
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			}
+			else
+			{
+				firstMouse = true;
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			}
+	}
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -135,7 +147,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	direction.x = cos(glm::radians(cam->getYaw())) * cos(glm::radians(cam->getPitch()));
 	direction.y = sin(glm::radians(cam->getPitch()));
 	direction.z = sin(glm::radians(cam->getYaw())) * cos(glm::radians(cam->getPitch()));
-	cam->setDirection(direction);
+	if (mouseEnabled) cam->setDirection(direction);
 }
 
 void scroll_callback(GLFWwindow* window, double xpos, double ypos)
@@ -185,7 +197,7 @@ void createLights(Shader& shader, std::vector<Light*>& lights)
 
 	auto* light = new Light(&shader, glm::vec3(0.f, 50.0f, 0.f), white);
 	lights.emplace_back(light);
-	//auto* light2 = new Light(&shader, glm::vec3(0, 10, 0), downVector, red, 100.0f);
+
 	//auto* light4 = new Light(&shader, glm::vec3(0.5, 8, 0), downVector, red, 100.0f);
 	//auto* light5 = new Light(&shader, glm::vec3(4, 8, 0), downVector, green, 100.0f);
 }
@@ -208,69 +220,6 @@ void promptFps(int& nbFrames, double& lastTime)
 	}
 }
 
-void InitInstancing(Model* rock)
-{
-	unsigned int amount = 50;
-	glm::mat4* modelMatrices;
-	modelMatrices = new glm::mat4[amount];
-
-	srand(glfwGetTime()); // initialize random seed	
-	float radius = 50.0;
-	float offset = 2.5f;
-	for (unsigned int i = 0; i < amount; i++)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
-		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
-		float angle = (float)i / (float)amount * 360.0f;
-		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float x = sin(angle) * radius + displacement;
-		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float y = displacement * 0.4f; // keep height of field smaller compared to width of x and z
-		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z));
-
-		// 2. scale: scale between 0.05 and 0.25f
-		float scale = (rand() % 20) / 100.0f + 0.05;
-		model = glm::scale(model, glm::vec3(scale));
-
-		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-		float rotAngle = (rand() % 360);
-		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-		// 4. now add to list of matrices
-		modelMatrices[i] = model;
-	}
-
-	// vertex buffer object
-	unsigned int buffer;
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-
-	for (unsigned int i = 0; i < rock->getModelData()->meshes.size(); i++)
-	{
-		unsigned int VAO = rock->getModelData()->meshes[i]->VAO;
-		glBindVertexArray(VAO);
-		// vertex attributes
-		std::size_t vec4Size = sizeof(glm::vec4);
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
-		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
-		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
-
-		glVertexAttribDivisor(3, 1);
-		glVertexAttribDivisor(4, 1);
-		glVertexAttribDivisor(5, 1);
-		glVertexAttribDivisor(6, 1);
-
-		glBindVertexArray(0);
-	}
-}
-
 void drawInstancing(Shader& shader, Model* rock, int amount, glm::mat4 projection)
 {
 	// draw meteorites
@@ -288,6 +237,150 @@ void drawInstancing(Shader& shader, Model* rock, int amount, glm::mat4 projectio
 			amount
 		);
 	}
+}
+
+bool RaycastWorld(btDiscreteDynamicsWorld* dynamicsWorld, const btVector3& Start, btVector3& End, btVector3& Normal) {
+
+
+	btCollisionWorld::ClosestRayResultCallback RayCallback(Start, End);
+	RayCallback.m_collisionFilterMask = btBroadphaseProxy::AllFilter;
+
+	// Perform raycast
+	dynamicsWorld->rayTest(Start, End, RayCallback);
+	if (RayCallback.hasHit()) {
+
+		End = RayCallback.m_hitPointWorld;
+		Normal = RayCallback.m_hitNormalWorld;
+		return true;
+	}
+
+
+	return false;
+}
+
+int comboCurrentItem = 0;
+void imGuiLights(Shader& shader, std::vector<Light*>& lights)
+{
+	char* items[50];
+	for (int i = 0; i < lights.size(); i++)
+	{
+		items[i] = new char[255];
+		itoa(i, items[i], 10);
+	}
+
+	float pos[3] = {
+		lights.at(comboCurrentItem)->getPosition().x,
+		lights.at(comboCurrentItem)->getPosition().y,
+		lights.at(comboCurrentItem)->getPosition().z
+	};
+	float ambiant[3] = {
+		lights.at(comboCurrentItem)->getAmbiant().x,
+		lights.at(comboCurrentItem)->getAmbiant().y,
+		lights.at(comboCurrentItem)->getAmbiant().z
+	};
+	float diffuse[3] = {
+		lights.at(comboCurrentItem)->getDiffuse().x,
+		lights.at(comboCurrentItem)->getDiffuse().y,
+		lights.at(comboCurrentItem)->getDiffuse().z
+	};
+	float spec[3] = {
+		lights.at(comboCurrentItem)->getSpecular().x,
+		lights.at(comboCurrentItem)->getSpecular().y,
+		lights.at(comboCurrentItem)->getSpecular().z
+	};
+	float down[3] = {
+		lights.at(comboCurrentItem)->getDirection().x,
+		lights.at(comboCurrentItem)->getDirection().y,
+		lights.at(comboCurrentItem)->getDirection().z
+	};
+	float linear = lights.at(comboCurrentItem)->getLinear();
+	float quadra = lights.at(comboCurrentItem)->getQuadratic();
+	bool isDir = lights.at(comboCurrentItem)->getIsDirectional();
+	float cutoff = lights.at(comboCurrentItem)->getCutOff();
+
+	ImGui::Begin("Lights");
+	if (ImGui::Combo("Light index", &comboCurrentItem, items, lights.size(), 5))
+	{
+		for (int n = 0; n < lights.size(); n++)
+		{
+			const bool is_selected = (comboCurrentItem == n);
+			if (ImGui::Selectable(items[n], is_selected))
+				comboCurrentItem = n;
+
+			if (is_selected) {
+				pos[0] = lights.at(comboCurrentItem)->getPosition().x;
+				pos[1] = lights.at(comboCurrentItem)->getPosition().y;
+				pos[2] = lights.at(comboCurrentItem)->getPosition().z;
+
+				ambiant[0] = lights.at(comboCurrentItem)->getAmbiant().x;
+				ambiant[1] = lights.at(comboCurrentItem)->getAmbiant().y;
+				ambiant[2] = lights.at(comboCurrentItem)->getAmbiant().z;
+
+				diffuse[0] = lights.at(comboCurrentItem)->getDiffuse().x;
+				diffuse[1] = lights.at(comboCurrentItem)->getDiffuse().y;
+				diffuse[2] = lights.at(comboCurrentItem)->getDiffuse().z;
+
+				spec[0] = lights.at(comboCurrentItem)->getSpecular().x;
+				spec[1] = lights.at(comboCurrentItem)->getSpecular().y;
+				spec[2] = lights.at(comboCurrentItem)->getSpecular().z;
+
+				down[0] = lights.at(comboCurrentItem)->getDirection().x;
+				down[1] = lights.at(comboCurrentItem)->getDirection().y;
+				down[2] = lights.at(comboCurrentItem)->getDirection().z;
+
+				linear = lights.at(comboCurrentItem)->getLinear();
+				quadra = lights.at(comboCurrentItem)->getQuadratic();
+				isDir = lights.at(comboCurrentItem)->getIsDirectional();
+				cutoff = lights.at(comboCurrentItem)->getCutOff();
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+	}
+	ImGui::DragFloat3("Position", pos, 0.05f, -1000.0f, 1000.0f);
+	ImGui::ColorEdit3("Ambiant", ambiant);
+
+	if (lights.at(comboCurrentItem)->getIsDirectional()) {
+		ImGui::DragFloat("cutoff", &cutoff, 0.1f, -100.0f, 100.0f);
+		ImGui::DragFloat3("Direction", down, 0.1f, -10.0f, 10.0f);
+	}
+	else
+	{
+		ImGui::ColorEdit3("Diffuse", diffuse);
+		ImGui::ColorEdit3("Specular", spec);
+		ImGui::SliderFloat("linear", &linear, -0.5f, 5.0f);
+		ImGui::SliderFloat("quadra", &quadra, 0.0f, 10.0f);
+	}
+
+	ImGui::Checkbox("Directional", &isDir);
+	if (lights.at(comboCurrentItem)->getIsDirectional() != isDir) {
+		lights.at(comboCurrentItem)->setIsDirectional(isDir);
+	}
+
+	if (ImGui::Button("Set current position"))
+	{
+		lights.at(comboCurrentItem)->setPosition(localPlayer->getPosition());
+	}
+	else
+	{
+		lights.at(comboCurrentItem)->setPosition({ pos[0], pos[1], pos[2] });
+	}
+	if (ImGui::Button("Add light"))
+	{
+		const glm::vec3 white = glm::vec3(1.0f, 1.0f, 1.0f);
+		auto* light = new Light(&shader, localPlayer->getPosition(), white);
+		lights.emplace_back(light);
+	}
+
+	lights.at(comboCurrentItem)->setAmbiant({ ambiant[0], ambiant[1], ambiant[2] });
+	lights.at(comboCurrentItem)->setDiffuse({ diffuse[0], diffuse[1], diffuse[2] });
+	lights.at(comboCurrentItem)->setSpecular({ spec[0], spec[1], spec[2] });
+	lights.at(comboCurrentItem)->setDirection({ down[0], down[1], down[2] });
+	lights.at(comboCurrentItem)->setLinear(linear);
+	lights.at(comboCurrentItem)->setQuadratic(quadra);
+	lights.at(comboCurrentItem)->setCutOff(cutoff);
+
+
+	ImGui::End();
 }
 
 int main() {
@@ -339,17 +432,25 @@ int main() {
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(debugDraw);
+	//dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
+
+#pragma region imgui
+	ImGui::CreateContext();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+	ImGui::StyleColorsDark();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+#pragma endregion imgui
 
 	std::vector<Light*> lights;
 	//../../models/floor_2/floor.obj
 	//StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
-	StaticModel model("../../models/floor_2/floor.obj", glm::vec3(0.0f, -5.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(1.0f));
-	//Model model3("../../models/crate/Wooden Crate.obj", glm::vec3(0.0f, 5.0f, 0.0f));
+	StaticModel model("../../models/kino/kino.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
+	//DynamicModel model3("../../models/crate/Wooden Crate.obj", glm::vec3(-4.0f, -5.0f, 40.4f), 1.0f, HitBoxFactory::AABB);
 	//../../models/manequin/manequin_3.fbx
 	InstancedModel modelInstanced("../../models/crate/Wooden Crate.obj", 100);
-	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(0, 0, 0));
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(-20.4472f, -5.9984f, 80.152f));
 
 	std::vector<Model*> dynamicModels;
 	for (int i = 0; i < 0; i++)
@@ -365,7 +466,7 @@ int main() {
 	Shader animationShader("./animation.vert", "./animation.frag");
 	SkyBox skybox("../../textures/skybox");
 
-	glm::mat4 projection = glm::perspective(glm::radians(FOV), float(WIDTH / HEIGHT), 0.1f, DRAW_DISTANCE);
+	glm::mat4 projection = glm::perspective(glm::radians(FOV), 16.0f / 9.0f, 0.1f, DRAW_DISTANCE);
 
 	setupShader(animationShader, projection);
 	setupShader(shader, projection);
@@ -375,7 +476,7 @@ int main() {
 
 	void initParticles();
 
-	btVector3 g = btVector3(0, -1, 0);
+	btVector3 g = btVector3(0, 0, 0);
 	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 		rigidBody->setGravity(g);
@@ -399,16 +500,13 @@ int main() {
 		{
 			int dx = 1;
 			float i = 0;
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			while (true) {
-				std::this_thread::sleep_for(std::chrono::milliseconds(5));
-				model3.setPosition(glm::vec3(0, 3, -5 + i));
-				model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
-				animator.UpdateAnimation(deltaTime);
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				//model3.setPosition(glm::vec3(0, 3, -5 + i));
+				//model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
+				//animator.UpdateAnimation(deltaTime);
 			}
 		});*/
-
-	modelInstanced.setPosition(0, glm::vec3(5, 5, 5));
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1 / 10.0f;
@@ -423,13 +521,36 @@ int main() {
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 
-		modelInstanced.draw(instancedShader, projection, localPlayer->getCamera()->getViewMatrix());
+		//modelInstanced.draw(instancedShader, projection, localPlayer->getCamera()->getViewMatrix());
+		const glm::vec3 pp = localPlayer->getPosition();
 
-		for (Light* l : lights)
+		btVector3 playerPos = btVector3(pp.x, pp.y, pp.z);
+		btVector3 playerPos2 = btVector3(pp.x, pp.y - 2.0f, pp.z);
+		btVector3 normal;
+
+		if (!RaycastWorld(dynamicsWorld, playerPos, playerPos2, normal)) //rien en dessous des pieds
 		{
-			l->draw(localPlayer->getCamera()->getViewMatrix(), projection);
+			g = btVector3(0, -5, 0);
+			for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
+				if (rigidBody->getGravity().getY() != -5) {
+					rigidBody->setGravity(g);
+				}
+			}
 		}
+		else
+		{
+			g = btVector3(0, 0, 0);
+			for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
+				if (rigidBody->getGravity().getY() != 0) {
+					rigidBody->setGravity(g);
+				}
+			}
+		}
+
 
 		dynamicsWorld->stepSimulation(timeStep, 10);
 		dynamicsWorld->debugDrawWorld();
@@ -439,8 +560,6 @@ int main() {
 		lastFrame = currentFrame;
 		promptFps(nbFrames, lastTime);
 
-		modelInstanced.setPosition(0, glm::vec3(currentFrame * 0.1f, 5, 5));
-
 
 		localPlayer->move(forward, backward, left, right, jump, deltaTime);
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
@@ -448,8 +567,14 @@ int main() {
 
 		//model3.draw(animationShader, animator, localPlayer->getCamera()->getViewMatrix());
 
+		for (Light* l : lights)
+		{
+			l->draw(localPlayer->getCamera()->getViewMatrix(), projection);
+		}
 
 		shader.use();
+		if (!mouseEnabled) imGuiLights(shader, lights);
+		//std::cout << pp.x << ", " << pp.y << ", " << pp.z << std::endl;
 		//viewpos inutile
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
@@ -457,7 +582,6 @@ int main() {
 		localPlayer->draw(shader);
 		model.draw(shader);
 		//model3.draw(shader);
-
 
 		for (Model* m : dynamicModels)
 		{
@@ -471,10 +595,13 @@ int main() {
 		skyboxShader.setMatrix("projection", projection);
 		skybox.draw();
 #pragma endregion
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
+	ImGui_ImplGlfw_Shutdown();
 	glfwTerminate();
 	return 0;
 }

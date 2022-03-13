@@ -35,6 +35,7 @@ Light::~Light()
 void Light::setPosition(const glm::vec3& position)
 {
 	this->position = position;
+	modelMatrix = glm::translate(glm::mat4(1.0f), position);
 	shader->setVec3("lights[" + std::to_string(id) + "].position", position);
 }
 
@@ -62,6 +63,19 @@ void Light::setDirection(const glm::vec3& direction)
 	shader->setVec3("lights[" + std::to_string(id) + "].direction", direction);
 }
 
+void Light::setIsDirectional(bool isDir)
+{
+	this->isDirectional = isDir;
+	this->direction = new glm::vec3(glm::vec3(0, -1, 0));
+	this->cutOff = new float(100.0f);
+	initShader();
+}
+
+void Light::setConstant(float constant)
+{
+	this->constant = constant;
+}
+
 void Light::setLinear(float linear)
 {
 	this->linear = linear;
@@ -86,12 +100,11 @@ void Light::initShader() const
 	shader->setVec3("lights[" + std::to_string(id) + "].ambient", ambiant);
 	shader->setVec3("lights[" + std::to_string(id) + "].diffuse", diffuse);// emet
 	shader->setVec3("lights[" + std::to_string(id) + "].specular", specular);//reflet
-
 	if (this->isDirectional) {
 		shader->setVec3("lights[" + std::to_string(id) + "].direction", *direction);
 		shader->setValue<float>("lights[" + std::to_string(id) + "].cutOff", glm::cos(glm::radians(*cutOff))); //radius
-		shader->setValue<bool>("lights[" + std::to_string(id) + "].isDirectional", isDirectional);
 	}
+	shader->setValue<bool>("lights[" + std::to_string(id) + "].isDirectional", isDirectional);
 	shader->setValue<float>("lights[" + std::to_string(id) + "].linear", linear);
 	shader->setValue<float>("lights[" + std::to_string(id) + "].quadratic", quadratic);
 	shader->setValue<float>("lights[" + std::to_string(id) + "].constant", constant);
@@ -109,6 +122,58 @@ void Light::draw(const glm::mat4& viewMatrix, const glm::mat4 projection)
 	glBindVertexArray(lightCubeVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
+}
+
+glm::vec3 Light::getPosition() const
+{
+	return position;
+}
+
+glm::vec3 Light::getAmbiant() const
+{
+	return ambiant;
+}
+
+glm::vec3 Light::getDiffuse() const
+{
+	return diffuse;
+}
+
+glm::vec3 Light::getSpecular() const
+{
+	return specular;
+}
+
+glm::vec3 Light::getDirection() const
+{
+	if (!direction) return glm::vec3(0.0f, -1.0f, 0.0f);
+	return *direction;
+}
+
+float Light::getConstant() const
+{
+	return constant;
+}
+
+float Light::getLinear() const
+{
+	return linear;
+}
+
+float Light::getQuadratic() const
+{
+	return quadratic;
+}
+
+float Light::getCutOff() const
+{
+	if (cutOff == nullptr) return 30.0f;
+	return *cutOff;
+}
+
+bool Light::getIsDirectional() const
+{
+	return isDirectional;
 }
 
 void Light::setupCube()

@@ -1,4 +1,7 @@
 #include "TriangleHitbox.h"
+
+#include <filesystem>
+
 #include "AABBHitbox.h"
 #include <glad/glad.h>
 #include "MyMotionState.h"
@@ -12,8 +15,25 @@ TriangleHitbox::~TriangleHitbox()
 
 std::vector<btRigidBody*>& TriangleHitbox::generateHitBoxes(Model* model)
 {
+
 	this->model = model;
-	const std::vector<Mesh*> meshes = model->getModelData()->meshes;
+	Model* hitboxModel = nullptr;
+
+	std::string path = model->directory;
+	const int pathLength = path.length();
+	const std::string dir = path.substr(0, pathLength - 4);
+	const std::string ext = path.substr(pathLength - 4);
+
+	if (std::filesystem::exists(dir + "_hitbox" + ext))
+	{
+		hitboxModel = new Model(dir + "_hitbox" + ext, model->getPosition());
+	}
+	else
+	{
+		hitboxModel = model;
+	}
+
+	const std::vector<Mesh*> meshes = hitboxModel->getModelData()->meshes;
 	const glm::vec3 scale = model->getScale();
 	for (Mesh* m : meshes) {
 		const std::vector<Vertex> vertices = m->vertices;

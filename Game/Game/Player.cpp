@@ -13,9 +13,10 @@ Player::~Player()
 	delete model;
 }
 
+//todo: remove this
 glm::vec3 Player::getPosition() const
 {
-	return position;
+	return model->getPosition();
 }
 
 void Player::setPosition(const glm::vec3& position)

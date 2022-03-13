@@ -23,6 +23,8 @@ public:
 	void setDiffuse(const glm::vec3& diffuse);
 	void setSpecular(const glm::vec3& specular);
 	void setDirection(const glm::vec3& direction);
+	void setIsDirectional(bool isDirectional);
+	void setConstant(float constant);
 
 	void setLinear(float linear);
 	void setQuadratic(float quadratic);
@@ -31,6 +33,18 @@ public:
 
 	void draw(const glm::mat4& viewMatrix, const glm::mat4 projection);
 
+
+	glm::vec3 getPosition() const;
+	glm::vec3 getAmbiant() const;
+	glm::vec3 getDiffuse() const;
+	glm::vec3 getSpecular() const;
+	glm::vec3 getDirection() const;
+	float getConstant() const;
+	float getLinear() const;
+	float getQuadratic() const;
+	float getCutOff() const;
+	bool getIsDirectional() const;
+
 private:
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 ambiant = glm::vec3(1.0f);
@@ -38,7 +52,7 @@ private:
 	glm::vec3 specular = glm::vec3(1.0f);
 	glm::vec3* direction = nullptr;
 
-	const float constant = 0.5f;
+	float constant = 0.5f;
 	float linear = 0.37f;
 	float quadratic = 0.14f;
 	float* cutOff = nullptr;

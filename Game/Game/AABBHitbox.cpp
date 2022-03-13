@@ -38,6 +38,7 @@ std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 	if (model->getWeight() == 0.0f) {
 		rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 	}
+	rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() /* | btCollisionObject::CF_NO_CONTACT_RESPONSE*/);
 	rigidBodys.back()->setMotionState(new MyMotionState(model, transform));
 	rigidBodys.back()->setCenterOfMassTransform(transform);
 	//TODO: find best way

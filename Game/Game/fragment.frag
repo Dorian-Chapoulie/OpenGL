@@ -1,5 +1,5 @@
 #version 330 core
-#define NR_POINT_LIGHTS 10  
+#define NR_POINT_LIGHTS 100  
 struct Material {
     vec3 ambient;
     vec3 diffuse;
@@ -60,7 +60,7 @@ vec3 CalcDirLight(Light light, vec3 normal) {
         float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
         //ambient  *= attenuation; // remove attenuation from ambient, as otherwise at large distances the light would be darker inside than outside the spotlight due the ambient term in the else branche
-        diffuse   *= attenuation;
+        diffuse  *= attenuation;
         specular *= attenuation;   
             
         return (ambient + diffuse + specular);
@@ -90,7 +90,7 @@ vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos) {
     vec3 specular = light.specular * (spec * material.specular);  
 
     // attenuation
-    float distance = 1.0f; //length(light.position - FragPos);
+    float distance = length(light.position - FragPos) * 0.1f;
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     ambient  *= attenuation;
     diffuse  *= attenuation;

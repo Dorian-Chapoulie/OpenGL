@@ -25,7 +25,7 @@ std::vector<btRigidBody*>& AABBMultipleHitBox::generateHitBoxes(Model* model)
 
 	if (std::filesystem::exists(dir + "_hitbox" + ext))
 	{
-		hitboxModel = new Model("../../models/arch/arch_hitbox.obj", model->getPosition());
+		hitboxModel = new Model(dir + "_hitbox" + ext, model->getPosition());
 	}
 	else
 	{
