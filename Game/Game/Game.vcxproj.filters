@@ -189,6 +189,9 @@
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="LevelKinoDerToten.cpp">
+      <Filter>level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -322,6 +325,9 @@
     </ClInclude>
     <ClInclude Include="imgui\imgui_impl_opengl3_loader.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelKinoDerToten.h">
+      <Filter>level</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

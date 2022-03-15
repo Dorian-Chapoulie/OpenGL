@@ -168,6 +168,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="InstancedModel.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="LevelKinoDerToten.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="InstancedModel.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelKinoDerToten.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LocalPlayer.h" />
     <ClInclude Include="Log.h" />

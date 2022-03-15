@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <nlohmann/json.hpp>
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -25,6 +26,7 @@
 #include "DefaultLoader.h"
 #include "DynamicModel.h"
 #include "InstancedModel.h"
+#include "LevelKinoDerToten.h"
 #include "SkeletalLoader.h"
 #include "StaticModel.h"
 
@@ -379,7 +381,13 @@ void imGuiLights(Shader& shader, std::vector<Light*>& lights)
 	lights.at(comboCurrentItem)->setQuadratic(quadra);
 	lights.at(comboCurrentItem)->setCutOff(cutoff);
 
-
+	if (ImGui::Button("Save"))
+	{
+		nlohmann::json exportJson;
+		for (int i = 0; i < lights.size(); i++) exportJson[i] = lights.at(i)->toJson();
+		std::ofstream outStream("lights.json");
+		outStream << std::setw(4) << exportJson << std::endl;
+	}
 	ImGui::End();
 }
 
@@ -443,10 +451,10 @@ int main() {
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 #pragma endregion imgui
 
-	std::vector<Light*> lights;
+	//std::vector<Light*> lights;
 	//../../models/floor_2/floor.obj
 	//StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
-	StaticModel model("../../models/kino/kino.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
+	//StaticModel model("../../models/kino/kino.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
 	//DynamicModel model3("../../models/crate/Wooden Crate.obj", glm::vec3(-4.0f, -5.0f, 40.4f), 1.0f, HitBoxFactory::AABB);
 	//../../models/manequin/manequin_3.fbx
 	InstancedModel modelInstanced("../../models/crate/Wooden Crate.obj", 100);
@@ -472,7 +480,9 @@ int main() {
 	setupShader(shader, projection);
 	setupSkyBoxShader(skyboxShader, projection);
 	setupSound();
-	createLights(shader, lights);
+	//createLights(shader, lights);
+
+	LevelKinoDerToten map(shader);
 
 	void initParticles();
 
@@ -481,7 +491,7 @@ int main() {
 		dynamicsWorld->addRigidBody(rigidBody);
 		rigidBody->setGravity(g);
 	}
-	for (auto* rigidBody : model.getRigidBodys()) {
+	for (auto* rigidBody : map.getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 	/*for (DynamicModel* m : dynamicModels)
@@ -567,20 +577,20 @@ int main() {
 
 		//model3.draw(animationShader, animator, localPlayer->getCamera()->getViewMatrix());
 
-		for (Light* l : lights)
+		for (Light* l : map.getLights())
 		{
 			l->draw(localPlayer->getCamera()->getViewMatrix(), projection);
 		}
 
 		shader.use();
-		if (!mouseEnabled) imGuiLights(shader, lights);
+		if (!mouseEnabled) imGuiLights(shader, map.getLights());
 		//std::cout << pp.x << ", " << pp.y << ", " << pp.z << std::endl;
 		//viewpos inutile
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
 		localPlayer->draw(shader);
-		model.draw(shader);
+		map.draw();
 		//model3.draw(shader);
 
 		for (Model* m : dynamicModels)

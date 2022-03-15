@@ -124,6 +124,23 @@ void Light::draw(const glm::mat4& viewMatrix, const glm::mat4 projection)
 	glBindVertexArray(0);
 }
 
+nlohmann::json Light::toJson() const
+{
+	const glm::vec3 dir = getDirection();
+	const float cut = getCutOff();
+	return {
+		{"position", {position.x, position.y, position.z}},
+		{"ambiant", {ambiant.x, ambiant.y, ambiant.z}},
+		{"diffuse", {diffuse.x, diffuse.y, diffuse.z}},
+		{"specular", {specular.x, specular.y, specular.z} },
+		{"direction", {dir.x, dir.y, dir.z}},
+		{"linear", linear},
+		{"quadratic", quadratic},
+		{"cutOff", cut},
+		{"isDirectional", isDirectional},
+	};
+}
+
 glm::vec3 Light::getPosition() const
 {
 	return position;

@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/vec3.hpp>
-
+#include <nlohmann/json.hpp>
 #include "Shader.h"
 
 class Light
@@ -32,6 +32,8 @@ public:
 	void initShader() const;
 
 	void draw(const glm::mat4& viewMatrix, const glm::mat4 projection);
+
+	nlohmann::json toJson() const;
 
 
 	glm::vec3 getPosition() const;
