@@ -21,6 +21,7 @@ void InstancedModel::draw(Shader& shader, const glm::mat4& projection, const glm
 		{
 			glActiveTexture(GL_TEXTURE0 + i);
 			int number = 0;
+			if (model->getModelData()->loadedTextures.size() <= i) continue;
 			std::string name = model->getModelData()->loadedTextures[i].type;
 			if (name == "texture_diffuse") {
 				number = diffuseNr++;

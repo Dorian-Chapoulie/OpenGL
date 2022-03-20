@@ -1,3 +1,4 @@
+#include <excpt.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <nlohmann/json.hpp>
@@ -241,13 +242,14 @@ void drawInstancing(Shader& shader, Model* rock, int amount, glm::mat4 projectio
 	}
 }
 
-bool RaycastWorld(btDiscreteDynamicsWorld* dynamicsWorld, const btVector3& Start, btVector3& End, btVector3& Normal) {
+bool RaycastWorld(btDiscreteDynamicsWorld* dynamicsWorld, btVector3 Start, btVector3 End, btVector3& Normal) {
 
 
 	btCollisionWorld::ClosestRayResultCallback RayCallback(Start, End);
 	RayCallback.m_collisionFilterMask = btBroadphaseProxy::AllFilter;
 
-	// Perform raycast
+	//std::cout << Start.getX() << " " << Start.getY() << " " << Start.getZ() << std::endl;
+	//std::cout << End.getX() << " " << End.getY() << " " << End.getZ() << std::endl << std::endl;
 	dynamicsWorld->rayTest(Start, End, RayCallback);
 	if (RayCallback.hasHit()) {
 
@@ -391,6 +393,154 @@ void imGuiLights(Shader& shader, std::vector<Light*>& lights)
 	ImGui::End();
 }
 
+float get3DDistance(btVector3 a, btVector3 b)
+{
+	return sqrt(
+		pow(abs(a.getX() - b.getX()), 2) +
+		pow(abs(a.getY() - b.getY()), 2) +
+		pow(abs(a.getZ() - b.getZ()), 2)
+	);
+}
+/*std::sort(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b)
+		{
+			return get3DDistance(a->getWorldTransform().getOrigin(), start) < get3DDistance(b->getWorldTransform().getOrigin(), start);
+		});*/
+struct Node
+{
+	btRigidBody* body;
+	float g = 0.0f;
+	float h = 0.0f;
+	float f = 9999.0f;
+	int id = -1;
+	Node* parent = nullptr;
+public:
+	Node(btRigidBody* body, float g, float h, int id)
+	{
+		this->body = body;
+		this->g = g;
+		this->h = h;
+		this->id = id;
+	}
+};
+void performAstar(std::vector<btRigidBody*>& path, btVector3 start, btVector3 end, std::vector<btRigidBody*> beacons, btDiscreteDynamicsWorld* dynamicsWorld)
+{
+	std::vector<Node> nodes, open, closed;
+	std::sort(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b)
+		{
+			return get3DDistance(a->getWorldTransform().getOrigin(), start) < get3DDistance(b->getWorldTransform().getOrigin(), start);
+		});
+	for (int i = 0; i < beacons.size(); i++)
+	{
+		nodes.emplace_back(Node(
+			beacons[i],
+			get3DDistance(beacons[i]->getWorldTransform().getOrigin(), start),
+			get3DDistance(beacons[i]->getWorldTransform().getOrigin(), end),
+			i
+		));
+	}
+
+	open.emplace_back(nodes[0]);
+
+	while (open.size() > 0)
+	{
+		Node current = *std::min_element(nodes.begin(), nodes.end(), [](Node& a, Node& b)
+			{
+				return a.f < b.f;
+			});
+		std::remove_if(open.begin(), open.end(), [&](Node& n)
+			{
+				return n.id == current.id;
+			});
+		closed.emplace_back(current);
+
+		Node closest = *std::min_element(nodes.begin(), nodes.end(), [&](Node& a, Node& b)
+			{
+				return get3DDistance(a.body->getWorldTransform().getOrigin(), end) < get3DDistance(b.body->getWorldTransform().getOrigin(), end);
+			});
+
+		if (current.id == closest.id)
+		{
+			path.emplace_back(current.body);
+			Node* tmp = current.parent;
+			while (tmp != nullptr)
+			{
+				path.emplace_back(tmp->body);
+				tmp = tmp->parent;
+			}
+			break;
+		}
+
+		std::sort(nodes.begin(), nodes.end(), [&](Node& a, Node& b)
+			{
+				return get3DDistance(a.body->getWorldTransform().getOrigin(), current.body->getWorldTransform().getOrigin()) < get3DDistance(b.body->getWorldTransform().getOrigin(), current.body->getWorldTransform().getOrigin());
+			});
+		std::vector<Node> children;
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			if (nodes[i].id != current.id)
+			{
+				children.emplace_back(nodes[i]);
+			}
+		}
+
+		for (Node child : children)
+		{
+			if (std::find_if(closed.begin(), closed.end(), [&](Node& c) {return child.id == c.id; }) != closed.end()) {
+				continue;
+			}
+
+			child.parent = &current;
+			child.g = current.g + get3DDistance(child.body->getWorldTransform().getOrigin(), current.body->getWorldTransform().getOrigin());
+			child.h = get3DDistance(child.body->getWorldTransform().getOrigin(), end);
+			child.f = child.g + child.h;
+
+			auto it = std::find_if(open.begin(), open.end(), [&](Node& c) {return child.id == c.id; });
+			if (it != open.end()) {
+				if (child.g > (*it).g)
+				{
+					continue;
+				}
+			}
+			open.emplace_back(child);
+		}
+	}
+}
+
+void moveEnemy(std::vector<btRigidBody*> p, DynamicModel& enemy)
+{
+	if (p.size() <= 0) return;
+	std::vector<btRigidBody*> path = { p.begin(), p.end() };
+
+
+	glm::vec3 enemyPos = enemy.getPosition();
+	btVector3 enemyPosbt = { enemyPos.x, enemyPos.y, enemyPos.z };
+	btVector3 diff = { 0.0f, 0.0f, 0.0f };
+	if (path.size() <= 0) return;
+	for (btRigidBody* r : path)
+	{
+		path.erase(
+			std::remove_if(path.begin(),
+				path.end(),
+				[&](btRigidBody* r) {return get3DDistance(enemyPosbt, r->getWorldTransform().getOrigin()) <= 2.0; }
+			),
+			path.end()
+		);
+		diff = (r->getWorldTransform().getOrigin() - enemyPosbt);
+		diff *= 0.8f;
+		break;
+	}
+
+	for (auto* rigidBody : enemy.getRigidBodys()) {
+		rigidBody->activate();
+		rigidBody->setLinearVelocity(btVector3(
+			diff.getX(),
+			0,
+			diff.getZ()
+		));
+	}
+
+}
+
 int main() {
 #pragma region setup
 	glfwInit();
@@ -457,16 +607,13 @@ int main() {
 	//StaticModel model("../../models/kino/kino.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
 	//DynamicModel model3("../../models/crate/Wooden Crate.obj", glm::vec3(-4.0f, -5.0f, 40.4f), 1.0f, HitBoxFactory::AABB);
 	//../../models/manequin/manequin_3.fbx
-	InstancedModel modelInstanced("../../models/crate/Wooden Crate.obj", 100);
+	InstancedModel modelInstanced("../../models/cube/cube.obj", 100);
 	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(-20.4472f, -5.9984f, 80.152f));
 
+	DynamicModel enemy("../../models/cube/cube.obj", glm::vec3(-20.4472f, -5.9984f, 80.152f), 1.0f, HitBoxFactory::AABB);
+
 	std::vector<Model*> dynamicModels;
-	for (int i = 0; i < 0; i++)
-	{
-		dynamicModels.emplace_back(
-			new Model("../../models/crate/Wooden Crate.obj", { 0, 0, 0 })
-		);
-	}
+
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader instancedShader("./instancedVert.vert", "./instancedFrag.frag");
@@ -484,14 +631,18 @@ int main() {
 
 	LevelKinoDerToten map(shader);
 
+
 	void initParticles();
 
-	btVector3 g = btVector3(0, 0, 0);
+	btVector3 g = btVector3(0, -5, 0);
 	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 		rigidBody->setGravity(g);
 	}
 	for (auto* rigidBody : map.getModel()->getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}
+	for (auto* rigidBody : enemy.getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 	/*for (DynamicModel* m : dynamicModels)
@@ -505,18 +656,59 @@ int main() {
 	}*/
 
 	//Animator animator(model3.getAnimation(), &model3);
-
-	/*std::thread t([&]()
+	for (int i = 0; i < 100; i++)
+	{
+		glm::vec3 pos = { i, 0, 0 };
+		dynamicModels.emplace_back(
+			new Model("../../models/cube/cube.obj", pos)
+		);
+	}
+	std::thread t([&]()
 		{
 			int dx = 1;
 			float i = 0;
+			std::vector<btRigidBody*> path;
+			std::vector<btRigidBody*> beacons = map.getNavigationBodys();
+			while (!jump) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			}
+
+			std::thread m([&]()
+				{
+					while (true) {
+						std::this_thread::sleep_for(std::chrono::milliseconds(100));
+						for (int i = 0; i < 100; i++)
+						{
+							glm::vec3 pos = { 0,-100,0 };
+							dynamicModels[i]->setPosition(pos);
+						}
+						for (const auto* r : path)
+						{
+							//std::cout << (int)r->getUserPointer() << std::endl;
+						}
+						//std::cout << "--------" << std::endl << std::endl;
+						for (int i = 0; i < dynamicModels.size(); i++)
+						{
+							if (i >= path.size()) break;
+							glm::vec3 pos = { path[i]->getWorldTransform().getOrigin().getX(),
+							path[i]->getWorldTransform().getOrigin().getY(),
+							path[i]->getWorldTransform().getOrigin().getZ() };
+							dynamicModels[i]->setPosition(pos);
+						}
+						moveEnemy(path, enemy);
+					}
+				});
+
 			while (true) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				btVector3 playerPosition = { localPlayer->getPosition().x, localPlayer->getPosition().y, localPlayer->getPosition().z };
+				btVector3 enemyPosition = enemy.getRigidBodys()[0]->getWorldTransform().getOrigin();
+				performAstar(path, enemyPosition, playerPosition, beacons, dynamicsWorld);
 				//model3.setPosition(glm::vec3(0, 3, -5 + i));
 				//model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
 				//animator.UpdateAnimation(deltaTime);
 			}
-		});*/
+		});
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
 	float timeStep = 1 / 10.0f;
@@ -542,7 +734,7 @@ int main() {
 		btVector3 playerPos2 = btVector3(pp.x, pp.y - 2.0f, pp.z);
 		btVector3 normal;
 
-		if (!RaycastWorld(dynamicsWorld, playerPos, playerPos2, normal)) //rien en dessous des pieds
+		/*if (!RaycastWorld(dynamicsWorld, playerPos, playerPos2, normal)) //rien en dessous des pieds
 		{
 			g = btVector3(0, -5, 0);
 			for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
@@ -559,7 +751,7 @@ int main() {
 					rigidBody->setGravity(g);
 				}
 			}
-		}
+		}*/
 
 
 		dynamicsWorld->stepSimulation(timeStep, 10);
@@ -568,7 +760,7 @@ int main() {
 		const float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		promptFps(nbFrames, lastTime);
+		//promptFps(nbFrames, lastTime);
 
 
 		localPlayer->move(forward, backward, left, right, jump, deltaTime);
@@ -584,13 +776,13 @@ int main() {
 
 		shader.use();
 		if (!mouseEnabled) imGuiLights(shader, map.getLights());
-		//std::cout << pp.x << ", " << pp.y << ", " << pp.z << std::endl;
-		//viewpos inutile
+
 		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
 		localPlayer->draw(shader);
 		map.draw();
+		enemy.draw(shader);
 		//model3.draw(shader);
 
 		for (Model* m : dynamicModels)

@@ -2,7 +2,10 @@
 
 LevelKinoDerToten::LevelKinoDerToten(Shader& shader) : Level(shader)
 {
-	this->model = new StaticModel("../../models/kino/kino.obj", position, hitboxType, glm::vec3(2.0f));
+	constexpr glm::vec3 scale = glm::vec3(2.0f);
+	this->model = new StaticModel("../../models/kino/kino.obj", position, hitboxType, scale);
+	this->navigation = new StaticModel("../../models/kino/kino_navigation.obj", position, HitBoxFactory::AABB_MULTIPLE, scale);
+
 	init();
 }
 

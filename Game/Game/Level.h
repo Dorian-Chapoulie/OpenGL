@@ -14,9 +14,11 @@ public:
 
 	Model* getModel();
 	std::vector<Light*>& getLights();
+	std::vector<btRigidBody*> getNavigationBodys();
 
 protected:
 	StaticModel* model = nullptr;
+	StaticModel* navigation = nullptr;
 	Shader& shader;
 	std::vector<Light*> lights;
 

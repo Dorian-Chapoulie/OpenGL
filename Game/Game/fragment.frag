@@ -90,7 +90,7 @@ vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos) {
     vec3 specular = light.specular * (spec * material.specular);  
 
     // attenuation
-    float distance = length(light.position - FragPos) * 0.1f;
+    float distance = 4.0f;//length(light.position - FragPos) * 0.1f;
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     ambient  *= attenuation;
     diffuse  *= attenuation;

@@ -31,7 +31,7 @@ std::vector<btRigidBody*>& AABBMultipleHitBox::generateHitBoxes(Model* model)
 	{
 		hitboxModel = model;
 	}
-
+	int index = 0;
 	for (Mesh* mesh : hitboxModel->getModelData()->meshes) {
 		const std::array<glm::vec3, 2> dataSize = getMeshCenterAndSize(mesh->getVertices());
 		const glm::vec3 size = glm::vec3(dataSize[0] * glm::vec3(0.5));
@@ -50,12 +50,14 @@ std::vector<btRigidBody*>& AABBMultipleHitBox::generateHitBoxes(Model* model)
 			boxCollisionShapes.back()
 		)));
 
+		rigidBodys.back()->setUserPointer((void*)index);
 		rigidBodys.back()->setMotionState(new MyMotionState(model, transform));
 		rigidBodys.back()->setCenterOfMassTransform(transform);
 		//TODO: find best way
 		rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
+		index++;
 	}
-	std::cout << model->directory << " has: " << rigidBodys.size() << " hitboxes." << std::endl;
+
 	return rigidBodys;
 }
 

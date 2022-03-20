@@ -35,6 +35,7 @@ std::vector<btRigidBody*>& TriangleHitbox::generateHitBoxes(Model* model)
 
 	const std::vector<Mesh*> meshes = hitboxModel->getModelData()->meshes;
 	const glm::vec3 scale = model->getScale();
+	int index = 0;
 	for (Mesh* m : meshes) {
 		const std::vector<Vertex> vertices = m->vertices;
 		const std::vector<unsigned int> indices = m->indices;
@@ -62,12 +63,14 @@ std::vector<btRigidBody*>& TriangleHitbox::generateHitBoxes(Model* model)
 			btVector3(0, 0, 0)
 		);
 		rigidBodys.emplace_back(new btRigidBody(rigidBodyConstructionInfo));
+		rigidBodys.back()->setUserPointer((void*)index);
 
 		auto* physicsRigidBody = rigidBodys.back();
 		btTransform tr;
 		tr.setIdentity();
 		tr.setOrigin(btVector3(model->getPosition().x, model->getPosition().y, model->getPosition().z));
 		physicsRigidBody->setWorldTransform(tr);
+		index++;
 	}
 	return rigidBodys;
 }

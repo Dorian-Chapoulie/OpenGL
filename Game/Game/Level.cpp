@@ -31,3 +31,8 @@ std::vector<Light*>& Level::getLights()
 {
 	return lights;
 }
+
+std::vector<btRigidBody*> Level::getNavigationBodys()
+{
+	return navigation->getRigidBodys();
+}
