@@ -1,4 +1,4 @@
-# Blender 3.1.0 MTL File: 'untitled.blend'
+# Blender 3.1.0 MTL File: 'untitled_lite.blend'
 # www.blender.org
 
 newmtl !watergreen
@@ -20,7 +20,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\rusted_steel.jpg
+map_Kd  textures\rusted_steel.jpg
 
 newmtl Material.001
 Ns 250.000000
@@ -31,7 +31,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\miage_pared_reversed.png
+map_Kd  textures\miage_pared_reversed.png
 
 newmtl abyss_wall14
 Ns 250.000000
@@ -42,7 +42,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\plaster_plasterwall034a.png
+map_Kd  textures\plaster_plasterwall034a.png
 
 newmtl adams_outsidew1
 Ns 250.000000
@@ -53,7 +53,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\wood_doorframe.jpg
+map_Kd  textures\wood_doorframe.jpg
 
 newmtl alfombra_kino
 Ns 250.000000
@@ -64,7 +64,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\moquette_rouge.jpg
+map_Kd  textures\moquette_rouge.jpg
 
 newmtl amarilloviejo2
 Ns 250.000000
@@ -115,7 +115,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\miageflag.png
+map_Kd  textures\miageflag.png
 
 newmtl basetrim01
 Ns 250.000000
@@ -126,7 +126,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\de_cbble_woodceiling01.png
+map_Kd  textures\de_cbble_woodceiling01.png
 
 newmtl black
 Ns 250.000000
@@ -137,7 +137,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\rusted_steel.jpg
+map_Kd  textures\rusted_steel.jpg
 
 newmtl black_cloth1
 Ns 250.000000
@@ -148,7 +148,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\rusted_steel.jpg
+map_Kd  textures\rusted_steel.jpg
 
 newmtl black_floor4
 Ns 250.000000
@@ -159,7 +159,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_drainage_concreteceiling_01.png
+map_Kd  textures\concrete_drainage_concreteceiling_01.png
 
 newmtl caja08
 Ns 250.000000
@@ -170,7 +170,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_hr_c_hr_conc_pillar_b.png
+map_Kd  textures\concrete_hr_c_hr_conc_pillar_b.png
 
 newmtl cardbox1
 Ns 250.000000
@@ -191,7 +191,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl cardbox3
 Ns 250.000000
@@ -242,7 +242,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl column
 Ns 250.000000
@@ -253,7 +253,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\de_cbble_woodceiling01.png
+map_Kd  textures\de_cbble_woodceiling01.png
 
 newmtl contacto
 Ns 250.000000
@@ -274,7 +274,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~RmH7niAE_concrete_fence_concrete_fence_rubble.png
+map_Kd  textures\~RmH7niAE_concrete_fence_concrete_fence_rubble.png
 
 newmtl doubletap_r
 Ns 250.000000
@@ -305,7 +305,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_concretefloor013a.png
+map_Kd  textures\concrete_concretefloor013a.png
 
 newmtl fifties_dr3d
 Ns 250.000000
@@ -326,7 +326,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\cs_italy_hpe_cellar_stone_floor.png
+map_Kd  textures\cs_italy_hpe_cellar_stone_floor.png
 
 newmtl floorsub
 Ns 250.000000
@@ -347,7 +347,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\window.jpg
+map_Kd  textures\window.jpg
 
 newmtl generic121b
 Ns 250.000000
@@ -368,7 +368,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\devris.jpg
+map_Kd  textures\devris.jpg
 
 newmtl generic87c
 Ns 250.000000
@@ -389,7 +389,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\blured_glass.jpg
+map_Kd  textures\blured_glass.jpg
 
 newmtl imagen_kino_rmf
 Ns 250.000000
@@ -430,7 +430,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\ceiling_window.png
+map_Kd  textures\ceiling_window.png
 
 newmtl lab1_glu1
 Ns 250.000000
@@ -441,7 +441,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\whitebrick.jpg
+map_Kd  textures\whitebrick.jpg
 
 newmtl luzama
 Ns 250.000000
@@ -452,7 +452,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl ma2_light04
 Ns 250.000000
@@ -463,7 +463,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_wall.jpg
+map_Kd  textures\concrete_wall.jpg
 
 newmtl madera1_kino
 Ns 250.000000
@@ -474,7 +474,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\models_cs_italy_blkmetal.png
+map_Kd  textures\models_cs_italy_blkmetal.png
 
 newmtl madera2_q
 Ns 250.000000
@@ -485,7 +485,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\viewparquet.jpg
+map_Kd  textures\viewparquet.jpg
 
 newmtl madera_caja_sig
 Ns 250.000000
@@ -536,7 +536,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl mundomapper_v5
 Ns 250.000000
@@ -557,7 +557,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl out_boxa
 Ns 250.000000
@@ -568,7 +568,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl out_boxb
 Ns 250.000000
@@ -579,7 +579,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl out_boxc
 Ns 250.000000
@@ -590,7 +590,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl out_boxd
 Ns 250.000000
@@ -601,7 +601,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl out_dmp2b
 Ns 250.000000
@@ -612,7 +612,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl out_dmp3a
 Ns 250.000000
@@ -623,7 +623,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl out_dmp3c
 Ns 250.000000
@@ -634,7 +634,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl out_dmplid
 Ns 250.000000
@@ -645,7 +645,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl packapunch_cart
 Ns 250.000000
@@ -656,7 +656,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl packapunch_r
 Ns 250.000000
@@ -667,7 +667,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl pantallakino
 Ns 250.000000
@@ -678,7 +678,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\coper.jpg
+map_Kd  textures\coper.jpg
 
 newmtl para_pared
 Ns 250.000000
@@ -689,7 +689,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\miage_pared.png
+map_Kd  textures\miage_pared.png
 
 newmtl para_pared.001
 Ns 250.000000
@@ -700,7 +700,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\miage_pared.png
+map_Kd  textures\miage_pared.png
 
 newmtl para_pared2
 Ns 250.000000
@@ -711,7 +711,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\de_cbble_woodceiling01.png
+map_Kd  textures\de_cbble_woodceiling01.png
 
 newmtl pared1_q
 Ns 250.000000
@@ -722,7 +722,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\plaster_plasterwall034a.png
+map_Kd  textures\plaster_plasterwall034a.png
 
 newmtl pared3_q
 Ns 250.000000
@@ -733,7 +733,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\de_cbble_woodceiling01.png
+map_Kd  textures\de_cbble_woodceiling01.png
 
 newmtl pared4_ladrillo
 Ns 250.000000
@@ -744,7 +744,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\brick.jpg
+map_Kd  textures\brick.jpg
 
 newmtl pared4_q
 Ns 250.000000
@@ -755,7 +755,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\plaster_plasterwall034d.png
+map_Kd  textures\plaster_plasterwall034d.png
 
 newmtl pared6_q
 Ns 250.000000
@@ -766,7 +766,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\plaster_plasterwall034d.png
+map_Kd  textures\plaster_plasterwall034d.png
 
 newmtl pared_azul
 Ns 250.000000
@@ -777,7 +777,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_wall.jpg
+map_Kd  textures\concrete_wall.jpg
 
 newmtl pared_azul3
 Ns 250.000000
@@ -798,7 +798,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~RmH7niAE_concrete_fence_concrete_fence_rubble.png
+map_Kd  textures\~RmH7niAE_concrete_fence_concrete_fence_rubble.png
 
 newmtl pared_leaked2
 Ns 250.000000
@@ -809,7 +809,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\cobblestone_hr_c_inferno_cobblestone_a.png
+map_Kd  textures\cobblestone_hr_c_inferno_cobblestone_a.png
 
 newmtl pared_oscura4
 Ns 250.000000
@@ -820,7 +820,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\models_props_cs_italy_hpe_italy_pipe_wall.png
+map_Kd  textures\models_props_cs_italy_hpe_italy_pipe_wall.png
 
 newmtl pi_wood2
 Ns 250.000000
@@ -841,7 +841,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl piso2_q
 Ns 250.000000
@@ -852,7 +852,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\damier.jpg
+map_Kd  textures\damier.jpg
 
 newmtl piso3_q
 Ns 250.000000
@@ -863,7 +863,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\damier.jpg
+map_Kd  textures\damier.jpg
 
 newmtl puerta_metal
 Ns 250.000000
@@ -874,7 +874,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\metaldoor.jpg
+map_Kd  textures\metaldoor.jpg
 
 newmtl puertadoble
 Ns 250.000000
@@ -885,7 +885,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\models_props_de_mirage_broken_wall_1_broken_wall_1.png
+map_Kd  textures\models_props_de_mirage_broken_wall_1_broken_wall_1.png
 
 newmtl qe_road2
 Ns 250.000000
@@ -896,7 +896,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\road.jpg
+map_Kd  textures\road.jpg
 
 newmtl quickrevive_r
 Ns 250.000000
@@ -917,7 +917,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\wood_doorframe.jpg
+map_Kd  textures\wood_doorframe.jpg
 
 newmtl roundedfloor2
 Ns 250.000000
@@ -928,7 +928,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_concretefloor013a.png
+map_Kd  textures\concrete_concretefloor013a.png
 
 newmtl schrank2_a
 Ns 250.000000
@@ -949,7 +949,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\models_props_cs_office_shelves_metal.png
+map_Kd  textures\models_props_cs_office_shelves_metal.png
 
 newmtl silo2_wet4d
 Ns 250.000000
@@ -960,7 +960,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl sky
 Ns 250.000000
@@ -1001,7 +1001,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_wall.jpg
+map_Kd  textures\concrete_wall.jpg
 
 newmtl tejas3
 Ns 250.000000
@@ -1012,7 +1012,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_wall.jpg
+map_Kd  textures\concrete_wall.jpg
 
 newmtl tnnl_flr4
 Ns 250.000000
@@ -1023,7 +1023,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\concrete_concrete_floor_02b.png
+map_Kd  textures\concrete_concrete_floor_02b.png
 
 newmtl ventana1
 Ns 250.000000
@@ -1054,7 +1054,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl wall_red05
 Ns 250.000000
@@ -1065,7 +1065,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl walll1
 Ns 250.000000
@@ -1076,7 +1076,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~RmH7niAE_concrete_fence_concrete_fence_rubble.png
+map_Kd  textures\~RmH7niAE_concrete_fence_concrete_fence_rubble.png
 
 newmtl white
 Ns 250.000000
@@ -1097,7 +1097,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\de_cbble_woodceiling01.png
+map_Kd  textures\de_cbble_woodceiling01.png
 
 newmtl xcrate10a
 Ns 250.000000
@@ -1128,7 +1128,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\models_props_cs_office_crate_office_indoor_64.png
+map_Kd  textures\models_props_cs_office_crate_office_indoor_64.png
 
 newmtl xcrate10d
 Ns 250.000000
@@ -1179,7 +1179,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\wood_doorframe.jpg
+map_Kd  textures\wood_doorframe.jpg
 
 newmtl xcrate9b
 Ns 250.000000
@@ -1190,7 +1190,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\wood_doorframe.jpg
+map_Kd  textures\wood_doorframe.jpg
 
 newmtl xcrate9c
 Ns 250.000000
@@ -1201,7 +1201,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\wood_doorframe.jpg
+map_Kd  textures\wood_doorframe.jpg
 
 newmtl xcrate9d
 Ns 250.000000
@@ -1212,7 +1212,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\models_props_cs_militia_boxes1.png
+map_Kd  textures\models_props_cs_militia_boxes1.png
 
 newmtl yellow
 Ns 250.000000
@@ -1233,7 +1233,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl {bars
 Ns 250.000000
@@ -1244,7 +1244,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
+map_Kd  textures\~ZxZaEyyy_de_mirage_broken_wall_1_broken_wall_1_normal.png
 
 newmtl {cortinas
 Ns 250.000000
@@ -1275,7 +1275,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\broken_window.jpg
+map_Kd  textures\broken_window.jpg
 
 newmtl {grate4a
 Ns 250.000000
@@ -1306,7 +1306,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\velour.jpg
+map_Kd  textures\velour.jpg
 
 newmtl {ladder2
 Ns 250.000000
@@ -1327,7 +1327,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd  .\textures\wood_wall.jpg
+map_Kd  textures\wood_wall.jpg
 
 newmtl {razor1
 Ns 250.000000

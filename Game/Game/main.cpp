@@ -404,29 +404,29 @@ float get3DDistance(btVector3 a, btVector3 b)
 
 void performAstar(std::vector<btRigidBody*>& path, btVector3 start, btVector3 end, std::vector<btRigidBody*> beacons, btDiscreteDynamicsWorld* dynamicsWorld)
 {
-	constexpr int NODES_AROUND = 10;
-	//Récupérer node de fin
+	int NODES_AROUND = 10;
+	//RÃ©cupÃ©rer node de fin
 	btRigidBody* endNode = *std::min_element(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b) {
 		return get3DDistance(a->getWorldTransform().getOrigin(), end) < get3DDistance(b->getWorldTransform().getOrigin(), end);
-	});
+		});
 
-	//Récupérer node de début
+	//RÃ©cupÃ©rer node de dÃ©but
 	btRigidBody* startNode = *std::min_element(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b) {
 		return get3DDistance(a->getWorldTransform().getOrigin(), start) < get3DDistance(b->getWorldTransform().getOrigin(), start);
-	});
+		});
 
-	//Pour tout les nodes autour u noeud de debut
-	std::sort(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b) {
-		const btVector3 startNodeVector = startNode->getWorldTransform().getOrigin();
-		return get3DDistance(a->getWorldTransform().getOrigin(), startNodeVector) < get3DDistance(b->getWorldTransform().getOrigin(), startNodeVector);
-	});
+	std::vector<std::vector<btRigidBody*>> results;
+
+	std::sort(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b)
+		{
+			return get3DDistance(a->getWorldTransform().getOrigin(), startNode->getWorldTransform().getOrigin()) < get3DDistance(b->getWorldTransform().getOrigin(), startNode->getWorldTransform().getOrigin());
+		});
 
 	std::vector<btRigidBody*> beaconsCopy = beacons;
-	std::vector<std::vector<btRigidBody*>> results;
 	for (int i = 0; i < NODES_AROUND; i++) {
 		results.emplace_back(std::vector<btRigidBody*>());
 
-		//Récupérer node de début
+		//RÃ©cupÃ©rer node de dÃ©but
 		btRigidBody* startNodeTmp = beaconsCopy[i];
 		results[i].emplace_back(startNodeTmp);
 		beaconsCopy.erase(std::remove_if(beaconsCopy.begin(),
@@ -447,13 +447,18 @@ void performAstar(std::vector<btRigidBody*>& path, btVector3 start, btVector3 en
 			std::sort(tmp.begin(), tmp.end(), [&](btRigidBody* a, btRigidBody* b) {
 				const btVector3 endNodeVector = endNode->getWorldTransform().getOrigin();
 				return get3DDistance(a->getWorldTransform().getOrigin(), endNodeVector) < get3DDistance(b->getWorldTransform().getOrigin(), endNodeVector);
-			});
+				});
 			if (tmp.size() <= 0) break;
 
 			//Ajouter le noeud le plus proche de end parmis mes voisins
 			bool shouldBreak = true;
 			for (int j = 0; j < tmp.size(); j++) {
-				if ((int)tmp[j]->getUserPointer() != (int)startNodeTmp->getUserPointer() && abs(endNode->getWorldTransform().getOrigin().getY() - tmp[j]->getWorldTransform().getOrigin().getY()) <= 5.0) {
+				float offsetY = abs(results[i].back()->getWorldTransform().getOrigin().getY() - tmp[j]->getWorldTransform().getOrigin().getY());
+				btVector3 n;
+				bool isValid = !RaycastWorld(dynamicsWorld, tmp[j]->getWorldTransform().getOrigin(), results[i].back()->getWorldTransform().getOrigin(), n);
+
+				if ((int)tmp[j]->getUserPointer() != (int)startNodeTmp->getUserPointer()
+					&& offsetY <= 5.0 && isValid) {
 					results[i].emplace_back(tmp[j]);
 
 					beaconsCopy.erase(std::remove_if(beaconsCopy.begin(),
@@ -472,33 +477,71 @@ void performAstar(std::vector<btRigidBody*>& path, btVector3 start, btVector3 en
 
 	std::vector<btRigidBody*> res = *std::min_element(results.begin(), results.end(), [](std::vector<btRigidBody*> a, std::vector<btRigidBody*> b) {
 		return a.size() < b.size();
-	});
+		});
 
-	for (int i = 0; i < results.size(); i++) {
-		//std::cout << i << ": " << results[i].size() << std::endl;
+	bool noPathFound = true;
+	path.clear();
+	for (std::vector<btRigidBody*> p : results)
+	{
+		float offsetY = abs(p.back()->getWorldTransform().getOrigin().getY() - endNode->getWorldTransform().getOrigin().getY());
+		if ((int)p.back()->getUserPointer() == (int)endNode->getUserPointer() && p.size() != 1 && offsetY <= 5.0)
+		{
+			path.emplace_back(startNode);
+			for (btRigidBody* r : p) path.emplace_back(r);
+			noPathFound = false;
+			break;
+		}
 	}
 
-	path.emplace_back(startNode);
-	for (btRigidBody* r : res) path.emplace_back(r);
+	if (noPathFound)
+	{
+		std::sort(results.begin(), results.end(), [&](std::vector<btRigidBody*> a, std::vector<btRigidBody*> b)
+			{
+				return get3DDistance(a.back()->getWorldTransform().getOrigin(), endNode->getWorldTransform().getOrigin()) < get3DDistance(b.back()->getWorldTransform().getOrigin(), endNode->getWorldTransform().getOrigin());
+			});
+		std::vector<btRigidBody*> randomRes = results[0/*rand() % results.size()*/];
+		path.emplace_back(startNode);
+		for (btRigidBody* r : randomRes) path.emplace_back(r);
+	}
+
 }
 
-void moveEnemy(std::vector<btRigidBody*> p, btVector3 enemyPosbt, DynamicModel& enemy)
+std::vector<int> doneNodes;
+void moveEnemy(std::vector<btRigidBody*> path, DynamicModel& enemy, btVector3 end)
 {
-	if (p.size() <= 0) return;
-	std::vector<btRigidBody*> path = { p.begin(), p.end() };
+	const btVector3 enemyPosbt = enemy.getRigidBodys()[0]->getWorldTransform().getOrigin();
 
-	btVector3 diff = { 0.0f, 0.0f, 0.0f };
+	for (btRigidBody* r : path)
+	{
+		const float dist = get3DDistance(r->getWorldTransform().getOrigin(), enemyPosbt);
+		if (dist <= 3)
+		{
+			doneNodes.emplace_back((int)r->getUserPointer());
+		}
+	}
 
-	path.erase(std::remove_if(path.begin(),
-		path.end(),
-		[&](btRigidBody* a) { return get3DDistance(enemyPosbt, a->getWorldTransform().getOrigin()) <= 3; }),
+	path.erase(
+		std::remove_if(path.begin(),
+			path.end(),
+			[&](btRigidBody* a)
+			{
+				return get3DDistance(enemyPosbt, a->getWorldTransform().getOrigin()) <= 5.123f || std::find(doneNodes.begin(), doneNodes.end(), (int)a->getUserPointer()) != doneNodes.end();
+			}
+		),
 		path.end());
-	if (path.size() <= 0) return;
 
-	diff = (path[0]->getWorldTransform().getOrigin() - enemyPosbt);
-	diff *= 0.2f;
+	if (path.size() <= 0) {
+		doneNodes.clear();
+		return;
+	}
+	btVector3 diff;
+	for (btRigidBody* r : path)
+	{
 
-
+		diff = (r->getWorldTransform().getOrigin() - enemyPosbt);
+		diff *= 0.8f;
+		break;
+	}
 	for (auto* rigidBody : enemy.getRigidBodys()) {
 		rigidBody->activate();
 		rigidBody->setLinearVelocity(btVector3(
@@ -579,7 +622,7 @@ int main() {
 	InstancedModel modelInstanced("../../models/cube/cube.obj", 100);
 	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(-20.4472f, -5.9984f, 80.152f));
 
-	DynamicModel enemy("../../models/cube/cube.obj", glm::vec3(-20.4472f, -5.9984f, 80.152f), 1.0f, HitBoxFactory::AABB);
+	DynamicModel enemy("../../models/cube/cube.obj", glm::vec3(18.0f, 5.0f, 43.0f), 1.0f, HitBoxFactory::AABB);
 
 	std::vector<Model*> dynamicModels;
 
@@ -638,6 +681,7 @@ int main() {
 			float i = 0;
 			std::vector<btRigidBody*> path;
 			std::vector<btRigidBody*> beacons = map.getNavigationBodys();
+
 			while (!jump) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			}
@@ -661,9 +705,8 @@ int main() {
 					path[i]->getWorldTransform().getOrigin().getZ() };
 					dynamicModels[i]->setPosition(pos);
 				}
-				moveEnemy(path, enemyPosition, enemy);
+				moveEnemy(path, enemy, playerPosition);
 				path.clear();
-
 				//model3.setPosition(glm::vec3(0, 3, -5 + i));
 				//model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
 				//animator.UpdateAnimation(deltaTime);
@@ -694,7 +737,7 @@ int main() {
 		btVector3 playerPos2 = btVector3(pp.x, pp.y - 2.0f, pp.z);
 		btVector3 normal;
 
-		/*if (!RaycastWorld(dynamicsWorld, playerPos, playerPos2, normal)) //rien en dessous des pieds
+		if (!RaycastWorld(dynamicsWorld, playerPos, playerPos2, normal)) //rien en dessous des pieds
 		{
 			g = btVector3(0, -5, 0);
 			for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
@@ -711,7 +754,7 @@ int main() {
 					rigidBody->setGravity(g);
 				}
 			}
-		}*/
+		}
 
 
 		dynamicsWorld->stepSimulation(timeStep, 10);
@@ -741,7 +784,7 @@ int main() {
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
 		localPlayer->draw(shader);
-		map.draw();
+		if (!jump) map.draw();
 		enemy.draw(shader);
 		//model3.draw(shader);
 
