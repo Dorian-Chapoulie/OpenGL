@@ -395,140 +395,109 @@ void imGuiLights(Shader& shader, std::vector<Light*>& lights)
 
 float get3DDistance(btVector3 a, btVector3 b)
 {
-	return sqrt(
+	return abs(sqrt(
 		pow(abs(a.getX() - b.getX()), 2) +
 		pow(abs(a.getY() - b.getY()), 2) +
 		pow(abs(a.getZ() - b.getZ()), 2)
-	);
+	));
 }
-/*std::sort(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b)
-		{
-			return get3DDistance(a->getWorldTransform().getOrigin(), start) < get3DDistance(b->getWorldTransform().getOrigin(), start);
-		});*/
-struct Node
-{
-	btRigidBody* body;
-	float g = 0.0f;
-	float h = 0.0f;
-	float f = 9999.0f;
-	int id = -1;
-	Node* parent = nullptr;
-public:
-	Node(btRigidBody* body, float g, float h, int id)
-	{
-		this->body = body;
-		this->g = g;
-		this->h = h;
-		this->id = id;
-	}
-};
+
 void performAstar(std::vector<btRigidBody*>& path, btVector3 start, btVector3 end, std::vector<btRigidBody*> beacons, btDiscreteDynamicsWorld* dynamicsWorld)
 {
-	std::vector<Node> nodes, open, closed;
-	std::sort(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b)
-		{
-			return get3DDistance(a->getWorldTransform().getOrigin(), start) < get3DDistance(b->getWorldTransform().getOrigin(), start);
-		});
-	for (int i = 0; i < beacons.size(); i++)
-	{
-		nodes.emplace_back(Node(
-			beacons[i],
-			get3DDistance(beacons[i]->getWorldTransform().getOrigin(), start),
-			get3DDistance(beacons[i]->getWorldTransform().getOrigin(), end),
-			i
-		));
-	}
+	constexpr int NODES_AROUND = 10;
+	//Récupérer node de fin
+	btRigidBody* endNode = *std::min_element(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b) {
+		return get3DDistance(a->getWorldTransform().getOrigin(), end) < get3DDistance(b->getWorldTransform().getOrigin(), end);
+	});
 
-	open.emplace_back(nodes[0]);
+	//Récupérer node de début
+	btRigidBody* startNode = *std::min_element(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b) {
+		return get3DDistance(a->getWorldTransform().getOrigin(), start) < get3DDistance(b->getWorldTransform().getOrigin(), start);
+	});
 
-	while (open.size() > 0)
-	{
-		Node current = *std::min_element(nodes.begin(), nodes.end(), [](Node& a, Node& b)
-			{
-				return a.f < b.f;
-			});
-		std::remove_if(open.begin(), open.end(), [&](Node& n)
-			{
-				return n.id == current.id;
-			});
-		closed.emplace_back(current);
+	//Pour tout les nodes autour u noeud de debut
+	std::sort(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b) {
+		const btVector3 startNodeVector = startNode->getWorldTransform().getOrigin();
+		return get3DDistance(a->getWorldTransform().getOrigin(), startNodeVector) < get3DDistance(b->getWorldTransform().getOrigin(), startNodeVector);
+	});
 
-		Node closest = *std::min_element(nodes.begin(), nodes.end(), [&](Node& a, Node& b)
-			{
-				return get3DDistance(a.body->getWorldTransform().getOrigin(), end) < get3DDistance(b.body->getWorldTransform().getOrigin(), end);
-			});
+	std::vector<btRigidBody*> beaconsCopy = beacons;
+	std::vector<std::vector<btRigidBody*>> results;
+	for (int i = 0; i < NODES_AROUND; i++) {
+		results.emplace_back(std::vector<btRigidBody*>());
 
-		if (current.id == closest.id)
-		{
-			path.emplace_back(current.body);
-			Node* tmp = current.parent;
-			while (tmp != nullptr)
-			{
-				path.emplace_back(tmp->body);
-				tmp = tmp->parent;
-			}
-			break;
-		}
+		//Récupérer node de début
+		btRigidBody* startNodeTmp = beaconsCopy[i];
+		results[i].emplace_back(startNodeTmp);
+		beaconsCopy.erase(std::remove_if(beaconsCopy.begin(),
+			beaconsCopy.end(),
+			[&](btRigidBody* a) {return (int)beaconsCopy[i]->getUserPointer() == (int)a->getUserPointer(); }),
+			beaconsCopy.end()
+		);
 
-		std::sort(nodes.begin(), nodes.end(), [&](Node& a, Node& b)
-			{
-				return get3DDistance(a.body->getWorldTransform().getOrigin(), current.body->getWorldTransform().getOrigin()) < get3DDistance(b.body->getWorldTransform().getOrigin(), current.body->getWorldTransform().getOrigin());
-			});
-		std::vector<Node> children;
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			if (nodes[i].id != current.id)
-			{
-				children.emplace_back(nodes[i]);
-			}
-		}
+		while ((int)results[i].back()->getUserPointer() != (int)endNode->getUserPointer()) {
 
-		for (Node child : children)
-		{
-			if (std::find_if(closed.begin(), closed.end(), [&](Node& c) {return child.id == c.id; }) != closed.end()) {
-				continue;
+			std::vector<btRigidBody*> tmp;
+			for (int j = 0; j < beaconsCopy.size(); j++) {
+				if (j >= NODES_AROUND) break;
+				tmp.emplace_back(beaconsCopy[j]);
 			}
 
-			child.parent = &current;
-			child.g = current.g + get3DDistance(child.body->getWorldTransform().getOrigin(), current.body->getWorldTransform().getOrigin());
-			child.h = get3DDistance(child.body->getWorldTransform().getOrigin(), end);
-			child.f = child.g + child.h;
+			//Trie les noeuds proche de moi en fonction de leurs distance eu noeud de fin
+			std::sort(tmp.begin(), tmp.end(), [&](btRigidBody* a, btRigidBody* b) {
+				const btVector3 endNodeVector = endNode->getWorldTransform().getOrigin();
+				return get3DDistance(a->getWorldTransform().getOrigin(), endNodeVector) < get3DDistance(b->getWorldTransform().getOrigin(), endNodeVector);
+			});
+			if (tmp.size() <= 0) break;
 
-			auto it = std::find_if(open.begin(), open.end(), [&](Node& c) {return child.id == c.id; });
-			if (it != open.end()) {
-				if (child.g > (*it).g)
-				{
-					continue;
+			//Ajouter le noeud le plus proche de end parmis mes voisins
+			bool shouldBreak = true;
+			for (int j = 0; j < tmp.size(); j++) {
+				if ((int)tmp[j]->getUserPointer() != (int)startNodeTmp->getUserPointer() && abs(endNode->getWorldTransform().getOrigin().getY() - tmp[j]->getWorldTransform().getOrigin().getY()) <= 5.0) {
+					results[i].emplace_back(tmp[j]);
+
+					beaconsCopy.erase(std::remove_if(beaconsCopy.begin(),
+						beaconsCopy.end(),
+						[&](btRigidBody* a) {return  (int)tmp[j]->getUserPointer() == (int)a->getUserPointer(); }),
+						beaconsCopy.end()
+					);
+					shouldBreak = false;
+					break;
 				}
 			}
-			open.emplace_back(child);
+			if (shouldBreak) break;
 		}
+		beaconsCopy = beacons;
 	}
+
+	std::vector<btRigidBody*> res = *std::min_element(results.begin(), results.end(), [](std::vector<btRigidBody*> a, std::vector<btRigidBody*> b) {
+		return a.size() < b.size();
+	});
+
+	for (int i = 0; i < results.size(); i++) {
+		//std::cout << i << ": " << results[i].size() << std::endl;
+	}
+
+	path.emplace_back(startNode);
+	for (btRigidBody* r : res) path.emplace_back(r);
 }
 
-void moveEnemy(std::vector<btRigidBody*> p, DynamicModel& enemy)
+void moveEnemy(std::vector<btRigidBody*> p, btVector3 enemyPosbt, DynamicModel& enemy)
 {
 	if (p.size() <= 0) return;
 	std::vector<btRigidBody*> path = { p.begin(), p.end() };
 
-
-	glm::vec3 enemyPos = enemy.getPosition();
-	btVector3 enemyPosbt = { enemyPos.x, enemyPos.y, enemyPos.z };
 	btVector3 diff = { 0.0f, 0.0f, 0.0f };
+
+	path.erase(std::remove_if(path.begin(),
+		path.end(),
+		[&](btRigidBody* a) { return get3DDistance(enemyPosbt, a->getWorldTransform().getOrigin()) <= 3; }),
+		path.end());
 	if (path.size() <= 0) return;
-	for (btRigidBody* r : path)
-	{
-		path.erase(
-			std::remove_if(path.begin(),
-				path.end(),
-				[&](btRigidBody* r) {return get3DDistance(enemyPosbt, r->getWorldTransform().getOrigin()) <= 2.0; }
-			),
-			path.end()
-		);
-		diff = (r->getWorldTransform().getOrigin() - enemyPosbt);
-		diff *= 0.8f;
-		break;
-	}
+
+	diff = (path[0]->getWorldTransform().getOrigin() - enemyPosbt);
+	diff *= 0.2f;
+
 
 	for (auto* rigidBody : enemy.getRigidBodys()) {
 		rigidBody->activate();
@@ -673,37 +642,28 @@ int main() {
 				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			}
 
-			std::thread m([&]()
-				{
-					while (true) {
-						std::this_thread::sleep_for(std::chrono::milliseconds(100));
-						for (int i = 0; i < 100; i++)
-						{
-							glm::vec3 pos = { 0,-100,0 };
-							dynamicModels[i]->setPosition(pos);
-						}
-						for (const auto* r : path)
-						{
-							//std::cout << (int)r->getUserPointer() << std::endl;
-						}
-						//std::cout << "--------" << std::endl << std::endl;
-						for (int i = 0; i < dynamicModels.size(); i++)
-						{
-							if (i >= path.size()) break;
-							glm::vec3 pos = { path[i]->getWorldTransform().getOrigin().getX(),
-							path[i]->getWorldTransform().getOrigin().getY(),
-							path[i]->getWorldTransform().getOrigin().getZ() };
-							dynamicModels[i]->setPosition(pos);
-						}
-						moveEnemy(path, enemy);
-					}
-				});
-
 			while (true) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				btVector3 playerPosition = { localPlayer->getPosition().x, localPlayer->getPosition().y, localPlayer->getPosition().z };
 				btVector3 enemyPosition = enemy.getRigidBodys()[0]->getWorldTransform().getOrigin();
 				performAstar(path, enemyPosition, playerPosition, beacons, dynamicsWorld);
+
+				for (int i = 0; i < 100; i++)
+				{
+					glm::vec3 pos = { 0,-100,0 };
+					dynamicModels[i]->setPosition(pos);
+				}
+				for (int i = 0; i < dynamicModels.size(); i++)
+				{
+					if (i >= path.size()) break;
+					glm::vec3 pos = { path[i]->getWorldTransform().getOrigin().getX(),
+					path[i]->getWorldTransform().getOrigin().getY(),
+					path[i]->getWorldTransform().getOrigin().getZ() };
+					dynamicModels[i]->setPosition(pos);
+				}
+				moveEnemy(path, enemyPosition, enemy);
+				path.clear();
+
 				//model3.setPosition(glm::vec3(0, 3, -5 + i));
 				//model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
 				//animator.UpdateAnimation(deltaTime);
