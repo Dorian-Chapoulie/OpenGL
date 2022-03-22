@@ -6,7 +6,7 @@
 SkyBox::SkyBox(const std::string& path)
 {
 	cubemapTexture = loadCubemap(faces, path);
-	
+
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glBindVertexArray(VAO);
@@ -14,6 +14,10 @@ SkyBox::SkyBox(const std::string& path)
 	glBufferData(GL_ARRAY_BUFFER, 108 * sizeof(float), &skyboxVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+}
+
+SkyBox::SkyBox()
+{
 }
 
 void SkyBox::draw() const

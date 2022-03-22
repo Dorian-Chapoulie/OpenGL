@@ -192,6 +192,12 @@
     <ClCompile Include="LevelKinoDerToten.cpp">
       <Filter>level</Filter>
     </ClCompile>
+    <ClCompile Include="EZNgine.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseApplication.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -328,6 +334,12 @@
     </ClInclude>
     <ClInclude Include="LevelKinoDerToten.h">
       <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="EZNgine.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseApplication.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

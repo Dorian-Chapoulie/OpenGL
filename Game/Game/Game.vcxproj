@@ -41,7 +41,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -151,10 +151,12 @@
     <ClCompile Include="AABBMultipleHitBox.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Animator.cpp" />
+    <ClCompile Include="BaseApplication.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DefaultLoader.cpp" />
     <ClCompile Include="DynamicModel.cpp" />
+    <ClCompile Include="EZNgine.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLDebugDrawer.cpp" />
     <ClCompile Include="IHitBox.cpp" />
@@ -195,11 +197,13 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Animator.h" />
     <ClInclude Include="AssimpHelper.hpp" />
+    <ClInclude Include="BaseApplication.h" />
     <ClInclude Include="Bone.h" />
     <ClInclude Include="BoneInfo.hpp" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DefaultLoader.h" />
     <ClInclude Include="DynamicModel.h" />
+    <ClInclude Include="EZNgine.h" />
     <ClInclude Include="GLDebugDrawer.h" />
     <ClInclude Include="IHitBox.h" />
     <ClInclude Include="HitBoxFactory.h" />

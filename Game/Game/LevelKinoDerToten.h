@@ -11,6 +11,6 @@ public:
 private:
 	const glm::vec3 position = { 0.0f, 0.0f, 0.0f };
 	const HitBoxFactory::TYPE hitboxType = HitBoxFactory::TRIANGLE;
-	const std::string lightFilename = "lights.json";
+	const std::string lightFilename = "../../maps/lights.json";
 };
 

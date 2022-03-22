@@ -31,6 +31,8 @@
 #include "SkeletalLoader.h"
 #include "StaticModel.h"
 
+#ifdef sandbox
+
 #define WIDTH 800
 #define HEIGHT 600
 #define FULLSCREEN false
@@ -223,25 +225,6 @@ void promptFps(int& nbFrames, double& lastTime)
 	}
 }
 
-void drawInstancing(Shader& shader, Model* rock, int amount, glm::mat4 projection)
-{
-	// draw meteorites
-	shader.use();
-	shader.setMatrix("projection", projection);
-	shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
-	for (unsigned int i = 0; i < rock->getModelData()->meshes.size(); i++)
-	{
-		glBindVertexArray(rock->getModelData()->meshes[i]->VAO);
-		glDrawElementsInstanced(
-			GL_TRIANGLES,
-			rock->getModelData()->meshes[i]->indices.size(),
-			GL_UNSIGNED_INT,
-			0,
-			amount
-		);
-	}
-}
-
 bool RaycastWorld(btDiscreteDynamicsWorld* dynamicsWorld, btVector3 Start, btVector3 End, btVector3& Normal) {
 
 
@@ -393,166 +376,6 @@ void imGuiLights(Shader& shader, std::vector<Light*>& lights)
 	ImGui::End();
 }
 
-float get3DDistance(btVector3 a, btVector3 b)
-{
-	return abs(sqrt(
-		pow(abs(a.getX() - b.getX()), 2) +
-		pow(abs(a.getY() - b.getY()), 2) +
-		pow(abs(a.getZ() - b.getZ()), 2)
-	));
-}
-
-void performAstar(std::vector<btRigidBody*>& path, btVector3 start, btVector3 end, std::vector<btRigidBody*> beacons, btDiscreteDynamicsWorld* dynamicsWorld)
-{
-	int NODES_AROUND = 10;
-	//Récupérer node de fin
-	btRigidBody* endNode = *std::min_element(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b) {
-		return get3DDistance(a->getWorldTransform().getOrigin(), end) < get3DDistance(b->getWorldTransform().getOrigin(), end);
-		});
-
-	//Récupérer node de début
-	btRigidBody* startNode = *std::min_element(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b) {
-		return get3DDistance(a->getWorldTransform().getOrigin(), start) < get3DDistance(b->getWorldTransform().getOrigin(), start);
-		});
-
-	std::vector<std::vector<btRigidBody*>> results;
-
-	std::sort(beacons.begin(), beacons.end(), [&](btRigidBody* a, btRigidBody* b)
-		{
-			return get3DDistance(a->getWorldTransform().getOrigin(), startNode->getWorldTransform().getOrigin()) < get3DDistance(b->getWorldTransform().getOrigin(), startNode->getWorldTransform().getOrigin());
-		});
-
-	std::vector<btRigidBody*> beaconsCopy = beacons;
-	for (int i = 0; i < NODES_AROUND; i++) {
-		results.emplace_back(std::vector<btRigidBody*>());
-
-		//Récupérer node de début
-		btRigidBody* startNodeTmp = beaconsCopy[i];
-		results[i].emplace_back(startNodeTmp);
-		beaconsCopy.erase(std::remove_if(beaconsCopy.begin(),
-			beaconsCopy.end(),
-			[&](btRigidBody* a) {return (int)beaconsCopy[i]->getUserPointer() == (int)a->getUserPointer(); }),
-			beaconsCopy.end()
-		);
-
-		while ((int)results[i].back()->getUserPointer() != (int)endNode->getUserPointer()) {
-
-			std::vector<btRigidBody*> tmp;
-			for (int j = 0; j < beaconsCopy.size(); j++) {
-				if (j >= NODES_AROUND) break;
-				tmp.emplace_back(beaconsCopy[j]);
-			}
-
-			//Trie les noeuds proche de moi en fonction de leurs distance eu noeud de fin
-			std::sort(tmp.begin(), tmp.end(), [&](btRigidBody* a, btRigidBody* b) {
-				const btVector3 endNodeVector = endNode->getWorldTransform().getOrigin();
-				return get3DDistance(a->getWorldTransform().getOrigin(), endNodeVector) < get3DDistance(b->getWorldTransform().getOrigin(), endNodeVector);
-				});
-			if (tmp.size() <= 0) break;
-
-			//Ajouter le noeud le plus proche de end parmis mes voisins
-			bool shouldBreak = true;
-			for (int j = 0; j < tmp.size(); j++) {
-				float offsetY = abs(results[i].back()->getWorldTransform().getOrigin().getY() - tmp[j]->getWorldTransform().getOrigin().getY());
-				btVector3 n;
-				bool isValid = !RaycastWorld(dynamicsWorld, tmp[j]->getWorldTransform().getOrigin(), results[i].back()->getWorldTransform().getOrigin(), n);
-
-				if ((int)tmp[j]->getUserPointer() != (int)startNodeTmp->getUserPointer()
-					&& offsetY <= 5.0 && isValid) {
-					results[i].emplace_back(tmp[j]);
-
-					beaconsCopy.erase(std::remove_if(beaconsCopy.begin(),
-						beaconsCopy.end(),
-						[&](btRigidBody* a) {return  (int)tmp[j]->getUserPointer() == (int)a->getUserPointer(); }),
-						beaconsCopy.end()
-					);
-					shouldBreak = false;
-					break;
-				}
-			}
-			if (shouldBreak) break;
-		}
-		beaconsCopy = beacons;
-	}
-
-	std::vector<btRigidBody*> res = *std::min_element(results.begin(), results.end(), [](std::vector<btRigidBody*> a, std::vector<btRigidBody*> b) {
-		return a.size() < b.size();
-		});
-
-	bool noPathFound = true;
-	path.clear();
-	for (std::vector<btRigidBody*> p : results)
-	{
-		float offsetY = abs(p.back()->getWorldTransform().getOrigin().getY() - endNode->getWorldTransform().getOrigin().getY());
-		if ((int)p.back()->getUserPointer() == (int)endNode->getUserPointer() && p.size() != 1 && offsetY <= 5.0)
-		{
-			path.emplace_back(startNode);
-			for (btRigidBody* r : p) path.emplace_back(r);
-			noPathFound = false;
-			break;
-		}
-	}
-
-	if (noPathFound)
-	{
-		std::sort(results.begin(), results.end(), [&](std::vector<btRigidBody*> a, std::vector<btRigidBody*> b)
-			{
-				return get3DDistance(a.back()->getWorldTransform().getOrigin(), endNode->getWorldTransform().getOrigin()) < get3DDistance(b.back()->getWorldTransform().getOrigin(), endNode->getWorldTransform().getOrigin());
-			});
-		std::vector<btRigidBody*> randomRes = results[0/*rand() % results.size()*/];
-		path.emplace_back(startNode);
-		for (btRigidBody* r : randomRes) path.emplace_back(r);
-	}
-
-}
-
-std::vector<int> doneNodes;
-void moveEnemy(std::vector<btRigidBody*> path, DynamicModel& enemy, btVector3 end)
-{
-	const btVector3 enemyPosbt = enemy.getRigidBodys()[0]->getWorldTransform().getOrigin();
-
-	for (btRigidBody* r : path)
-	{
-		const float dist = get3DDistance(r->getWorldTransform().getOrigin(), enemyPosbt);
-		if (dist <= 3)
-		{
-			doneNodes.emplace_back((int)r->getUserPointer());
-		}
-	}
-
-	path.erase(
-		std::remove_if(path.begin(),
-			path.end(),
-			[&](btRigidBody* a)
-			{
-				return get3DDistance(enemyPosbt, a->getWorldTransform().getOrigin()) <= 5.123f || std::find(doneNodes.begin(), doneNodes.end(), (int)a->getUserPointer()) != doneNodes.end();
-			}
-		),
-		path.end());
-
-	if (path.size() <= 0) {
-		doneNodes.clear();
-		return;
-	}
-	btVector3 diff;
-	for (btRigidBody* r : path)
-	{
-
-		diff = (r->getWorldTransform().getOrigin() - enemyPosbt);
-		diff *= 0.8f;
-		break;
-	}
-	for (auto* rigidBody : enemy.getRigidBodys()) {
-		rigidBody->activate();
-		rigidBody->setLinearVelocity(btVector3(
-			diff.getX(),
-			0,
-			diff.getZ()
-		));
-	}
-
-}
-
 int main() {
 #pragma region setup
 	glfwInit();
@@ -602,7 +425,7 @@ int main() {
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(debugDraw);
+	dynamicsWorld->setDebugDrawer(debugDraw);
 #pragma endregion physics
 
 #pragma region imgui
@@ -613,19 +436,13 @@ int main() {
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 #pragma endregion imgui
 
-	//std::vector<Light*> lights;
-	//../../models/floor_2/floor.obj
-	//StaticModel model("../../models/css/css.dae", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB_MULTIPLE, glm::vec3(5.0f));
-	//StaticModel model("../../models/kino/kino.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::TRIANGLE, glm::vec3(2.0f));
-	//DynamicModel model3("../../models/crate/Wooden Crate.obj", glm::vec3(-4.0f, -5.0f, 40.4f), 1.0f, HitBoxFactory::AABB);
-	//../../models/manequin/manequin_3.fbx
-	InstancedModel modelInstanced("../../models/cube/cube.obj", 100);
-	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(-20.4472f, -5.9984f, 80.152f));
+	InstancedModel modelInstanced("../../models/shooter_bullet/bullet.fbx", 100);
+	localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(0.0f, 6.0f, 0.0f));
 
-	DynamicModel enemy("../../models/cube/cube.obj", glm::vec3(18.0f, 5.0f, 43.0f), 1.0f, HitBoxFactory::AABB);
 
-	std::vector<Model*> dynamicModels;
+	StaticModel enemy("../../models/shooter/shooter.fbx", glm::vec3(0.0f, 6.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(0.01f));
 
+	modelInstanced.setPosition(0, { 0, 8, 0 });
 
 	Shader shader("./vertex.vert", "./fragment.frag");
 	Shader instancedShader("./instancedVert.vert", "./instancedFrag.frag");
@@ -643,13 +460,9 @@ int main() {
 
 	LevelKinoDerToten map(shader);
 
-
-	void initParticles();
-
-	btVector3 g = btVector3(0, -5, 0);
+	btVector3 g = btVector3(0, -9, 0);
 	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
-		rigidBody->setGravity(g);
 	}
 	for (auto* rigidBody : map.getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
@@ -667,17 +480,10 @@ int main() {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}*/
 
-	//Animator animator(model3.getAnimation(), &model3);
-	for (int i = 0; i < 100; i++)
-	{
-		glm::vec3 pos = { i, 0, 0 };
-		dynamicModels.emplace_back(
-			new Model("../../models/cube/cube.obj", pos)
-		);
-	}
+	//Animator animator(enemy.getAnimation(), &enemy);
 	std::thread t([&]()
 		{
-			int dx = 1;
+			/*int dx = 1;
 			float i = 0;
 			std::vector<btRigidBody*> path;
 			std::vector<btRigidBody*> beacons = map.getNavigationBodys();
@@ -690,7 +496,7 @@ int main() {
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				btVector3 playerPosition = { localPlayer->getPosition().x, localPlayer->getPosition().y, localPlayer->getPosition().z };
 				btVector3 enemyPosition = enemy.getRigidBodys()[0]->getWorldTransform().getOrigin();
-				performAstar(path, enemyPosition, playerPosition, beacons, dynamicsWorld);
+				//performAstar(path, enemyPosition, playerPosition, beacons, dynamicsWorld);
 
 				for (int i = 0; i < 100; i++)
 				{
@@ -705,12 +511,12 @@ int main() {
 					path[i]->getWorldTransform().getOrigin().getZ() };
 					dynamicModels[i]->setPosition(pos);
 				}
-				moveEnemy(path, enemy, playerPosition);
-				path.clear();
+				//moveEnemy(path, enemy, playerPosition);
+				//path.clear();
 				//model3.setPosition(glm::vec3(0, 3, -5 + i));
 				//model3.setRotation(glm::vec3(0, 1, 0), i += 0.1f);
 				//animator.UpdateAnimation(deltaTime);
-			}
+			}*/
 		});
 
 	const static std::unique_ptr<Camera>& cam = localPlayer->getCamera();
@@ -730,7 +536,9 @@ int main() {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		//modelInstanced.draw(instancedShader, projection, localPlayer->getCamera()->getViewMatrix());
+		//enemy.setRotation({ 1.0f, 0.0f, 0.0f }, -100.0f);
+
+		modelInstanced.draw(instancedShader, projection, localPlayer->getCamera()->getViewMatrix());
 		const glm::vec3 pp = localPlayer->getPosition();
 
 		btVector3 playerPos = btVector3(pp.x, pp.y, pp.z);
@@ -766,6 +574,15 @@ int main() {
 		//promptFps(nbFrames, lastTime);
 
 
+		/*animationShader.use();
+		animationShader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+		auto transforms = animator.GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i) {
+			animationShader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+		}
+		enemy.draw(animationShader);*/
+
+
 		localPlayer->move(forward, backward, left, right, jump, deltaTime);
 		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 		localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
@@ -784,14 +601,8 @@ int main() {
 		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
 		localPlayer->draw(shader);
-		if (!jump) map.draw();
+		map.draw();
 		enemy.draw(shader);
-		//model3.draw(shader);
-
-		for (Model* m : dynamicModels)
-		{
-			m->draw(shader);
-		}
 #pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);
 		skyboxShader.use();
@@ -810,3 +621,93 @@ int main() {
 	glfwTerminate();
 	return 0;
 }
+
+#else
+
+#include "EZNgine.h"
+#include "BaseApplication.h"
+#define DRAW_DISTANCE 5000.0f
+#define FOV 50.0f
+
+
+class Game : public BaseApplication
+{
+private:
+	bool forward = false, backward = false, left = false, right = false, jump = false;
+public:
+
+	void processInput(void* w) override
+	{
+		GLFWwindow* window = (GLFWwindow*)w;
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true);
+
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			forward = true;
+			backward = false;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			backward = true;
+			forward = false;
+		}
+		else {
+			forward = false;
+			backward = false;
+		}
+
+
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			left = true;
+			right = false;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			right = true;
+			left = false;
+		}
+		else
+		{
+			right = false;
+			left = false;
+		}
+	}
+
+	void loop(Shader& shader, double timeStamp) override
+	{
+		LocalPlayer* localPlayer = EZNgine::localPlayer;
+		std::unique_ptr<Camera>& cam = localPlayer->getCamera();
+		localPlayer->move(forward, backward, left, right, jump, timeStamp);
+		localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
+		localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
+
+
+
+		shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
+		shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
+
+		localPlayer->draw(shader);
+	};
+
+	void loopInstancied(Shader& shader, double timeStamp) override
+	{
+
+	};
+
+	void onInitialized(EZNgine* engine) override
+	{
+
+	}
+};
+
+int main()
+{
+	Game g;
+	glm::mat4 projection = glm::perspective(glm::radians(FOV), 16.0f / 9.0f, 0.1f, DRAW_DISTANCE);
+	EZNgine engine(projection, &g);
+
+
+
+	return 0;
+}
+
+
+#endif

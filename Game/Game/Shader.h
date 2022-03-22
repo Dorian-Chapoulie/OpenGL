@@ -10,7 +10,7 @@
 class Shader
 {
 public:
-
+	Shader();
 	Shader(const char* vertexPath, const char* fragmentPath);
 	void use();
 

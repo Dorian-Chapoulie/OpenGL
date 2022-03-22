@@ -1,12 +1,19 @@
 ﻿#include "Shader.h"
 
 unsigned int Shader::currentShaderId = 0;
+const std::string BASE_PATH = "../../shaders/";
+
+Shader::Shader()
+{
+}
+
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
 	vertexPathName = vertexPath;
 	fragmentPathName = fragmentPath;
-	std::string vShaderCode = readFile(vertexPath);
-	std::string fShaderCode = readFile(fragmentPath);
+
+	std::string vShaderCode = readFile(std::string(BASE_PATH + vertexPath).c_str());
+	std::string fShaderCode = readFile(std::string(BASE_PATH + fragmentPath).c_str());
 
 	init(vShaderCode, fShaderCode);
 }
@@ -53,7 +60,7 @@ std::string Shader::readFile(const char* fileName) const
 	}
 	catch (std::ifstream::failure e)
 	{
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ on file [" << fileName << "]: " << e.what() << std::endl;
 	}
 
 	return content;

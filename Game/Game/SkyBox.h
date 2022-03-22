@@ -7,6 +7,7 @@ class SkyBox
 {
 public:
 	SkyBox(const std::string& path);
+	SkyBox();
 
 	void draw() const;
 
