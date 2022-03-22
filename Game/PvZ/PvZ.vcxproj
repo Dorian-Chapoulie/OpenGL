@@ -78,8 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\Game;..\..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Game\x64\Debug..\..\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\Game;..\..\dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\x64\Debug;..\..\dependencies\lib;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
