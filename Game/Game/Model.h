@@ -39,6 +39,8 @@ public:
 	ModelData* getModelData();
 	Animation* getAnimation();
 
+	void setMatrix(glm::mat4 mat);
+
 	virtual std::vector<btRigidBody*>& getRigidBodys();
 	void setHitboxToBone(std::string boneName, btRigidBody* hitbox);
 	btRigidBody* getHitboxFromBoneName(const std::string& boneName);

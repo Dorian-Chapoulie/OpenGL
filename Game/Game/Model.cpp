@@ -50,6 +50,11 @@ Animation* Model::getAnimation()
 	return animation;
 }
 
+void Model::setMatrix(glm::mat4 mat)
+{
+	this->modelMatrix = mat;
+}
+
 std::vector<btRigidBody*>& Model::getRigidBodys()
 {
 	return rigidBodys;
