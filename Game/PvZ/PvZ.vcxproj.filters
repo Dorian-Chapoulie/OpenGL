@@ -22,6 +22,12 @@
     <Filter Include="Entity\Enemy">
       <UniqueIdentifier>{13d3cdb1-dd00-4d79-94e4-c81a6a7260b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Entity\Player">
+      <UniqueIdentifier>{9c322244-c489-408b-86fa-31e3d3350a42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity\Trigger">
+      <UniqueIdentifier>{2e08ba29-cf96-4c86-9e14-83fe433ae686}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -39,6 +45,12 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Entity\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Entity\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Trigger.cpp">
+      <Filter>Entity\Trigger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -52,6 +64,12 @@
     </ClInclude>
     <ClInclude Include="Enemy.h">
       <Filter>Entity\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Entity\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Trigger.h">
+      <Filter>Entity\Trigger</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

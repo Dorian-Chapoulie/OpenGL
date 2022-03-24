@@ -1,11 +1,14 @@
 #include "BasicBullet.h"
 #include "DynamicModel.h"
+#include "Enemy.h"
+#include "Player.h"
 
 BasicBullet::BasicBullet(glm::vec3 position, glm::vec3 direction)
 	: direction(direction)
 {
 	weight = 1.0f;
-	model = new DynamicModel(filePath, position, weight, HitBoxFactory::AABB);
+	MAX_LIFETIME = 5.0f;
+	setModel(new DynamicModel(filePath, position, weight, HitBoxFactory::AABB));
 }
 
 void BasicBullet::onInit(btDiscreteDynamicsWorld* world)
@@ -19,7 +22,17 @@ void BasicBullet::onInit(btDiscreteDynamicsWorld* world)
 
 void BasicBullet::onCollide(Entity* other)
 {
-	std::cout << "Bullet collide" << std::endl;
+	const PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(other);
+	const Enemy* enemy = dynamic_cast<Enemy*>(other);
+	if (playerEntity)
+	{
+		std::cout << "Bullet collide with player" << std::endl;
+	}
+	else if (enemy)
+	{
+		std::cout << "Bullet collide with enemy" << std::endl;
+	}
+	state = ENTITY_STATE::DEAD;
 }
 
 void BasicBullet::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)

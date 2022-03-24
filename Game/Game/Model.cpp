@@ -91,6 +91,7 @@ void Model::setWorldTransform(const glm::vec3& position, const glm::quat& rot, f
 
 Model::~Model()
 {
+
 }
 
 void Model::loadModel(const std::string& path)

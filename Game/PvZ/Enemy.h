@@ -11,13 +11,14 @@ public:
 	void onUpdate(double timeStamp, btDiscreteDynamicsWorld* world) override;
 
 	void shoot(glm::vec3 direction);
+	void removeBullet(int index);
 
 	std::vector<BasicBullet*> bullets;
 
 private:
 	const std::string filePath = "../../models/shooter/shooter.fbx";
 	const float scale = 0.01f;
-	const int fireRate = 1;
+	const float fireRate = 0.5f;
 	double timeBuffer = 0.0;
 };
 

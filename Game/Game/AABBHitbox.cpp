@@ -35,8 +35,8 @@ std::vector<btRigidBody*>& AABBHitbox::generateHitBoxes(Model* model)
 	)));
 
 	//TODO: add isStatic or isKinematic and set the flag
-	if (model->getWeight() == 0.0f) {
-		rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+	if (model->getWeight() == 1.0f) {
+		rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 	rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() /* | btCollisionObject::CF_NO_CONTACT_RESPONSE*/);
 	rigidBodys.back()->setMotionState(new MyMotionState(model, transform));
