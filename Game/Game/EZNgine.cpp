@@ -12,6 +12,9 @@ float mouseX = 0.0f, mouseY = 0.0f;
 
 LocalPlayer* EZNgine::localPlayer = nullptr;
 BaseApplication* EZNgine::base_application = nullptr;
+float EZNgine::WIDTH = 800.0f;
+float EZNgine::HEIGHT = 600.0f;
+bool EZNgine::FULLSCREEN = false;
 
 EZNgine::EZNgine(const glm::mat4 projection, BaseApplication* base_application)
 	: projection(projection)
@@ -30,6 +33,7 @@ void EZNgine::framebuffer_size_callback(GLFWwindow* window, int width, int heigh
 
 void EZNgine::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	if (!base_application->mouseEnabled) return;
+
 	if (base_application->firstMouse)
 	{
 		lastX = xpos;
@@ -207,7 +211,7 @@ void EZNgine::setupBulletPhysics()
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(debugDraw);
+	//dynamicsWorld->setDebugDrawer(debugDraw);
 }
 
 void EZNgine::setupImGui()

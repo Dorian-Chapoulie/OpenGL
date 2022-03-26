@@ -9,8 +9,14 @@ GameManager::GameManager(glm::mat4 proj)
 
 void GameManager::processInput(void* w) {
 	GLFWwindow* window = (GLFWwindow*)w;
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && mouseEnabled) {
 		glfwSetWindowShouldClose(window, true);
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		playerEntity->shoot(world);
+	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		forward = true;
@@ -57,6 +63,8 @@ void GameManager::loop(Shader& shader, double timeStamp)
 	localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 	checkPlayerFloorColision(localPlayer, timeStamp);
 
+	//std::cout << localPlayer->getPosition().x << " " << localPlayer->getPosition().y << " " << localPlayer->getPosition().z << std::endl;
+
 
 	shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 	shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
@@ -64,7 +72,22 @@ void GameManager::loop(Shader& shader, double timeStamp)
 	manageLights(shader);
 	checkCollisions();
 
+	manageEntity(playerEntity, timeStamp, shader);
 	localPlayer->draw(shader);
+
+	for (int i = 0; i < playerEntity->bullets.size(); i++)
+	{
+		BasicBullet* b = playerEntity->bullets[i];
+		if (b->state == Entity::ENTITY_STATE::DEAD)
+		{
+			playerEntity->removeBullet(i);
+			deleteEntity(b);
+		}
+		else {
+			manageEntity(b, timeStamp, shader);
+			checkLifeTime(b);
+		}
+	}
 	for (Enemy* e : enemys) {
 		manageEntity(e, timeStamp, shader);
 		for (int i = 0; i < e->bullets.size(); i++) {
@@ -96,8 +119,9 @@ void GameManager::loopInstancied(Shader& shader, double timeStamp)
 void GameManager::onInitialized(EZNgine* engine)
 {
 	world = engine->dynamicsWorld;
-	map = new LevelKinoDerToten(engine->shader);
+	map = new LevelDungeon(engine->shader);
 	playerEntity = new PlayerEntity(engine->localPlayer);
+	playerEntity->model->setPosition(map->playerSpawnPoint);
 
 	triggerTest = new Trigger([&](void* data)
 		{
@@ -109,7 +133,7 @@ void GameManager::onInitialized(EZNgine* engine)
 	triggerTest->onInit(world);
 	for (int i = 0; i < 1; i++)
 	{
-		enemys.emplace_back(new Enemy(glm::vec3(1.0f, 6.0f, 0.0f)));
+		enemys.emplace_back(new Enemy(glm::vec3(-132.686, 24.2506, 133.566)));
 		enemys.back()->onInit(world);
 	}
 
@@ -138,7 +162,8 @@ void GameManager::checkCollisions()
 		Entity* entityA = static_cast<Entity*>(obA->getUserPointer());
 		Entity* entityB = static_cast<Entity*>(obB->getUserPointer());
 
-		if (entityA && entityB) entityA->onCollide(entityB);
+		if (entityA) entityA->onCollide(entityB);
+		else if (entityB) entityB->onCollide(entityA);
 	}
 }
 

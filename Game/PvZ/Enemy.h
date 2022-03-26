@@ -16,8 +16,8 @@ public:
 	std::vector<BasicBullet*> bullets;
 
 private:
-	const std::string filePath = "../../models/shooter/shooter.fbx";
-	const float scale = 0.01f;
+	const std::string filePath = "../../models/shooter/shooter_2.fbx";
+	const float scale = 0.03f;
 	const float fireRate = 0.5f;
 	double timeBuffer = 0.0;
 };

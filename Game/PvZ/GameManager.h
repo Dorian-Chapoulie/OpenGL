@@ -1,8 +1,8 @@
 #pragma once
 #include "BaseApplication.h"
 #include "Enemy.h"
-#include "LevelKinoDerToten.h"
 #include "EZNgine.h"
+#include "LevelDungeon.h"
 #include "Player.h"
 #include "Trigger.h"
 
@@ -36,7 +36,7 @@ private:
 
 	const float GRAVITY_Y = -20.f;
 
-	LevelKinoDerToten* map;
+	LevelDungeon* map;
 	std::vector<Enemy*> enemys;
 	btDiscreteDynamicsWorld* world;
 	PlayerEntity* playerEntity;

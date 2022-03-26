@@ -1,11 +1,19 @@
 #include "EZNgine.h"
 #include "GameManager.h"
-#define DRAW_DISTANCE 5000.0f
+#define DRAW_DISTANCE 500.0f
 #define FOV 50.0f
 
 int main()
 {
-	glm::mat4 projection = glm::perspective(glm::radians(FOV), 800.0f / 600.0f, 0.1f, DRAW_DISTANCE);
+	constexpr float WIDTH = 800.0f;
+	constexpr float HEIGHT = 600.0f;
+	constexpr bool isFullScreen = false;
+
+	EZNgine::WIDTH = WIDTH;
+	EZNgine::HEIGHT = HEIGHT;
+	EZNgine::FULLSCREEN = isFullScreen;
+
+	glm::mat4 projection = glm::perspective(glm::radians(FOV), WIDTH / HEIGHT, 0.1f, DRAW_DISTANCE);
 	GameManager g(projection);
 	EZNgine engine(projection, &g);
 	g.setWindow(engine.window);

@@ -189,7 +189,7 @@
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="LevelKinoDerToten.cpp">
+    <ClCompile Include="LevelDungeon.cpp">
       <Filter>level</Filter>
     </ClCompile>
     <ClCompile Include="EZNgine.cpp">
@@ -332,7 +332,7 @@
     <ClInclude Include="imgui\imgui_impl_opengl3_loader.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="LevelKinoDerToten.h">
+    <ClInclude Include="LevelDungeon.h">
       <Filter>level</Filter>
     </ClInclude>
     <ClInclude Include="EZNgine.h">

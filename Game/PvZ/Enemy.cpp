@@ -11,7 +11,7 @@
 Enemy::Enemy(const glm::vec3 position)
 {
 	weight = 0.0f;
-	setModel(new StaticModel(filePath, position, HitBoxFactory::AABB, glm::vec3(scale)));
+	setModel(new StaticModel(filePath, position, HitBoxFactory::AABB, glm::vec3(scale), true));
 }
 
 void Enemy::onInit(btDiscreteDynamicsWorld* world)
@@ -49,7 +49,8 @@ void Enemy::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 
 	if (timeBuffer >= fireRate)
 	{
-		const glm::vec3 dir = localPlayerPosition - model->getPosition();
+		constexpr float projectilePower = 10.0f;
+		const glm::vec3 dir = glm::normalize(localPlayerPosition - model->getPosition()) * projectilePower;
 		shoot(dir);
 		bullets.back()->onInit(world);
 		timeBuffer = 0;
@@ -60,7 +61,7 @@ void Enemy::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 void Enemy::shoot(glm::vec3 direction)
 {
 	glm::vec3 pos = model->getPosition();
-	pos.y = 20.0f;
+	pos.y += 5.0f;
 	bullets.emplace_back(new BasicBullet(pos, direction));
 }
 

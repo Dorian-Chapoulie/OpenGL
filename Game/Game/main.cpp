@@ -27,7 +27,6 @@
 #include "DefaultLoader.h"
 #include "DynamicModel.h"
 #include "InstancedModel.h"
-#include "LevelKinoDerToten.h"
 #include "SkeletalLoader.h"
 #include "StaticModel.h"
 
@@ -458,7 +457,7 @@ int main() {
 	setupSound();
 	//createLights(shader, lights);
 
-	LevelKinoDerToten map(shader);
+	LevelDungeon map(shader);
 
 	btVector3 g = btVector3(0, -9, 0);
 	for (auto* rigidBody : localPlayer->getModel()->getRigidBodys()) {

@@ -16,12 +16,12 @@ public:
 	std::vector<Light*>& getLights();
 	std::vector<btRigidBody*> getNavigationBodys();
 
+	glm::vec3 playerSpawnPoint = glm::vec3(0.0f);
+
 protected:
 	StaticModel* model = nullptr;
 	StaticModel* navigation = nullptr;
 	Shader& shader;
 	std::vector<Light*> lights;
-
-	glm::vec3 playerSpawnPoint = glm::vec3(0.0f);
 };
 

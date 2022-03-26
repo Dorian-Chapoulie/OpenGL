@@ -24,6 +24,10 @@ public:
 	btDiscreteDynamicsWorld* dynamicsWorld;
 	GLFWwindow* window = nullptr;
 	void loop();
+
+	static float WIDTH, HEIGHT;
+	static bool FULLSCREEN;
+
 private:
 	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -45,8 +49,6 @@ private:
 	SkyBox* skybox;
 
 	glm::mat4 projection;
-	const float WIDTH = 800.0f, HEIGHT = 600.0f;
-	const bool FULLSCREEN = false;
 
 	static BaseApplication* base_application;
 };
