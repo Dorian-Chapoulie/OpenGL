@@ -22,13 +22,12 @@ public:
 
 	irrklang::ISoundEngine* soundEngine;
 	btDiscreteDynamicsWorld* dynamicsWorld;
-
+	GLFWwindow* window = nullptr;
+	void loop();
 private:
 	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 	static void scroll_callback(GLFWwindow* window, double xpos, double ypos);
-
-	void loop();
 
 	void setupShader();
 	void setupSkyBoxShader();
@@ -46,10 +45,9 @@ private:
 	SkyBox* skybox;
 
 	glm::mat4 projection;
-	GLFWwindow* window = nullptr;
 	const float WIDTH = 800.0f, HEIGHT = 600.0f;
 	const bool FULLSCREEN = false;
 
-	BaseApplication* base_application = nullptr;
+	static BaseApplication* base_application;
 };
 

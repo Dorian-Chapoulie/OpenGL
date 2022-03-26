@@ -5,9 +5,11 @@
 
 int main()
 {
-	GameManager g;
 	glm::mat4 projection = glm::perspective(glm::radians(FOV), 800.0f / 600.0f, 0.1f, DRAW_DISTANCE);
+	GameManager g(projection);
 	EZNgine engine(projection, &g);
+	g.setWindow(engine.window);
+	engine.loop();
 
 	return 0;
 }

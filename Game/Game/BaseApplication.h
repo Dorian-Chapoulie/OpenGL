@@ -10,5 +10,7 @@ public:
 	virtual void loopInstancied(Shader& shader, double timeStamp) = 0;
 	virtual void processInput(void* window) = 0;
 	virtual void onInitialized(EZNgine* engine) = 0;
+
+	bool mouseEnabled = true, firstMouse = true;
 };
 

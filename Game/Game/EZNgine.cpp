@@ -7,22 +7,20 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-bool firstMouse = true;
 float lastX = 0.0f, lastY = 0.0f;
 float mouseX = 0.0f, mouseY = 0.0f;
-bool mouseEnabled = true;
-
 
 LocalPlayer* EZNgine::localPlayer = nullptr;
+BaseApplication* EZNgine::base_application = nullptr;
 
 EZNgine::EZNgine(const glm::mat4 projection, BaseApplication* base_application)
-	: projection(projection), base_application(base_application)
+	: projection(projection)
 {
+	EZNgine::base_application = base_application;
 	this->setupOpenGl();
 	this->setupBulletPhysics();
 	this->init();
 	base_application->onInitialized(this);
-	this->loop();
 }
 
 void EZNgine::framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -31,11 +29,12 @@ void EZNgine::framebuffer_size_callback(GLFWwindow* window, int width, int heigh
 }
 
 void EZNgine::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-	if (firstMouse)
+	if (!base_application->mouseEnabled) return;
+	if (base_application->firstMouse)
 	{
 		lastX = xpos;
 		lastY = ypos;
-		firstMouse = false;
+		base_application->firstMouse = false;
 	}
 	mouseX = xpos;
 	mouseY = ypos;
@@ -63,7 +62,7 @@ void EZNgine::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	direction.x = cos(glm::radians(cam->getYaw())) * cos(glm::radians(cam->getPitch()));
 	direction.y = sin(glm::radians(cam->getPitch()));
 	direction.z = sin(glm::radians(cam->getYaw())) * cos(glm::radians(cam->getPitch()));
-	if (mouseEnabled) cam->setDirection(direction);
+	cam->setDirection(direction);
 }
 
 void EZNgine::scroll_callback(GLFWwindow* window, double xpos, double ypos)
