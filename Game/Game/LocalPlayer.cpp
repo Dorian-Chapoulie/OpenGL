@@ -54,15 +54,6 @@ void LocalPlayer::move(bool forward, bool backward, bool left, bool right, bool 
 		moveVector += glm::cross(view, UP);
 	}
 
-	if (false && jump && !isJumping) {
-		isJumping = true;
-		std::thread([&]() {
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(0.15s);
-			isJumping = false;
-			}).detach();
-	}
-
 	const float compensation = (1.0f + delta);
 	moveVector *= SPEED * compensation;
 
@@ -70,8 +61,15 @@ void LocalPlayer::move(bool forward, bool backward, bool left, bool right, bool 
 		rigidBody->activate();
 		rigidBody->setLinearVelocity(btVector3(
 			moveVector.x,
-			isJumping ? JUMP_FORCE : 0,
+			0,
 			moveVector.z
 		));
+		if (jump && canJump) {
+			rigidBody->applyCentralForce(btVector3(
+				moveVector.x,
+				(jump && canJump) ? JUMP_FORCE : 0.0f,
+				moveVector.z
+			));
+		}
 	}
 }

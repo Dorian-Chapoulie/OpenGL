@@ -33,23 +33,25 @@ void GameManager::processInput(void* w) {
 		right = false;
 		left = false;
 	}
+
+	jump = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
 }
 
 void GameManager::loop(Shader& shader, double timeStamp)
 {
 	LocalPlayer* localPlayer = EZNgine::localPlayer;
 	std::unique_ptr<Camera>& cam = localPlayer->getCamera();
+
 	localPlayer->move(forward, backward, left, right, jump, timeStamp);
 	localPlayer->setCameraPosition(localPlayer->getModel()->getPosition());
 	localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
+	checkPlayerFloorColision(localPlayer, timeStamp);
 
 
 	shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 	shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
 
 	checkCollisions();
-
-	std::cout << playerEntity->health << std::endl;
 
 	localPlayer->draw(shader);
 	for (Enemy* e : enemys) {
@@ -140,3 +142,37 @@ void GameManager::deleteEntity(Entity* e)
 	delete e;
 }
 
+void GameManager::checkPlayerFloorColision(LocalPlayer* lp, double timeStamp)
+{
+	const btVector3 playerPosition = { lp->getPosition().x, lp->getPosition().y, lp->getPosition().z };
+	const btVector3 playerPosDownVect = { lp->getPosition().x, lp->getPosition().y - 5.0f, lp->getPosition().z };
+
+	if (!raycastWorld(playerPosition, playerPosDownVect)) //rien en dessous des pieds
+	{
+		lp->canJump = false;
+		btVector3 gravity = btVector3(0, GRAVITY_Y, 0);
+		for (auto* rigidBody : lp->getModel()->getRigidBodys()) {
+			if (rigidBody->getGravity().getY() != GRAVITY_Y) {
+				rigidBody->setGravity(gravity);
+			}
+		}
+	}
+	else
+	{
+		lp->canJump = true;
+		btVector3 gravity = btVector3(0, 0, 0);
+		for (auto* rigidBody : lp->getModel()->getRigidBodys()) {
+			if (rigidBody->getGravity().getY() != 0) {
+				rigidBody->setGravity(gravity);
+			}
+		}
+	}
+}
+
+bool GameManager::raycastWorld(btVector3 Start, btVector3 End) {
+
+	btCollisionWorld::ClosestRayResultCallback RayCallback(Start, End);
+	RayCallback.m_collisionFilterMask = btBroadphaseProxy::AllFilter;
+	world->rayTest(Start, End, RayCallback);
+	return RayCallback.hasHit();
+}

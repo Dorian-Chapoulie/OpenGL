@@ -19,9 +19,14 @@ public:
 	void checkCollisions();
 	void checkLifeTime(Entity* e);
 	void deleteEntity(Entity* e);
+	void checkPlayerFloorColision(LocalPlayer* lp, double timeStamp);
+
+	bool raycastWorld(btVector3 Start, btVector3 End);
 
 private:
 	bool forward = false, backward = false, left = false, right = false, jump = false;
+
+	const float GRAVITY_Y = -20.f;
 
 	LevelKinoDerToten* map;
 	std::vector<Enemy*> enemys;
