@@ -171,7 +171,7 @@ void EZNgine::setupOpenGl()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_REFRESH_RATE, 144);
 
-	window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", FULLSCREEN ? glfwGetPrimaryMonitor() : NULL, NULL);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "EZNGINE", FULLSCREEN ? glfwGetPrimaryMonitor() : NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;

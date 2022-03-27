@@ -5,9 +5,9 @@
 
 int main()
 {
-	constexpr float WIDTH = 800.0f;
-	constexpr float HEIGHT = 600.0f;
-	constexpr bool isFullScreen = false;
+	constexpr float WIDTH = 1920.0f;
+	constexpr float HEIGHT = 1080.0f;
+	constexpr bool isFullScreen = true;
 
 	EZNgine::WIDTH = WIDTH;
 	EZNgine::HEIGHT = HEIGHT;
