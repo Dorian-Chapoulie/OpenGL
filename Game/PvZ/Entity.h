@@ -14,6 +14,9 @@ public:
 	void setModel(Model* model);
 	float getMaxLifeTime() const;
 	float getLifeTime() const;
+	float getLife() const;
+	void applyDamage(float life);
+	void setLife(float value);
 
 	Model* model;
 
@@ -28,7 +31,7 @@ public:
 protected:
 	float MAX_LIFETIME = std::numeric_limits<float>::max();
 	float lifeTime = 0.0f;
-	float life = 100.0f;
+	float life = 20.0f;
 	float weight = 1.0f;
 };
 

@@ -1,6 +1,11 @@
 #include "GameManager.h"
+
+#include <thread>
+
 #include "LocalPlayer.h"
 #include <imgui/imgui.h>
+
+#include "Animator.h"
 
 GameManager::GameManager(glm::mat4 proj)
 {
@@ -63,8 +68,8 @@ void GameManager::loop(Shader& shader, double timeStamp)
 	localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 	checkPlayerFloorColision(localPlayer, timeStamp);
 
+	//std::cout << playerEntity->getLife() << std::endl;
 	//std::cout << localPlayer->getPosition().x << " " << localPlayer->getPosition().y << " " << localPlayer->getPosition().z << std::endl;
-
 
 	shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
 	shader.setMatrix("view", localPlayer->getCamera()->getViewMatrix());
@@ -72,24 +77,69 @@ void GameManager::loop(Shader& shader, double timeStamp)
 	manageLights(shader);
 	checkCollisions();
 
-	manageEntity(playerEntity, timeStamp, shader);
+	manageEntity(playerEntity, timeStamp, shader, true);
 	localPlayer->draw(shader);
+
+	if (door != nullptr) door->draw(shader);
+
+	if (boss != nullptr)
+	{
+		if (boss->getLife() <= 0) boss->state = Entity::ENTITY_STATE::DEAD;
+
+		if (boss->state == Entity::ENTITY_STATE::DEAD)
+		{
+			for (int i = 0; i < boss->bullets.size(); i++) {
+				BasicBullet* b = boss->bullets[i];
+				boss->removeBullet(i);
+				deleteEntity(b);
+			}
+			deleteEntity(boss);
+		}
+		else {
+			manageEntity(boss, timeStamp, shader, true);
+			for (int i = 0; i < boss->bullets.size(); i++) {
+				BasicBullet* b = boss->bullets[i];
+				if (b->state == Entity::ENTITY_STATE::DEAD)
+				{
+					boss->removeBullet(i);
+					deleteEntity(b);
+				}
+				else {
+					manageEntity(b, timeStamp, shader, true);
+					checkLifeTime(b);
+				}
+			}
+		}
+	}
 
 	for (int i = 0; i < playerEntity->bullets.size(); i++)
 	{
-		BasicBullet* b = playerEntity->bullets[i];
+		PlayerBullet* b = playerEntity->bullets[i];
 		if (b->state == Entity::ENTITY_STATE::DEAD)
 		{
 			playerEntity->removeBullet(i);
 			deleteEntity(b);
 		}
 		else {
-			manageEntity(b, timeStamp, shader);
+			manageEntity(b, timeStamp, shader, true);
 			checkLifeTime(b);
 		}
 	}
 	for (Enemy* e : enemys) {
-		manageEntity(e, timeStamp, shader);
+		if (e->getLife() <= 0) e->state = Entity::ENTITY_STATE::DEAD;
+
+		if (e->state == Entity::ENTITY_STATE::DEAD)
+		{
+			for (int i = 0; i < e->bullets.size(); i++) {
+				BasicBullet* b = e->bullets[i];
+				e->removeBullet(i);
+				deleteEntity(b);
+			}
+			deleteEntity(e);
+			continue;
+		}
+
+		manageEntity(e, timeStamp, shader, true);
 		for (int i = 0; i < e->bullets.size(); i++) {
 			BasicBullet* b = e->bullets[i];
 			if (b->state == Entity::ENTITY_STATE::DEAD)
@@ -98,7 +148,7 @@ void GameManager::loop(Shader& shader, double timeStamp)
 				deleteEntity(b);
 			}
 			else {
-				manageEntity(b, timeStamp, shader);
+				manageEntity(b, timeStamp, shader, true);
 				checkLifeTime(b);
 			}
 		}
@@ -109,11 +159,24 @@ void GameManager::loop(Shader& shader, double timeStamp)
 	{
 		l->draw(EZNgine::localPlayer->getCamera()->getViewMatrix(), projection);
 	}
+
+	if (playerEntity->getLife() <= 0)
+	{
+		onLocalPlayerDie();
+	}
 };
 
 void GameManager::loopInstancied(Shader& shader, double timeStamp)
 {
 
+}
+
+void GameManager::loopAnimated(Shader& s, double timeStamp)
+{
+	for (Actor* a : actors)
+	{
+		a->model->draw(s, *a->animator, EZNgine::localPlayer->getCamera()->getViewMatrix());
+	}
 };
 
 void GameManager::onInitialized(EZNgine* engine)
@@ -123,17 +186,20 @@ void GameManager::onInitialized(EZNgine* engine)
 	playerEntity = new PlayerEntity(engine->localPlayer);
 	playerEntity->model->setPosition(map->playerSpawnPoint);
 
-	triggerTest = new Trigger([&](void* data)
-		{
-			std::cout << "Trigger collided with localplayer" << std::endl;
-			playerEntity->health = 0.0f;
-		}, { 20, 5, 5 });
+	initTrigers();
 
 
-	triggerTest->onInit(world);
-	for (int i = 0; i < 1; i++)
-	{
-		enemys.emplace_back(new Enemy(glm::vec3(-132.686, 24.2506, 133.566)));
+	std::array<glm::vec3, 7> enemysSpawnPoints = {
+		glm::vec3(-295.075f, 35, 169.402f),
+		glm::vec3(-299.401, 35, 227.285),
+		glm::vec3(-138.936, 35, 282.963),
+		glm::vec3(-303.846, 35, 429.078),
+		glm::vec3(-214.091, 35, 373.078),
+		glm::vec3(-161.147, 35, 531.068),
+		glm::vec3(-258.391, 35, 521.575)
+	};
+	for (const auto& vec : enemysSpawnPoints) {
+		enemys.emplace_back(new Enemy(vec));
 		enemys.back()->onInit(world);
 	}
 
@@ -143,12 +209,30 @@ void GameManager::onInitialized(EZNgine* engine)
 	for (auto* rigidBody : map->getModel()->getRigidBodys()) {
 		world->addRigidBody(rigidBody);
 	}
+
+	//actors.emplace_back(new Actor(new Model("../../models/erika/erika.dae", map->playerSpawnPoint, glm::vec3(0.05f), true)));
+	//actors.emplace_back(new Actor(new Model("../../models/gilbert/gilbert.dae", map->playerSpawnPoint, glm::vec3(0.05f), true)));
+	//actors.emplace_back(new Actor(new Model("../../models/karen/karen.dae", map->playerSpawnPoint, glm::vec3(0.05f), true)));
+	//actors.emplace_back(new Actor(new Model("../../models/orc/orc.dae", map->playerSpawnPoint, glm::vec3(0.05f), true)));
+
+	std::thread t([&]()
+		{
+			while (isPlaying)
+			{
+				for (Actor* a : actors)
+				{
+					a->animator->UpdateAnimation(0.05f);
+					std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				}
+			}
+		});
+	t.detach();
 }
 
-void GameManager::manageEntity(Entity* e, double timeStamp, Shader& shader)
+void GameManager::manageEntity(Entity* e, double timeStamp, Shader& shader, bool shouldDraw)
 {
 	e->onUpdate(timeStamp, world);
-	e->model->draw(shader);
+	if (shouldDraw) e->model->draw(shader);
 }
 
 void GameManager::checkCollisions()
@@ -179,7 +263,6 @@ void GameManager::deleteEntity(Entity* e)
 	for (btRigidBody* r : e->model->getRigidBodys()) {
 		world->removeCollisionObject(r);
 	}
-	delete e;
 }
 
 void GameManager::checkPlayerFloorColision(LocalPlayer* lp, double timeStamp)
@@ -222,6 +305,60 @@ void GameManager::manageLights(Shader& shader)
 	}
 
 	if (!mouseEnabled) imGuiLights(shader, map->getLights(), EZNgine::localPlayer);
+}
+
+void GameManager::onLocalPlayerDie()
+{
+	playerEntity->setLife(100.0f);
+	playerEntity->model->setPosition(map->playerSpawnPoint);
+	initTrigers();
+}
+
+void GameManager::initTrigers()
+{
+	if (door != nullptr)
+	{
+		door->setPosition({ 0, -100, 0 });
+	}
+	if (boss != nullptr)
+	{
+		boss->canShoot = false;
+		boss->model->setPosition({ 0, -200, 0 });
+		for (BasicBullet* b : boss->bullets)
+		{
+			deleteEntity(b);
+		}
+		boss->bullets.clear();
+	}
+
+	triggerTest = new Trigger([&](void* data)
+		{
+			if (boss == nullptr) {
+				boss = new Enemy({ -214.901, 135.939, 747.199 });
+				for (auto* rigidBody : boss->model->getRigidBodys()) {
+					world->addRigidBody(rigidBody);
+				}
+			}
+			else
+			{
+				boss->canShoot = true;
+				boss->setLife(100.0f);
+				boss->model->setPosition({ -214.901, 135.939, 747.199 });
+			}
+			if (door == nullptr) {
+				door = new StaticModel(doorPath, { -258.084, 120.004, 640.802 }, HitBoxFactory::AABB, glm::vec3(20.0f));
+				for (auto* rigidBody : door->getRigidBodys()) {
+					world->addRigidBody(rigidBody);
+				}
+			}
+			else
+			{
+				door->setPosition({ -258.084, 120.004, 640.802 });
+			}
+			deleteEntity(triggerTest);
+			delete triggerTest;
+		}, { -270.915, 104.992, 645.611 }, 10.0f);
+	triggerTest->onInit(world);
 }
 
 bool GameManager::raycastWorld(btVector3 Start, btVector3 End) {

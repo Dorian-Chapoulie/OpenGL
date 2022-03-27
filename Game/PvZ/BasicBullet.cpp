@@ -16,17 +16,17 @@ void BasicBullet::onInit(btDiscreteDynamicsWorld* world)
 	for (auto* rigidBody : model->getRigidBodys()) {
 		world->addRigidBody(rigidBody);
 		rigidBody->setGravity(customGravity);
-		rigidBody->applyCentralForce(btVector3(direction.x, 0.0f, direction.z));
+		rigidBody->applyCentralForce(btVector3(direction.x, direction.y, direction.z));
 	}
 }
 
 void BasicBullet::onCollide(Entity* other)
 {
-	const PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(other);
+	PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(other);
 	const Enemy* enemy = dynamic_cast<Enemy*>(other);
 	if (playerEntity)
 	{
-		std::cout << "Bullet collide with player" << std::endl;
+		playerEntity->applyDamage(this->damage);
 	}
 	else if (enemy)
 	{
@@ -38,4 +38,9 @@ void BasicBullet::onCollide(Entity* other)
 void BasicBullet::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 {
 	Entity::onUpdate(timeStamp, world);
+}
+
+float BasicBullet::getDamage() const
+{
+	return damage;
 }

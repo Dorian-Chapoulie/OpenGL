@@ -51,6 +51,12 @@
     <ClCompile Include="Trigger.cpp">
       <Filter>Entity\Trigger</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerBullet.cpp">
+      <Filter>Entity\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -70,6 +76,12 @@
     </ClInclude>
     <ClInclude Include="Trigger.h">
       <Filter>Entity\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerBullet.h">
+      <Filter>Entity\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

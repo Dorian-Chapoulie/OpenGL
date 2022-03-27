@@ -33,7 +33,7 @@ private:
 	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 	static void scroll_callback(GLFWwindow* window, double xpos, double ypos);
 
-	void setupShader();
+	void setupShader(Shader& shader);
 	void setupSkyBoxShader();
 	void setupSound();
 	void setupOpenGl();
@@ -46,6 +46,7 @@ private:
 
 	Shader instancedShader;
 	Shader skyboxShader;
+	Shader animationShader;
 	SkyBox* skybox;
 
 	glm::mat4 projection;

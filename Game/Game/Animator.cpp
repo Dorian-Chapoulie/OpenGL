@@ -70,6 +70,8 @@ std::vector<glm::mat4> Animator::GetFinalBoneMatrices()
 
 void Animator::updateBoneHitbox(const glm::mat4& boneTransformation, const std::string_view& boneName) const
 {
+	return;
+
 	std::string tmpBoneName = std::string(boneName);
 	const std::string bannedStr = "mixamorig";
 	if (tmpBoneName.find(bannedStr) != std::string::npos) {

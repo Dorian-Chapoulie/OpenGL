@@ -8,6 +8,7 @@ public:
 	BaseApplication();
 	virtual void loop(Shader& shader, double timeStamp) = 0;
 	virtual void loopInstancied(Shader& shader, double timeStamp) = 0;
+	virtual void loopAnimated(Shader& shader, double timeStamp) = 0;
 	virtual void processInput(void* window) = 0;
 	virtual void onInitialized(EZNgine* engine) = 0;
 

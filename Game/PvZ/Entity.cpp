@@ -40,3 +40,18 @@ float Entity::getLifeTime() const
 {
 	return lifeTime;
 }
+
+float Entity::getLife() const
+{
+	return life;
+}
+
+void Entity::applyDamage(float amount)
+{
+	this->life -= amount;
+}
+
+void Entity::setLife(float value)
+{
+	this->life = value;
+}

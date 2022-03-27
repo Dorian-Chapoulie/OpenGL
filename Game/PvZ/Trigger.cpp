@@ -11,7 +11,7 @@ Trigger::Trigger(std::function<void(void*)> foo, glm::vec3 position, float scale
 	: onCollideWithPlayerCallback(std::move(foo))
 {
 	weight = 0.0f;
-	setModel(new StaticModel(filePath, position, HitBoxFactory::AABB, glm::vec3(scale)));
+	setModel(new DynamicModel(filePath, position, 1.0f, HitBoxFactory::TRIANGLE, glm::vec3(scale)));
 }
 
 void Trigger::onInit(btDiscreteDynamicsWorld* world)
@@ -22,9 +22,11 @@ void Trigger::onInit(btDiscreteDynamicsWorld* world)
 void Trigger::onCollide(Entity* other)
 {
 	const PlayerEntity* player = dynamic_cast<PlayerEntity*>(other);
-	if (player)
+	if (player && !shouldIgnore)
 	{
 		onCollideWithPlayerCallback((void*)player);
+		shouldIgnore = true;
+		state = ENTITY_STATE::DEAD;
 	}
 }
 

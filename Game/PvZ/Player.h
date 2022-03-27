@@ -2,7 +2,7 @@
 #include "Entity.h"
 #include <LocalPlayer.h>
 
-#include "BasicBullet.h"
+#include "PlayerBullet.h"
 
 class PlayerEntity :
 	public Entity
@@ -18,8 +18,7 @@ public:
 	void shoot(btDiscreteDynamicsWorld* world);
 	void removeBullet(int index);
 
-	float health = 100.0f;
-	std::vector<BasicBullet*> bullets;
+	std::vector<PlayerBullet*> bullets;
 private:
 	//float health = 100.0f;
 	float timeBuffer = 0.0f;

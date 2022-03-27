@@ -4,14 +4,16 @@
 #include <glm/gtx/vector_angle.hpp>
 
 #include "EZNgine.h"
+#include "Animator.h"
 #include "StaticModel.h"
 #include "Player.h"
+#include "PlayerBullet.h"
 
 
 Enemy::Enemy(const glm::vec3 position)
 {
 	weight = 0.0f;
-	setModel(new StaticModel(filePath, position, HitBoxFactory::AABB, glm::vec3(scale), true));
+	setModel(new StaticModel(filePath, position, HitBoxFactory::AABB, glm::vec3(scale)));
 }
 
 void Enemy::onInit(btDiscreteDynamicsWorld* world)
@@ -23,16 +25,24 @@ void Enemy::onCollide(Entity* other)
 {
 	const PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(other);
 	const BasicBullet* bullet = dynamic_cast<BasicBullet*>(other);
+	PlayerBullet* playerBullet = dynamic_cast<PlayerBullet*>(other);
 	if (playerEntity)
 	{
 		//std::cout << "Enemy collide with player: " << std::endl;
+	}
+	else if (playerBullet)
+	{
+		if (playerBullet->state != ENTITY_STATE::DEAD) {
+			playerBullet->state = ENTITY_STATE::DEAD;
+			this->life -= bullet->getDamage();
+		}
 	}
 	else if (bullet)
 	{
 		//std::cout << "Enemy collide with bullet" << std::endl;
 	}
 }
-
+int i = 0;
 void Enemy::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 {
 	timeBuffer += timeStamp;
@@ -45,9 +55,13 @@ void Enemy::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 	glm::vec3 skew;
 	glm::vec4 perspective;
 	glm::decompose(transformation, s, rotation, translation, skew, perspective);
-	model->setMatrix(transformation * glm::scale(model->getScale()));
+	model->setMatrix(
+		transformation
+		* glm::scale(model->getScale())
+		/** glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0, 1, 0))*/
+	);
 
-	if (timeBuffer >= fireRate)
+	if (timeBuffer >= fireRate && canShoot)
 	{
 		constexpr float projectilePower = 10.0f;
 		const glm::vec3 dir = glm::normalize(localPlayerPosition - model->getPosition()) * projectilePower;
@@ -61,7 +75,7 @@ void Enemy::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 void Enemy::shoot(glm::vec3 direction)
 {
 	glm::vec3 pos = model->getPosition();
-	pos.y += 5.0f;
+	pos.y += 2.0f;
 	bullets.emplace_back(new BasicBullet(pos, direction));
 }
 

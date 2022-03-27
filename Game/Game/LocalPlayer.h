@@ -17,7 +17,7 @@ public:
 
 private:
 	std::unique_ptr<Camera>& camera = Camera::getInstance();
-	const float SPEED = 3.5f;
+	const float SPEED = 10.0f; // 3.5f;
 	const float JUMP_SECONDS = 0.5f;
 	float JUMP_FORCE = 2000.0f;
 	const float FALL_FORCE = -1.0f;

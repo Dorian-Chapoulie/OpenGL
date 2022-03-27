@@ -109,6 +109,9 @@ void EZNgine::loop()
 		instancedShader.use();
 		base_application->loopInstancied(instancedShader, deltaTime);
 
+		animationShader.use();
+		base_application->loopAnimated(animationShader, deltaTime);
+
 
 #pragma region SKYBOX
 		glDepthFunc(GL_LEQUAL);
@@ -128,21 +131,21 @@ void EZNgine::loop()
 	glfwTerminate();
 }
 
-void EZNgine::setupShader()
+void EZNgine::setupShader(Shader& s)
 {
 	const glm::mat4 model = glm::mat4(1.0f);
 	const glm::mat4 view = localPlayer->getCamera()->getViewMatrix();
 
-	shader.use();
-	shader.setMatrix("model", model);
-	shader.setMatrix("view", view);
-	shader.setVec3("viewPos", localPlayer->getCamera()->getPosition());
-	shader.setMatrix("projection", projection);
+	s.use();
+	s.setMatrix("model", model);
+	s.setMatrix("view", view);
+	s.setVec3("viewPos", localPlayer->getCamera()->getPosition());
+	s.setMatrix("projection", projection);
 
-	shader.setVec3("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setVec3("material.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-	shader.setValue<float>("material.shininess", 100.0f);
+	s.setVec3("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+	s.setVec3("material.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+	s.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	s.setValue<float>("material.shininess", 100.0f);
 }
 
 void EZNgine::setupSkyBoxShader()
@@ -242,10 +245,11 @@ void EZNgine::init()
 	instancedShader = Shader("instancedVert.vert", "instancedFrag.frag");
 	skyboxShader = Shader("skybox.vert", "skybox.frag");
 	skybox = new SkyBox("../../textures/skybox");
-	//animationShader = Shader("./animation.vert", "./animation.frag");
+	animationShader = Shader("./animation.vert", "./animation.frag");
 
+	this->setupShader(animationShader);
+	this->setupShader(shader);
 	this->setupImGui();
-	this->setupShader();
 	this->setupSkyBoxShader();
 	this->setupSound();
 }

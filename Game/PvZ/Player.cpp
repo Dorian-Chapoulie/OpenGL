@@ -4,6 +4,7 @@
 
 #include "Enemy.h"
 #include "EZNgine.h"
+#include "Trigger.h"
 
 PlayerEntity::PlayerEntity(LocalPlayer* localPlayer)
 {
@@ -19,14 +20,20 @@ void PlayerEntity::onCollide(Entity* other)
 {
 	BasicBullet* bullet = dynamic_cast<BasicBullet*>(other);
 	const Enemy* enemy = dynamic_cast<Enemy*>(other);
+	Trigger* trigger = dynamic_cast<Trigger*>(other);
 	if (bullet)
 	{
 		bullet->state = ENTITY_STATE::DEAD;
+		applyDamage(bullet->getDamage());
 		std::cout << "Player collide with bullet" << std::endl;
 	}
 	else if (enemy)
 	{
 		std::cout << "Player collide with enemy" << std::endl;
+	}
+	else if (trigger)
+	{
+		trigger->onCollide(this);
 	}
 }
 
@@ -48,9 +55,9 @@ void PlayerEntity::shoot(btDiscreteDynamicsWorld* world)
 	const glm::vec3 vel = forward * power;
 
 	origin.y += 5.0f;
-	bullets.emplace_back(new BasicBullet(origin, vel));
+	bullets.emplace_back(new PlayerBullet(origin, vel));
 	bullets.back()->onInit(world);
-	//timeBuffer = 0;
+	timeBuffer = 0;
 }
 
 void PlayerEntity::removeBullet(int index)

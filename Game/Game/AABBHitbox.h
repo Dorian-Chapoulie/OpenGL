@@ -16,7 +16,7 @@ public:
 private:
 	std::array<glm::vec3, 2> getBiggestHitBox() const;
 	std::array<glm::vec3, 2> getMeshCenterAndSize(const std::vector<Vertex>& vertices) const;
-	void test();
+
 protected:
 	void setRotationAroundCenter(const float angle) override;
 	void setWorldTransform(const glm::vec3& position, const glm::quat& rot) override;
