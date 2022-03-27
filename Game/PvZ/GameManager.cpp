@@ -210,19 +210,48 @@ void GameManager::onInitialized(EZNgine* engine)
 		world->addRigidBody(rigidBody);
 	}
 
-	//actors.emplace_back(new Actor(new Model("../../models/erika/erika.dae", map->playerSpawnPoint, glm::vec3(0.05f), true)));
-	//actors.emplace_back(new Actor(new Model("../../models/gilbert/gilbert.dae", map->playerSpawnPoint, glm::vec3(0.05f), true)));
-	//actors.emplace_back(new Actor(new Model("../../models/karen/karen.dae", map->playerSpawnPoint, glm::vec3(0.05f), true)));
-	//actors.emplace_back(new Actor(new Model("../../models/orc/orc.dae", map->playerSpawnPoint, glm::vec3(0.05f), true)));
+	actors.emplace_back(new Actor(new Model("../../models/erika/erika.dae", { -70, 16.5f, 25 }, glm::vec3(0.2f), true)));
+	actors.emplace_back(new Actor(new Model("../../models/gilbert/gilbert.dae", { -121, 16, -120 }, glm::vec3(0.2f), true)));
+	actors.emplace_back(new Actor(new Model("../../models/karen/karen.dae", { -350, 16, -70 }, glm::vec3(0.2f), true)));
+	actors.emplace_back(new Actor(new Model("../../models/orc/orc.dae", { -225, 16.5f, -77 }, glm::vec3(0.2f), true)));
+
+	actors[0]->model->setRotation({ 0, 1, 0 }, glm::radians(-90.0f));
+	actors[2]->model->setRotation({ 0, 1, 0 }, glm::radians(90.0f));
+
+	irrklang::vec3df position(actors[0]->model->getPosition().x, actors[0]->model->getPosition().y, actors[0]->model->getPosition().z);
+	auto s = EZNgine::soundEngine->play3D(std::string("../../audio/ambiance/0.wav").c_str(), position, true, false, true);
+
 
 	std::thread t([&]()
 		{
+			int i = 0;
 			while (isPlaying)
 			{
+				i += 10;
 				for (Actor* a : actors)
 				{
 					a->animator->UpdateAnimation(0.05f);
 					std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				}
+				if (i == 100)
+				{
+					irrklang::vec3df position(actors[0]->model->getPosition().x, actors[0]->model->getPosition().y, actors[0]->model->getPosition().z);
+					EZNgine::soundEngine->play3D(std::string("../../audio/actors/erika.wav").c_str(), position);
+				}
+				else if (i == 200)
+				{
+					irrklang::vec3df position(actors[2]->model->getPosition().x, actors[2]->model->getPosition().y, actors[2]->model->getPosition().z);
+					EZNgine::soundEngine->play3D(std::string("../../audio/actors/karen.wav").c_str(), position);
+				}
+				else if (i == 300)
+				{
+					irrklang::vec3df position(actors[3]->model->getPosition().x, actors[3]->model->getPosition().y, actors[3]->model->getPosition().z);
+					EZNgine::soundEngine->play3D(std::string("../../audio/actors/orc.wav").c_str(), position);
+				}
+				else if (i == 400)
+				{
+					irrklang::vec3df position(actors[1]->model->getPosition().x, actors[1]->model->getPosition().y, actors[1]->model->getPosition().z);
+					EZNgine::soundEngine->play3D(std::string("../../audio/actors/zombie.wav").c_str(), position);
 				}
 			}
 		});
@@ -242,6 +271,12 @@ void GameManager::checkCollisions()
 		const btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
 		const btCollisionObject* obA = contactManifold->getBody0();
 		const btCollisionObject* obB = contactManifold->getBody1();
+
+		if (!obA || !obB)
+		{
+			std::cout << "avoid crash" << std::endl;
+			return;
+		}
 
 		Entity* entityA = static_cast<Entity*>(obA->getUserPointer());
 		Entity* entityB = static_cast<Entity*>(obB->getUserPointer());
@@ -333,8 +368,13 @@ void GameManager::initTrigers()
 
 	triggerTest = new Trigger([&](void* data)
 		{
+			irrklang::vec3df position(playerEntity->model->getPosition().x, playerEntity->model->getPosition().y, playerEntity->model->getPosition().z);
+			auto s = EZNgine::soundEngine->play3D(std::string("../../audio/trigger/2.mp3").c_str(), position, true, false, true);
+
+
 			if (boss == nullptr) {
 				boss = new Enemy({ -214.901, 135.939, 747.199 });
+				boss->setLife(500.0f);
 				for (auto* rigidBody : boss->model->getRigidBodys()) {
 					world->addRigidBody(rigidBody);
 				}
@@ -342,7 +382,7 @@ void GameManager::initTrigers()
 			else
 			{
 				boss->canShoot = true;
-				boss->setLife(100.0f);
+				boss->setLife(500.0f);
 				boss->model->setPosition({ -214.901, 135.939, 747.199 });
 			}
 			if (door == nullptr) {

@@ -25,7 +25,13 @@ void PlayerEntity::onCollide(Entity* other)
 	{
 		bullet->state = ENTITY_STATE::DEAD;
 		applyDamage(bullet->getDamage());
-		std::cout << "Player collide with bullet" << std::endl;
+		if (this->life <= 0)
+		{
+			playDeathSound();
+		}
+		else {
+			playHurtSound();
+		}
 	}
 	else if (enemy)
 	{
@@ -49,10 +55,23 @@ void PlayerEntity::shoot(btDiscreteDynamicsWorld* world)
 
 	const glm::vec3 cameraPos = EZNgine::localPlayer->getCamera()->getPosition();
 
-	constexpr  float power = -10.f;
+	constexpr  float power = -70.f;
 	const glm::vec3 forward = glm::mat3(glm::inverse(EZNgine::localPlayer->getCamera()->getViewMatrix())) * glm::vec3(0, 0, 1);
 	glm::vec3 origin = cameraPos + forward;
 	const glm::vec3 vel = forward * power;
+
+	srand(time(NULL));
+	int random = rand() % 2;
+
+	irrklang::vec3df position(model->getPosition().x, model->getPosition().y, model->getPosition().z);
+	if (random == 2)
+	{
+		EZNgine::soundEngine->play3D(std::string("../../audio/throw/" + std::to_string(random) + ".mp3").c_str(), position);
+	}
+	else
+	{
+		EZNgine::soundEngine->play3D(std::string("../../audio/throw/" + std::to_string(random) + ".wav").c_str(), position);
+	}
 
 	origin.y += 5.0f;
 	bullets.emplace_back(new PlayerBullet(origin, vel));
@@ -63,4 +82,20 @@ void PlayerEntity::shoot(btDiscreteDynamicsWorld* world)
 void PlayerEntity::removeBullet(int index)
 {
 	bullets.erase(bullets.begin() + index);
+}
+
+void PlayerEntity::playHurtSound()
+{
+	srand(time(NULL));
+	int random = rand() % 3;
+	irrklang::vec3df position(model->getPosition().x, model->getPosition().y, model->getPosition().z);
+	EZNgine::soundEngine->play3D(std::string("../../audio/hit/" + std::to_string(random) + ".wav").c_str(), position);
+}
+
+void PlayerEntity::playDeathSound()
+{
+	srand(time(NULL));
+	int random = rand() % 3;
+	irrklang::vec3df position(model->getPosition().x, model->getPosition().y, model->getPosition().z);
+	EZNgine::soundEngine->play3D(std::string("../../audio/death/" + std::to_string(random) + ".wav").c_str(), position);
 }

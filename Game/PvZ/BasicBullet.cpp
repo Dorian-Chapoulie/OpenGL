@@ -7,7 +7,7 @@ BasicBullet::BasicBullet(glm::vec3 position, glm::vec3 direction)
 	: direction(direction)
 {
 	weight = 1.0f;
-	MAX_LIFETIME = 5.0f;
+	MAX_LIFETIME = 20.0f;
 	setModel(new DynamicModel(filePath, position, weight, HitBoxFactory::AABB));
 }
 
@@ -23,14 +23,15 @@ void BasicBullet::onInit(btDiscreteDynamicsWorld* world)
 void BasicBullet::onCollide(Entity* other)
 {
 	PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(other);
-	const Enemy* enemy = dynamic_cast<Enemy*>(other);
+	Enemy* enemy = dynamic_cast<Enemy*>(other);
 	if (playerEntity)
 	{
 		playerEntity->applyDamage(this->damage);
+		playerEntity->playHurtSound();
 	}
 	else if (enemy)
 	{
-		std::cout << "Bullet collide with enemy" << std::endl;
+		enemy->playHurtSound();
 	}
 	state = ENTITY_STATE::DEAD;
 }
@@ -43,4 +44,12 @@ void BasicBullet::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 float BasicBullet::getDamage() const
 {
 	return damage;
+}
+
+void BasicBullet::playHurtSound()
+{
+}
+
+void BasicBullet::playDeathSound()
+{
 }

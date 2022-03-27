@@ -33,7 +33,7 @@ ModelData* SkeletalLoader::loadModel(const std::string& path)
 		{
 			if (data->hitboxesBones.find(key.name) == data->hitboxesBones.end())
 			{
-				std::cout << "missing bone: " << key.name << std::endl;
+				//std::cout << "missing bone: " << key.name << std::endl;
 			}
 		}
 	}

@@ -34,3 +34,11 @@ void Trigger::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 {
 	Entity::onUpdate(timeStamp, world);
 }
+
+void Trigger::playHurtSound()
+{
+}
+
+void Trigger::playDeathSound()
+{
+}

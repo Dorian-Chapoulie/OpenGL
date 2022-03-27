@@ -20,7 +20,7 @@ public:
 	static LocalPlayer* localPlayer;
 	Shader shader;
 
-	irrklang::ISoundEngine* soundEngine;
+	static irrklang::ISoundEngine* soundEngine;
 	btDiscreteDynamicsWorld* dynamicsWorld;
 	GLFWwindow* window = nullptr;
 	void loop();

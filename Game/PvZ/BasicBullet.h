@@ -11,6 +11,8 @@ public:
 	void onUpdate(double timeStamp, btDiscreteDynamicsWorld* world) override;
 
 	float getDamage() const;
+	void playHurtSound() override;
+	void playDeathSound() override;
 
 private:
 	const btVector3 customGravity = { 0.0f, 0.0f, 0.0f };

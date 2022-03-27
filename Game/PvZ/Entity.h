@@ -11,6 +11,9 @@ public:
 	virtual void onCollide(Entity* other);
 	virtual void onUpdate(double timeStamp, btDiscreteDynamicsWorld* world);
 
+	virtual void playHurtSound() = 0;
+	virtual void playDeathSound() = 0;
+
 	void setModel(Model* model);
 	float getMaxLifeTime() const;
 	float getLifeTime() const;
@@ -31,7 +34,7 @@ public:
 protected:
 	float MAX_LIFETIME = std::numeric_limits<float>::max();
 	float lifeTime = 0.0f;
-	float life = 20.0f;
+	float life = 100.0f;
 	float weight = 1.0f;
 };
 

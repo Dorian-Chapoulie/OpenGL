@@ -12,6 +12,7 @@ float mouseX = 0.0f, mouseY = 0.0f;
 
 LocalPlayer* EZNgine::localPlayer = nullptr;
 BaseApplication* EZNgine::base_application = nullptr;
+irrklang::ISoundEngine* EZNgine::soundEngine = nullptr;
 float EZNgine::WIDTH = 800.0f;
 float EZNgine::HEIGHT = 600.0f;
 bool EZNgine::FULLSCREEN = false;
@@ -159,9 +160,7 @@ void EZNgine::setupSkyBoxShader()
 void EZNgine::setupSound()
 {
 	soundEngine = irrklang::createIrrKlangDevice();
-	//SoundEngine->play2D("../../audio/quake/standard/prepare.mp3", false);
-	//irrklang::vec3df position(0.0f, 0.8f, -8.0f);
-	//SoundEngine->play3D("../../audio/quake/standard/monsterkill.mp3", position);
+	soundEngine->setSoundVolume(1.0f);
 }
 
 void EZNgine::setupOpenGl()

@@ -18,6 +18,9 @@ public:
 	void shoot(btDiscreteDynamicsWorld* world);
 	void removeBullet(int index);
 
+	void playHurtSound() override;
+	void playDeathSound() override;
+
 	std::vector<PlayerBullet*> bullets;
 private:
 	//float health = 100.0f;

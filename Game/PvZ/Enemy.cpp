@@ -35,6 +35,16 @@ void Enemy::onCollide(Entity* other)
 		if (playerBullet->state != ENTITY_STATE::DEAD) {
 			playerBullet->state = ENTITY_STATE::DEAD;
 			this->life -= bullet->getDamage();
+
+			if (this->life <= 0)
+			{
+				playDeathSound();
+			}
+			else
+			{
+				playHurtSound();
+			}
+
 		}
 	}
 	else if (bullet)
@@ -63,7 +73,7 @@ void Enemy::onUpdate(double timeStamp, btDiscreteDynamicsWorld* world)
 
 	if (timeBuffer >= fireRate && canShoot)
 	{
-		constexpr float projectilePower = 10.0f;
+		constexpr float projectilePower = 50.0f;
 		const glm::vec3 dir = glm::normalize(localPlayerPosition - model->getPosition()) * projectilePower;
 		shoot(dir);
 		bullets.back()->onInit(world);
@@ -82,4 +92,20 @@ void Enemy::shoot(glm::vec3 direction)
 void Enemy::removeBullet(int index)
 {
 	bullets.erase(bullets.begin() + index);
+}
+
+void Enemy::playHurtSound()
+{
+	srand(time(NULL));
+	int random = rand() % 3;
+	irrklang::vec3df position(model->getPosition().x, model->getPosition().y, model->getPosition().z);
+	EZNgine::soundEngine->play3D(std::string("../../audio/hit/" + std::to_string(random) + ".wav").c_str(), position);
+}
+
+void Enemy::playDeathSound()
+{
+	srand(time(NULL));
+	int random = rand() % 3;
+	irrklang::vec3df position(model->getPosition().x, model->getPosition().y, model->getPosition().z);
+	EZNgine::soundEngine->play3D(std::string("../../audio/death/" + std::to_string(random) + ".wav").c_str(), position);
 }

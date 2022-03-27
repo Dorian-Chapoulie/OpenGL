@@ -7,7 +7,7 @@ public:
 	PlayerBullet(const glm::vec3& position, const glm::vec3& direction)
 		: BasicBullet(position, direction)
 	{
-		this->damage = 50.0f;
+		this->damage = 20.0f;
 	}
 
 	void onInit(btDiscreteDynamicsWorld* world) override;

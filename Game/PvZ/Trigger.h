@@ -12,6 +12,8 @@ public:
 	void onInit(btDiscreteDynamicsWorld* world) override;
 	void onCollide(Entity* other) override;
 	void onUpdate(double timeStamp, btDiscreteDynamicsWorld* world) override;
+	void playHurtSound() override;
+	void playDeathSound() override;
 
 private:
 	std::function<void(void*)> onCollideWithPlayerCallback;
