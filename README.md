@@ -4,4 +4,4 @@ Work in progress
 
 # Demo
 (click to view the video)
-[![Watch the video](https://img.youtube.com/vi/Gam8jikpqRY/maxresdefault.jpg)](https://youtu.be/Gam8jikpqRY)
+[![Watch the video](https://i9.ytimg.com/vi/Yj77KmJ69Dk/mqdefault.jpg?sqp=CLybkpIG&rs=AOn4CLCa0PBW7iKSCKkfJ-n4KJgRoDHygA)](https://youtu.be/Yj77KmJ69Dk)
