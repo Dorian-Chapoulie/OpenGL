@@ -3,4 +3,5 @@ This is a C++/OpenGL 3D library
 Work in progress
 
 # Demo
-[![Watch the video](https://i9.ytimg.com/vi/Yj77KmJ69Dk/mqdefault.jpg?sqp=CLybkpIG&rs=AOn4CLCa0PBW7iKSCKkfJ-n4KJgRoDHygA)](https://youtu.be/Yj77KmJ69Dk)
+Video: 
+[![Watch the video](https://img.youtube.com/vi/Yj77KmJ69Dk/maxresdefault.jpg)](https://youtu.be/Yj77KmJ69Dk)
