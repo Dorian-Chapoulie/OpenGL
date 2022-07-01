@@ -91,6 +91,7 @@ std::vector<unsigned> Mesh::getIndices()
 	return indices;
 }
 
+//TODO: call this
 void Mesh::cleanUp()
 {
 	this->vertices.clear();

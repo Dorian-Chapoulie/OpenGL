@@ -121,7 +121,6 @@ void Model::draw(Shader& shader)
 void Model::draw(Shader& shader, Animator& animator, const glm::mat4 viewMatrix)
 {
 	shader.use();
-	shader.setMatrix("view", viewMatrix);
 	auto transforms = animator.GetFinalBoneMatrices();
 	for (int i = 0; i < transforms.size(); ++i) {
 		shader.setMatrix("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);

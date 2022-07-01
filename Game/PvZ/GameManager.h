@@ -1,24 +1,23 @@
 #pragma once
-#include "Actor.h"
 #include "BaseApplication.h"
-#include "Enemy.h"
-#include "EZNgine.h"
-#include "LevelDungeon.h"
-#include "Player.h"
-#include "Trigger.h"
 
 class GameManager : public BaseApplication
 {
 public:
+	GameManager(glm::mat4 projection);
 
-	GameManager(glm::mat4 proj);
-
-	void processInput(void* w) override;
 	void loop(Shader& shader, double timeStamp) override;
 	void loopInstancied(Shader& shader, double timeStamp) override;
 	void loopAnimated(Shader& shader, double timeStamp) override;
+	void processInput(void* window) override;
 	void onInitialized(EZNgine* engine) override;
-	void manageEntity(Entity* e, double timeStamp, Shader& shader, bool shouldDraw = false);
+
+private:
+	bool forward = false, backward = false, left = false, right = false, jump = false;
+	glm::mat4 projection;
+};
+
+/*	void manageEntity(Entity* e, double timeStamp, Shader& shader, bool shouldDraw = false);
 
 	void checkCollisions();
 	void checkLifeTime(Entity* e);
@@ -58,4 +57,4 @@ private:
 	Enemy* boss = nullptr;
 
 	std::vector<Actor*> actors;
-};
+*/

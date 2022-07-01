@@ -13,9 +13,9 @@ float mouseX = 0.0f, mouseY = 0.0f;
 LocalPlayer* EZNgine::localPlayer = nullptr;
 BaseApplication* EZNgine::base_application = nullptr;
 irrklang::ISoundEngine* EZNgine::soundEngine = nullptr;
-float EZNgine::WIDTH = 800.0f;
-float EZNgine::HEIGHT = 600.0f;
-bool EZNgine::FULLSCREEN = false;
+int WIDTH = 800;
+int HEIGHT = 600;
+bool FULLSCREEN = false;
 
 EZNgine::EZNgine(const glm::mat4 projection, BaseApplication* base_application)
 	: projection(projection)
@@ -105,12 +105,15 @@ void EZNgine::loop()
 		base_application->processInput(window);
 
 		shader.use();
+		shader.setVec3("viewPos", EZNgine::localPlayer->getCamera()->getPosition());
+		shader.setMatrix("view", EZNgine::localPlayer->getCamera()->getViewMatrix());
 		base_application->loop(shader, deltaTime);
 
 		instancedShader.use();
 		base_application->loopInstancied(instancedShader, deltaTime);
 
 		animationShader.use();
+		animationShader.setMatrix("view", EZNgine::localPlayer->getCamera()->getViewMatrix());
 		base_application->loopAnimated(animationShader, deltaTime);
 
 
@@ -213,7 +216,7 @@ void EZNgine::setupBulletPhysics()
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(debugDraw);
+	dynamicsWorld->setDebugDrawer(debugDraw);
 }
 
 void EZNgine::setupImGui()
@@ -223,6 +226,13 @@ void EZNgine::setupImGui()
 	ImGui_ImplOpenGL3_Init("#version 330");
 	ImGui::StyleColorsDark();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+}
+
+void EZNgine::setupLight()
+{
+	shader.use();
+	constexpr glm::vec3 white = glm::vec3(1.0f, 1.0f, 1.0f);
+	defaultLight = new Light(&shader, glm::vec3(0.f, 5.0f, 0.f), white);
 }
 
 void EZNgine::promptFps(int& nbFrames, double& lastTime)
@@ -238,16 +248,18 @@ void EZNgine::promptFps(int& nbFrames, double& lastTime)
 
 void EZNgine::init()
 {
-	EZNgine::localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(0.0f, 6.0f, 0.0f));
+	EZNgine::localPlayer = new LocalPlayer("../../models/cube/cube.obj", glm::vec3(0.0f, 0.0f, 0.0f));
 
 	shader = Shader("vertex.vert", "fragment.frag");
-	instancedShader = Shader("instancedVert.vert", "instancedFrag.frag");
 	skyboxShader = Shader("skybox.vert", "skybox.frag");
-	skybox = new SkyBox("../../textures/skybox");
 	animationShader = Shader("./animation.vert", "./animation.frag");
+	instancedShader = Shader("instancedVert.vert", "instancedFrag.frag");
+	skybox = new SkyBox("../../textures/skybox");
+
 
 	this->setupShader(animationShader);
 	this->setupShader(shader);
+	this->setupLight();
 	this->setupImGui();
 	this->setupSkyBoxShader();
 	this->setupSound();

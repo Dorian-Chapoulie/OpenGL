@@ -27,16 +27,16 @@ ModelData* SkeletalLoader::loadModel(const std::string& path)
 
 	processNode(scene->mRootNode, scene);
 
-	if (data->hitboxesBones.size() < bonesHitboxNames.size())
+	/*if (data->hitboxesBones.size() < bonesHitboxNames.size())
 	{
 		for (const auto& key : bonesHitboxNames)
 		{
 			if (data->hitboxesBones.find(key.name) == data->hitboxesBones.end())
 			{
-				//std::cout << "missing bone: " << key.name << std::endl;
+				std::cout << "missing bone: " << key.name << std::endl;
 			}
 		}
-	}
+	}*/
 	cache[path] = *data;
 	return data;
 }

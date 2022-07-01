@@ -28,6 +28,11 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
 			format = GL_RGBA;
 			storedFormat = GL_COMPRESSED_RGBA;
 		}
+		else
+		{
+			std::cout << "usupported format" << std::endl;
+			throw "Unsupported format";
+		}
 
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
