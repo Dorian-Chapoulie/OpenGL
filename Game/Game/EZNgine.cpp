@@ -91,6 +91,16 @@ void EZNgine::loop()
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+#pragma region SKYBOX
+		glDepthFunc(GL_LEQUAL);
+		skyboxShader.use();
+		glm::mat4 view = glm::mat4(glm::mat3(localPlayer->getCamera()->getViewMatrix()));
+		skyboxShader.setMatrix("view", view);
+		skyboxShader.setMatrix("projection", projection);
+		skybox->draw();
+#pragma endregion
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -116,15 +126,6 @@ void EZNgine::loop()
 		animationShader.setMatrix("view", EZNgine::localPlayer->getCamera()->getViewMatrix());
 		base_application->loopAnimated(animationShader, deltaTime);
 
-
-#pragma region SKYBOX
-		glDepthFunc(GL_LEQUAL);
-		skyboxShader.use();
-		glm::mat4 view = glm::mat4(glm::mat3(localPlayer->getCamera()->getViewMatrix()));
-		skyboxShader.setMatrix("view", view);
-		skyboxShader.setMatrix("projection", projection);
-		skybox->draw();
-#pragma endregion
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
@@ -192,13 +193,18 @@ void EZNgine::setupOpenGl()
 
 
 	glfwSetFramebufferSizeCallback(window, &EZNgine::framebuffer_size_callback);
+	//TODO: add isTransparent and disable cullFace when drawing it (with materials ?)
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
+	//glDisable(GL_DEPTH_TEST);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, &EZNgine::mouse_callback);
 	glfwSetScrollCallback(window, &EZNgine::scroll_callback);
 	glfwSetCursorPos(window, WIDTH / 2.0f, HEIGHT / 2.0f);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void EZNgine::setupBulletPhysics()
@@ -216,7 +222,7 @@ void EZNgine::setupBulletPhysics()
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(debugDraw);
+	//dynamicsWorld->setDebugDrawer(debugDraw);
 }
 
 void EZNgine::setupImGui()
@@ -232,7 +238,7 @@ void EZNgine::setupLight()
 {
 	shader.use();
 	constexpr glm::vec3 white = glm::vec3(1.0f, 1.0f, 1.0f);
-	defaultLight = new Light(&shader, glm::vec3(0.f, 5.0f, 0.f), white);
+	defaultLight = new Light(&shader, glm::vec3(0.f, 30.0f, 0.f), white);
 }
 
 void EZNgine::promptFps(int& nbFrames, double& lastTime)
