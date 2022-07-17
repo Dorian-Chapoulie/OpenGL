@@ -9,6 +9,7 @@
 
 ///IMPORTANT: model.setRotation => ok
 ///			 dinamic => pas ok, remplacer par getHitbox.setRotationAroundCenter
+///TODO: setup materials in models
 
 GameManager::GameManager(glm::mat4 proj) : projection(proj)
 {
@@ -82,7 +83,7 @@ void GameManager::onInitialized(EZNgine* engine)
 	demoLevel = new DemoLevel(engine->shader);
 
 	btDiscreteDynamicsWorld* dynamicsWorld = engine->dynamicsWorld;
-	cube = new StaticModel("../../models/cube/cube.obj", glm::vec3(-10.0f, 5.0f, 0.0f), HitBoxFactory::AABB);
+	cube = new StaticModel("../../models/cube/cube_2.obj", glm::vec3(-10.0f, 5.0f, 0.0f), HitBoxFactory::AABB);
 	animatedModel = new StaticModel("../../models/manequin/manequin_3.fbx", glm::vec3(10.0f, 3.0f, 10.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	EZNgine::localPlayer->getModel()->setPosition(demoLevel->playerSpawnPoint);
 
