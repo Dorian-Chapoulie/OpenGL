@@ -7,10 +7,8 @@
 #include "EZNgine.h"
 #include "StaticModel.h"
 
-StaticModel* model = nullptr;
-StaticModel* model3 = nullptr;
-Animator* animator = nullptr;
-float deltaTest = 0.0f;
+///IMPORTANT: model.setRotation => ok
+///			 dinamic => pas ok, remplacer par getHitbox.setRotationAroundCenter
 
 GameManager::GameManager(glm::mat4 proj) : projection(proj)
 {
@@ -18,14 +16,15 @@ GameManager::GameManager(glm::mat4 proj) : projection(proj)
 
 void GameManager::loop(Shader& shader, double timeStamp)
 {
-	deltaTest = timeStamp;
+	currentTimestamp = timeStamp;
 	std::unique_ptr<Camera>& cam = EZNgine::localPlayer->getCamera();
 	EZNgine::localPlayer->move(forward, backward, left, right, jump, timeStamp);
 	EZNgine::localPlayer->setCameraPosition(EZNgine::localPlayer->getModel()->getPosition());
 	EZNgine::localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
+	demoLevel->draw();
 	EZNgine::localPlayer->draw(shader);
-	model->draw(shader);
+	cube->draw(shader);
 }
 
 void GameManager::loopInstancied(Shader& shader, double timeStamp)
@@ -34,7 +33,7 @@ void GameManager::loopInstancied(Shader& shader, double timeStamp)
 
 void GameManager::loopAnimated(Shader& shader, double timeStamp)
 {
-	model3->draw(shader, *animator, EZNgine::localPlayer->getCamera()->getViewMatrix());
+	animatedModel->draw(shader, *animator, EZNgine::localPlayer->getCamera()->getViewMatrix());
 }
 
 void GameManager::processInput(void* w) {
@@ -80,40 +79,36 @@ void GameManager::processInput(void* w) {
 
 void GameManager::onInitialized(EZNgine* engine)
 {
+	demoLevel = new DemoLevel(engine->shader);
+
 	btDiscreteDynamicsWorld* dynamicsWorld = engine->dynamicsWorld;
-	model = new StaticModel("../../models/floor_2/floor.obj", glm::vec3(0.0f, -5.0f, 0.0f), HitBoxFactory::AABB, glm::vec3(1.0f), false);
-	model3 = new StaticModel("../../models/manequin/manequin_3.fbx", glm::vec3(0.0f, 5.0f, -5.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
-	EZNgine::localPlayer->getModel()->setPosition({ 0.0f, 0.0f, 0.0f });
+	cube = new StaticModel("../../models/cube/cube.obj", glm::vec3(0.0f, 0.0f, 0.0f), HitBoxFactory::AABB);
+	animatedModel = new StaticModel("../../models/manequin/manequin_3.fbx", glm::vec3(10.0f, 3.0f, 10.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	EZNgine::localPlayer->getModel()->setPosition(demoLevel->playerSpawnPoint);
 
 	for (auto* rigidBody : EZNgine::localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
-	for (auto* rigidBody : model3->getRigidBodys()) {
+	for (auto* rigidBody : cube->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
-	for (auto* rigidBody : model->getRigidBodys()) {
+	for (auto* rigidBody : animatedModel->getRigidBodys()) {
+		dynamicsWorld->addRigidBody(rigidBody);
+	}
+	for (auto* rigidBody : demoLevel->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 
-	animator = new Animator(model3->getAnimation(), model3);
+	animator = new Animator(animatedModel->getAnimation(), animatedModel);
 
 	std::thread t([&]()
 		{
-			int dx = 1;
-			float i = 0;
-			//model3.setPosition(glm::vec3(0, 10, 0));
-			//model3.setRotation(glm::vec3(0, 1, 0), 90.0f);
-
+			float angle = 0;
 			while (true) {
-				model3->setRotation(glm::vec3(0, 1, 0), i += 0.01f);
-				animator->UpdateAnimation(deltaTest * 20.0f);
+				angle += 0.01f;
+				animatedModel->getHitBox()->setRotationAroundCenter(angle * 20.0f);
+				animator->UpdateAnimation(currentTimestamp * 20.0f);
 			}
 		});
 	t.detach();
 }
-
-/*
-void GameManager::setWindow(GLFWwindow* window)
-{
-	this->window = window;
-}*/

@@ -24,6 +24,7 @@
     <ProjectGuid>{78f72e87-c52c-45d4-905f-38a459717797}</ProjectGuid>
     <RootNamespace>PvZ</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Demo</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -150,25 +151,13 @@ copy /Y "$(SolutionDir)\..\dependencies\dll\irrKlang.dll" "$(TargetDir)"</Comman
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actor.cpp" />
-    <ClCompile Include="BasicBullet.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="DemoLevel.cpp" />
     <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="Source.cpp" />
-    <ClCompile Include="Trigger.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actor.h" />
-    <ClInclude Include="BasicBullet.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="Entity.h" />
+    <ClInclude Include="DemoLevel.h" />
     <ClInclude Include="GameManager.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerBullet.h" />
-    <ClInclude Include="Trigger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

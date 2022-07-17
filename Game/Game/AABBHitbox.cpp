@@ -100,7 +100,7 @@ std::array<glm::vec3, 2> AABBHitbox::getMeshCenterAndSize(const std::vector<Vert
 
 	return std::array<glm::vec3, 2> { {size, center} };
 }
-
+//TODO: pass angle vector as parameter instead of hardcoded (0,1,0)
 void AABBHitbox::setRotationAroundCenter(const float angle)
 {
 	centerRotation = glm::radians(angle);

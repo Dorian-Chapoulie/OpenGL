@@ -189,9 +189,6 @@
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="LevelDungeon.cpp">
-      <Filter>level</Filter>
-    </ClCompile>
     <ClCompile Include="EZNgine.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -331,9 +328,6 @@
     </ClInclude>
     <ClInclude Include="imgui\imgui_impl_opengl3_loader.h">
       <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelDungeon.h">
-      <Filter>level</Filter>
     </ClInclude>
     <ClInclude Include="EZNgine.h">
       <Filter>Fichiers d%27en-tête</Filter>

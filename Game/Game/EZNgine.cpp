@@ -216,7 +216,7 @@ void EZNgine::setupBulletPhysics()
 	GLDebugDrawer* debugDraw = new GLDebugDrawer();
 	debugDraw->DBG_DrawWireframe;
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(debugDraw);
+	//dynamicsWorld->setDebugDrawer(debugDraw);
 }
 
 void EZNgine::setupImGui()
