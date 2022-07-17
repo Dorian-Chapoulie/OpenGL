@@ -337,40 +337,46 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.frag">
+    <None Include="..\..\shaders\animation.frag">
       <Filter>shaders\fragment</Filter>
     </None>
-    <None Include="vertex.vert">
+    <None Include="..\..\shaders\fragment.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="..\..\shaders\instancedFrag.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="..\..\shaders\light.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="..\..\shaders\line.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="..\..\shaders\particles.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="..\..\shaders\skybox.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="..\..\shaders\vertex.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="skybox.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
-    <None Include="skybox.vert">
+    <None Include="..\..\shaders\skybox.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="animation.vert">
+    <None Include="..\..\shaders\particles.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="animation.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
-    <None Include="line.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
-    <None Include="line.vert">
+    <None Include="..\..\shaders\line.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="light.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
-    <None Include="light.vert">
+    <None Include="..\..\shaders\light.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="instancedFrag.frag">
-      <Filter>shaders\fragment</Filter>
+    <None Include="..\..\shaders\instancedVert.vert">
+      <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="instancedVert.vert">
+    <None Include="..\..\shaders\animation.vert">
       <Filter>shaders\vertex</Filter>
     </None>
   </ItemGroup>
