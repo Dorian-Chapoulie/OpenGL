@@ -174,6 +174,7 @@ void EZNgine::setupOpenGl()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_REFRESH_RATE, 144);
+	glfwWindowHint(GLFW_SAMPLES, 8);
 
 	window = glfwCreateWindow(WIDTH, HEIGHT, "EZNGINE", FULLSCREEN ? glfwGetPrimaryMonitor() : NULL, NULL);
 	if (window == NULL)
@@ -205,6 +206,7 @@ void EZNgine::setupOpenGl()
 	glfwSetCursorPos(window, WIDTH / 2.0f, HEIGHT / 2.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_MULTISAMPLE);
 }
 
 void EZNgine::setupBulletPhysics()
