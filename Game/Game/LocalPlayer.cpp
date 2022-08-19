@@ -57,6 +57,8 @@ void LocalPlayer::move(bool forward, bool backward, bool left, bool right, bool 
 	const float compensation = (1.0f + delta);
 	moveVector *= SPEED * compensation;
 
+	if (jump && canJump) isJumping = true;
+
 	for (auto* rigidBody : getModel()->getRigidBodys()) {
 		rigidBody->activate();
 		rigidBody->setLinearVelocity(btVector3(
@@ -64,10 +66,10 @@ void LocalPlayer::move(bool forward, bool backward, bool left, bool right, bool 
 			0,
 			moveVector.z
 		));
-		if (jump && canJump) {
+		if (isJumping) {
 			rigidBody->applyCentralForce(btVector3(
 				moveVector.x,
-				(jump && canJump) ? JUMP_FORCE : 0.0f,
+				JUMP_FORCE,
 				moveVector.z
 			));
 		}

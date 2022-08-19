@@ -3,6 +3,7 @@
 #include "AABBMultipleHitBox.h"
 #include "SkeletalHitbox.h"
 #include "TriangleHitbox.h"
+#include "CapsuleHitbox.h"
 
 HitBoxFactory* HitBoxFactory::instance = nullptr;
 
@@ -24,6 +25,8 @@ IHitBox* HitBoxFactory::getHitBoxes(TYPE type)
 		return new TriangleHitbox();
 	case SKELETAL:
 		return new SkeletalHitbox();
+	case CAPSULE:
+		return new CapsuleHitbox();
 	default:
 	case NONE:
 		return nullptr;

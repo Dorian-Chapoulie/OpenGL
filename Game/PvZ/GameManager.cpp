@@ -15,26 +15,27 @@ GameManager::GameManager(glm::mat4 proj) : projection(proj)
 {
 }
 
-void GameManager::loop(Shader& shader, double timeStamp)
+void GameManager::loop(Shader& shader, double frameTime)
 {
-	currentTimestamp = timeStamp;
+	currentTimestamp += frameTime;
 	std::unique_ptr<Camera>& cam = EZNgine::localPlayer->getCamera();
-	EZNgine::localPlayer->move(forward, backward, left, right, jump, timeStamp);
+	EZNgine::localPlayer->move(forward, backward, left, right, jump, frameTime);
 	EZNgine::localPlayer->setCameraPosition(EZNgine::localPlayer->getModel()->getPosition());
 	EZNgine::localPlayer->getModel()->getHitBox()->setRotationAroundCenter(-cam->getYaw() + cam->getDefaultYaw());
 
+	checkPlayerFloorColision(frameTime);
+
 	demoLevel->draw();
 	EZNgine::localPlayer->draw(shader);
-	cube->draw(shader);
 }
 
-void GameManager::loopInstancied(Shader& shader, double timeStamp)
+void GameManager::loopInstancied(Shader& shader, double frameTime)
 {
 }
 
-void GameManager::loopAnimated(Shader& shader, double timeStamp)
+void GameManager::loopAnimated(Shader& shader, double frameTime)
 {
-	animatedModel->draw(shader, *animator, EZNgine::localPlayer->getCamera()->getViewMatrix());
+	//animatedModel->draw(shader, *animator, EZNgine::localPlayer->getCamera()->getViewMatrix());
 }
 
 void GameManager::processInput(void* w) {
@@ -76,33 +77,34 @@ void GameManager::processInput(void* w) {
 	}
 
 	jump = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+	if (jump && EZNgine::localPlayer->canJump) {
+		EZNgine::localPlayer->lastJumpTimeStamp = currentTimestamp;
+	}
 }
 
 void GameManager::onInitialized(EZNgine* engine)
 {
 	demoLevel = new DemoLevel(engine->shader);
+	dynamicsWorld = engine->dynamicsWorld;
 
 	btDiscreteDynamicsWorld* dynamicsWorld = engine->dynamicsWorld;
-	cube = new StaticModel("../../models/cube/cube_2.obj", glm::vec3(-10.0f, 5.0f, 0.0f), HitBoxFactory::AABB);
-	animatedModel = new StaticModel("../../models/manequin/manequin_3.fbx", glm::vec3(10.0f, 3.0f, 10.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
+	//cube = new StaticModel("../../models/cube/cube_2.obj", glm::vec3(-10.0f, 5.0f, 0.0f), HitBoxFactory::AABB);
+	//animatedModel = new StaticModel("../../models/manequin/manequin_3.fbx", glm::vec3(10.0f, 3.0f, 10.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	EZNgine::localPlayer->getModel()->setPosition(demoLevel->playerSpawnPoint);
 
 	for (auto* rigidBody : EZNgine::localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
-	for (auto* rigidBody : cube->getRigidBodys()) {
+	/*for (auto* rigidBody : cube->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
-	}
-	for (auto* rigidBody : animatedModel->getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
-	}
+	}*/
 	for (auto* rigidBody : demoLevel->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
 
-	animator = new Animator(animatedModel->getAnimation(), animatedModel);
+	//animator = new Animator(animatedModel->getAnimation(), animatedModel);
 
-	std::thread t([&]()
+	/*std::thread t([&]()
 		{
 			float angle = 0;
 			while (true) {
@@ -111,5 +113,45 @@ void GameManager::onInitialized(EZNgine* engine)
 				animator->UpdateAnimation(currentTimestamp * 20.0f);
 			}
 		});
-	t.detach();
+	t.detach();*/
+}
+
+void GameManager::checkPlayerFloorColision(double frameTime)
+{
+	const auto lp = EZNgine::localPlayer;
+	const btVector3 playerPosition = { lp->getPosition().x, lp->getPosition().y, lp->getPosition().z };
+	const btVector3 playerPosDownVect = { lp->getPosition().x, lp->getPosition().y - 5.0f, lp->getPosition().z };
+
+	if (!raycastWorld(playerPosition, playerPosDownVect)) //rien en dessous des pieds 
+	{
+		if (currentTimestamp >= lp->lastJumpTimeStamp + lp->JUMP_TIME) {
+			lp->lastJumpTimeStamp = 0;
+			lp->isJumping = false;
+		}
+		lp->canJump = false;
+		btVector3 gravity = btVector3(0, GRAVITY_Y, 0);
+		for (auto* rigidBody : lp->getModel()->getRigidBodys()) {
+			if (rigidBody->getGravity().getY() != GRAVITY_Y) {
+				rigidBody->setGravity(gravity);
+			}
+		}
+	}
+	else //walking
+	{
+		lp->canJump = true;
+		btVector3 gravity = btVector3(0, 0, 0);
+		for (auto* rigidBody : lp->getModel()->getRigidBodys()) {
+			if (rigidBody->getGravity().getY() != 0) {
+				rigidBody->setGravity(gravity);
+			}
+		}
+	}
+}
+
+bool GameManager::raycastWorld(btVector3 Start, btVector3 End) {
+
+	btCollisionWorld::ClosestRayResultCallback RayCallback(Start, End);
+	RayCallback.m_collisionFilterMask = btBroadphaseProxy::AllFilter;
+	dynamicsWorld->rayTest(Start, End, RayCallback);
+	return RayCallback.hasHit();
 }

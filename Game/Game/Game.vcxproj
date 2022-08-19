@@ -185,6 +185,7 @@
     <ClCompile Include="SkeletalHitbox.cpp" />
     <ClCompile Include="SkeletalLoader.cpp" />
     <ClCompile Include="SkyBox.cpp" />
+    <ClCompile Include="CapsuleHitbox.cpp" />
     <ClCompile Include="StaticModel.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="SkeletalHitbox.h" />
     <ClInclude Include="SkeletalLoader.h" />
     <ClInclude Include="SkyBox.h" />
+    <ClInclude Include="CapsuleHitbox.h" />
     <ClInclude Include="StaticModel.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />

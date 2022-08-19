@@ -2,14 +2,14 @@
 
 DemoLevel::DemoLevel(Shader& shader) : Level(shader)
 {
-	glm::vec3 scale = glm::vec3(20.0f);
-	this->model = new StaticModel("../../maps/demomap.obj", position, hitboxType, scale);
+	glm::vec3 scale = glm::vec3(1.0f);
+	this->model = new StaticModel("../../maps/plateformer/Low Poly Tree House/house.obj", position, hitboxType, scale);
 	init();
 }
 
 void DemoLevel::init()
 {
-	playerSpawnPoint = { 0, 0, 0 };
+	playerSpawnPoint = { -40.0f, 251.0f, -17.0f };
 	lights = loadLights();
 }
 

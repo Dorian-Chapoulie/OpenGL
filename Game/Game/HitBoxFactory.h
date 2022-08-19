@@ -14,6 +14,7 @@ public:
 		AABB_MULTIPLE,
 		TRIANGLE,
 		SKELETAL,
+		CAPSULE,
 		NONE,
 	};
 

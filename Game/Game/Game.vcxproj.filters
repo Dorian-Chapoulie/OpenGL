@@ -195,6 +195,9 @@
     <ClCompile Include="BaseApplication.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="CapsuleHitbox.cpp">
+      <Filter>hitbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -334,6 +337,9 @@
     </ClInclude>
     <ClInclude Include="BaseApplication.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="CapsuleHitbox.h">
+      <Filter>hitbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
