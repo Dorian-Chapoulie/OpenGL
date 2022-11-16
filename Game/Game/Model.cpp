@@ -175,6 +175,7 @@ void Model::setPosition(const glm::vec3& position)
 
 void Model::setRotation(const glm::vec3& rotationAxis, float angle)
 {
+	//TODO: rotation pair (axis <=> angle)
 	rotationY = angle;
 	this->rotation = rotationAxis;
 	this->modelMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale) * glm::rotate(glm::mat4(1.0f), angle, rotationAxis);

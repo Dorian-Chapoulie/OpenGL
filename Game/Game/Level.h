@@ -10,7 +10,7 @@ public:
 
 	virtual void init() = 0;
 	virtual std::vector<Light*> loadLights();
-	void draw() const;
+	virtual void draw() const;
 
 	Model* getModel();
 	std::vector<Light*>& getLights();

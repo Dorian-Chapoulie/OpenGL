@@ -25,6 +25,7 @@ void GameManager::loop(Shader& shader, double frameTime)
 
 	checkPlayerFloorColision(frameTime);
 
+	demoLevel->animatePlateforms(currentTimestamp);
 	demoLevel->draw();
 	EZNgine::localPlayer->draw(shader);
 }
@@ -88,18 +89,19 @@ void GameManager::onInitialized(EZNgine* engine)
 	dynamicsWorld = engine->dynamicsWorld;
 
 	btDiscreteDynamicsWorld* dynamicsWorld = engine->dynamicsWorld;
-	//cube = new StaticModel("../../models/cube/cube_2.obj", glm::vec3(-10.0f, 5.0f, 0.0f), HitBoxFactory::AABB);
-	//animatedModel = new StaticModel("../../models/manequin/manequin_3.fbx", glm::vec3(10.0f, 3.0f, 10.0f), HitBoxFactory::AABB, glm::vec3(0.05f), true);
 	EZNgine::localPlayer->getModel()->setPosition(demoLevel->playerSpawnPoint);
 
 	for (auto* rigidBody : EZNgine::localPlayer->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
 	}
-	/*for (auto* rigidBody : cube->getRigidBodys()) {
-		dynamicsWorld->addRigidBody(rigidBody);
-	}*/
 	for (auto* rigidBody : demoLevel->getModel()->getRigidBodys()) {
 		dynamicsWorld->addRigidBody(rigidBody);
+	}
+
+	for (auto* model : demoLevel->plateforms) {
+		for (auto* rigidBody : model->getRigidBodys()) {
+			dynamicsWorld->addRigidBody(rigidBody);
+		}
 	}
 
 	//animator = new Animator(animatedModel->getAnimation(), animatedModel);

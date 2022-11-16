@@ -64,6 +64,7 @@ std::vector<btRigidBody*>& TriangleHitbox::generateHitBoxes(Model* model)
 		);
 		rigidBodys.emplace_back(new btRigidBody(rigidBodyConstructionInfo));
 		rigidBodys.back()->setUserPointer((void*)index);
+		rigidBodys.back()->setFriction(0.5f);
 
 		auto* physicsRigidBody = rigidBodys.back();
 		btTransform tr;

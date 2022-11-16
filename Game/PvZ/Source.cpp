@@ -1,7 +1,7 @@
 #include "EZNgine.h"
 #include "GameManager.h"
 
-#define DRAW_DISTANCE 500.0f
+#define DRAW_DISTANCE 5000.0f
 #define FOV 70.0f
 
 //TODO: set engine WIDTH HEIGHT FULLSCREEN

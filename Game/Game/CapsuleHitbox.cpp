@@ -41,6 +41,7 @@ std::vector<btRigidBody*>& CapsuleHitbox::generateHitBoxes(Model* model)
 	rigidBodys.back()->setCollisionFlags(rigidBodys.back()->getCollisionFlags() /* | btCollisionObject::CF_NO_CONTACT_RESPONSE*/);
 	rigidBodys.back()->setMotionState(new MyMotionState(model, transform));
 	rigidBodys.back()->setCenterOfMassTransform(transform);
+	rigidBodys.back()->setFriction(0.5f);
 	//TODO: find best way
 	rigidBodys.back()->setActivationState(DISABLE_DEACTIVATION);
 

@@ -1,7 +1,7 @@
-# Blender MTL File: 'map.blend'
+# Blender MTL File: 'None'
 # Material Count: 1
 
-newmtl mat20
+newmtl mat20.004
 Ns 0.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.190000 0.090000 0.060000
@@ -10,3 +10,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 1
+map_Kd brown.jpg
